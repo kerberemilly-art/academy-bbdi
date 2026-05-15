@@ -1,0 +1,130 @@
+
+
+Diferença de uma bateria e de uma fonte.
+Muitas vezes uma pessoa leiga pode acabar confundindo ou não sabendo bem a diferença entre 
+uma bateria e uma fonte. Para que se possa entender vamos exemplificar do que se trata cada 
+produto á partir das sua função.
+BATERIAS
+Sua função é armazenar energia 
+para o momento em que o 
+notebook não estiver conectado 
+mais a energiaFONTES
+A função básica de uma fonte é fazer a 
+conversão da energia de corrente 
+alternada (110V / 240V ) para a corrente 
+contínua, a qual é a necessária ao 
+equipamento (12V á 24V).
+
+Identificando uma bateria de notebook
+Atualmente temos dois tipos de baterias disponíveis no mercado: As baterias internas e as 
+baterias externas .
+Bateria Externa
+(Li-Ion)Bateria Interna
+(Li-PO)
+1) Os modelos externos que são os mais antigos e conhecidos pela facilidade da retirada 
+da  bateria, apenas puxando as travas que a seguram no compartimento.
+2) Já os modelos internos são modelo onde na grande maioria dos casos é necessário a 
+retirada da tampa traseira do equipamento para poder acessar a bateria.
+
+Apesar de ambos os modelos terem o mesmo elemento interno (Li -ion) a diferença esta na forma 
+como este elemento é armazenado. 
+Nos modelos internos são armazenados em células cilíndricas (parecendo pilhas) enquanto que no 
+modelos internos são em “bags” ou bolsas plásticas mais maleáveis e finas. 
+Li-Ion
+Células CilíndricasLi-PO
+Células chatas
+
+
+Características de uma bateria:
+1) Voltagem
+A tensão da bateria, mas conhecida como voltagem esta ligado a quantidade 
+de células que esta bateria tem, irá varia entre 7.4V e 15.2V
+2) Amperagem
+A amperagem é a capacidade de carga total da bateria, quanto maior 
+for esta unidade, maior será a autonomia deste produto.
+3) Watts
+O Watts é a potência total da bateria , para as bateria esta unidade é o 
+Wh (watts/hora).
+4) Part number
+É o código que identifica a bateria . Por esta nomenclatura é possível 
+identificar o formato da bateria, seu encaixe e os modelos de notebooks 
+no qual ela é compatível.1 243
+
+V x mAh = Wh
+Fórmula base para descobrir as informações de uma bateia.
+VoltagemAmperagem
+Watts
+Exemplo:
+Se uma bateria possui 6600mAh, e10.8 Volts basta multiplicar ambos os 
+valores obtendo assim 72Wh , sempre arredondamos os valores
+
+Como identificar a bateria á partir do modelo do notebook.
+Primeiramente precisamos identificar o modelo do notebook. Temos duas formas de conseguir esta informação.
+Através do sistema operacional , faça o seguinte:
+1) Segure a tecla Windows (com o logo) e pressionar 
+a tecla R para abrir o menu "Executar“
+2) Digite então " dxdiag " (sem aspas) para abrir a 
+Ferramenta de Diagnósticos do DirectX . 
+Nessa tela estará disponível a informação 
+sobre modelo do seu notebook.
+
+
+Como identificar a bateria á partir do modelo do notebook.
+Através do próprio notebook
+Uma das maneiras mais fáceis de checar qual o modelo 
+do seu notebook é simplesmente procurando no próprio 
+aparelho. 
+A maioria dos notebooks possuem etiquetas na parte 
+de baixo com informações sobre o modelo, sistema 
+operacional, número serial e mais.
+De posse desta informação pode -se fazer uma pesquisa 
+em nosso site ou em sites próximos para identificar a 
+bateria que este equipamento utiliza.
+
+Como pesquisar pelo site da Bbbaterias.com
+Há dois caminhos que podem se utilizar para identificar um 
+produto em nosso site.
+•Colocando o modelo diretamente no campo de pesquisa do 
+site, mais prático e rápido
+•Filtrando e utilizando o menu de marcas / linhas / modelos
+Importante: verificar em ambos os casos se é o modelo pesquisado, 
+pois a busca pode trazer um semelhante por falta se estoque
+Como pesquisar pelo Callcenter
+Outra forma muito utilizada é pesquisar pela aba callcenter do nosso 
+CRM (Protheus).
+Aqui você irá colocar o modelo da pesquisar e o sistema te retornará 
+com todos os produtos compatíveis com o modelo pesquisado. 
+
+Como identificar o numero de células de uma bateria
+De acordo com o modelo da bateria é possível identificar a quantidade de células a partir da sua voltagem e amperagem:
+Baterias Externas:
+6 células
+4400mAh
+12 células
+8800mAh
+Encaixe no notebook, a 
+bateria fica visível após 
+colocada o encaixe
+
+Como identificar o numero de células de uma bateria
+Baterias Internas:
+Os modelos de baterias internas, por serem instaladas dentro dos equipamentos e terem o espaço limitado para a 
+colocação das bateria em geral estes modelos tem 2,3 ou 4 células. sendo possível identificar o numero de células pela 
+voltagem da bateria
+3 células 4 células
+Elas são compatíveis, mas é importante ter cuidado com o detalhe das células
+
+Como identificar o numero de células de uma bateria
+Encaixe no notebook, a 
+bateria fica dentro e não 
+exposta, após colocada a 
+tampa traseira 
+POSSUI UMA 
+CÉLULA A MAISNota -se que as baterias são 
+idênticas em seus encaixes
+No caso da bateria de 3 células, apenas ira 
+“sobrar” o espaço de uma célula.
+
+Dúvidas?
+
+

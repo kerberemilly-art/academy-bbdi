@@ -1,0 +1,8 @@
+# Gitignore raiz
+PortalTreinamentos/node_modules/
+PortalTreinamentos/dist/
+.vscode/
+.idea/
+*.log
+*.pyc
+__pycache__/

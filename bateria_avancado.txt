@@ -1,0 +1,171 @@
+
+PRINCIPAIS SITES DE ANALISE DE COMPATIBILIDADES
+Sites Nacionais
+Os principal site para analise de compatibilidades é o 
+site da BBbaterias, pois ele é o site mais completo, com 
+maior numero de compatibilidades da américa latina.
+Além deles podemos indicar ainda o dos seus principais 
+concorrentes:
+Sites Internacionais
+Já em um âmbito internacional podemos indicar os 
+seguintes sites:
+www.bringit.com.br
+www.elgscreen.com
+
+Identificando um modelos da concorrência (BRINGIT)
+A Bringit é a nossa principaL concorrente no mercado nacional.
+Por ter um site bem completo de compatibilidades por vezes identificamos um produto neste site, e temos uma forma facilitada 
+de identificar o modelo igual e nossos produtos. Para isso podemos ver de duas formas
+Passo 1: Identifique a referencia no site da Bringit
+Assim como no nosso site, só o inicio do SKU é valido ( Neste caso BC316 )
+
+Passo 2: Acessando o Tableau digite o código identificado. Caso este produto já conste em nosso cadastro será informada nossa
+referência BBDI para este produto.
+Identificando um modelos da concorrência (BRINGIT)
+
+Passo 2: Acessando a planilha de código da Bringit 
+1)
+Pressione CTRL + F
+2)
+Digite o código identificado
+3)
+Se já tiver sido identificado o nosso código aparecerá ao lado.
+Identificando um modelos da concorrência (BRINGIT)
+Código interno BBDI
+Código interno BGT
+Caixa de pesquisa 
+CTRL+F
+
+Quanto tempo dura uma bateria de notebook?
+O cálculo de quantas horas uma bateria pode durar é relativo pois dependera de algumas fatores do equipamento, como o 
+consumo dos aplicativos instalados, consumo da tela, placas de vídeo, temperatura externa, etc.
+Porém podemos fazer uma estimativa de acordo com a mAh da bateria, como a tabela descrita abaixo:
+Vale ressaltar que são uma estimativa aproximada de tempo de consumo, pode variar de equipamento para equipamento
+
+BATERIAS COM MESMO NÚMERO DE CELULAS, MAS COM DIFERENÇAS NA AMPERAGEM
+Existirão casos onde encontrará modelos de baterias com a mAh diferente do modelo antigo do cliente, como por exemplo o 
+cliente ter uma bateria antiga com 4400mAh e o nosso modelos ter 5200mAh.
+Isso ocorre porque uma célula pode variar de 2200mAh a 2600mAh, dependendo do fabricante desta célula como vimos 
+antes quanto maior for a unidade mAh, maior será a autonomia da bateria.
+Então neste caso você pode utilizar como argumentação a maior que este nosso modelo terá no equipamento do cliente ( estes 
+800mAh a mais terão uma autonomia de 20% á 30% maior que o modelo antigo.)
+4400mAh
+5200mAh
+Modelo comum (Standard)
+Autonomia aprox. 2 horas
+Capacidade 20% á 30% superior
+Autonomia aprox. 2h30min
+
+E no caso contrario onde a bateria antiga do cliente tem uma maior mAh que o nosso modelo, é prudente informar ao cliente 
+desta diferença de mAh, para que ele não se sinta lesado quando perceber desta diferença de autonomia entre as baterias 
+(pode-se dizer ao cliente que a diferença de autonomia é em torno de 15% á 20% em comparação com o modelo antigo dele). 
+Na grande maioria das vezes o cliente opta por adquirir esta bateria mesmo com uma autonomia um pouco inferior.
+Lembrando que o mesmo vale para os Wh da bateria, uma vez que ele são resultados da multiplicação da voltagem pela 
+mAh.
+Bateria antiga
+5200mAh
+BestBattery®
+4400mAh
+15 á 20%
+menos carga
+
+Baterias com voltagens diferentes
+Por vezes encontramos casos onde uma mesma linha de notebooks ou um mesmo modelo pode ter sido produzido com 
+baterias com numero de células diferentes e consequentemente com voltagens também diferentes.
+Quando existem casos assim, pode ser que ao substituir a bateria por um modelo com a voltagem diferente esta não seja 
+identificada pelo equipamento.
+Quando isto ocorrer tente identificar a voltagem da bateria antiga efetue a troca para o modelo com a mesma voltagem
+
+Principais modelos com voltagens diferentes:
+BB11-AC082
+15.2V – 2200mAh – 33Wh
+BB11-AC085
+11.1V – 2200mAh – 25Wh
+BB11-DE099
+11.1V – 4400mAh – 49Wh
+BB11-DE099-4C
+14.8V – 2200mAh – 32Wh
+BB11-DE105
+7.4V – 4500mAh – 33Wh
+BB11-DE105-3C
+11.1V – 3100mAh – 34Wh
+BB11-DE127
+7.4V – 7500mAh – 56Wh
+BB11-DE127-3C
+11.1V – 3840mAh – 43Wh
+BB11-DE151
+7.6V – 7890mAh – 60Wh
+BB11-DE151-3C
+11.4V – 4000mAh – 45Wh
+BB11-SS015
+11.1V – 4400mAh – 49Wh
+BB11-SS015-S
+14.8V – 2200mAh – 32Wh
+BB11-AP030
+V – mAh – Wh
+BB11-AP034
+V – Ah – Wh
+Aguardando retorno da fábrica
+
+Versão do Chipset atualizada
+Todas as baterias de notebook tem um chipset identificador que “conversa” com o notebook, passando informações sobre 
+o estado de carga da bateria, ciclos, etc...
+Algumas vezes este chipset pode ser atualizado de acordo com uma serie de notebooks é lançada. Neste caso teríamos a 
+mesma bateria nos dois equipamentos, porém a bateria mais antiga não é reconhecida do modelo mais atual.
+FRU 42T4763
+BB11-LE009
+FRU 42T4765
+BB11-LE019
+Lenovo Thinkpad T410
+Lenovo Thinkpad T420
+Lenovo Thinkpad T430
+
+Fisicamente as duas baterias são iguais, podem até ter o mesmo part number, porém a pergunta que se deve fazer nestes casos é “Qual o 
+modelo do notebook?” 
+Sendo o modelo mais atual, deve-se vender o modelo de bateria também mais atual.
+Na dúvida venda o modelo mais atual, que será compatível a todos os modelos de notebooks
+Outros casos semelhantes a este:
+BB11-LE015 / BB11-LE020
+Compatível com Thinkpad X220
+BB11-LE033
+Compatível com Thinkpad X220
+BB11-LE022
+Compatível com Thinkpad Y480 / Y580
+BB11-LE032
+Compatível com Thinkpad E480 / E580 / 
+V580
+
+Outro problema muito comum de ocorrer no não reconhecimento da bateria devido a histórico da bateria que fica registrado no sistema 
+operacional do notebook. 
+Quando este caso ocorrer o melhor a fazer é seguir o seguinte processo:
+1 – Deixando o notebook sem a bateria ligue-o somente 
+com a fonte conectada na energia.
+2 – Escreva no campo de pesquisa do Windows 
+“Gerenciamento de computador”
+3 – Vá para “Gerenciamento de dispositivos” e depois 
+“Baterias”.
+Histórico da bateria antiga
+
+Histórico da bateria antiga
+4 – Clicando no símbolo de “+” você encontrará o ícone com a 
+seguinte frase “Bateria Método de controle Compatível com 
+ACPI da Microsoft”
+5 – Nesta opção clique com o botão direito sobre ela depois em 
+“desinstalar”
+6 – Pronto, você terá excluído o histórico da bateria antiga e 
+poderá agora colocar a nova bateria, que deverá ser 
+identificada pelo equipamento
+
+Bateria que não carrega até 100%
+Tem casos também onde o cliente informa que a nova bateria adquirida não chega a 100% de carga, quando chega a uns 70% para de 
+recarregar.
+Isto pode estar ocorrendo devido a um recurso que pode estar instalado no notebook que por segurança limita o carregamento da bateria; é 
+o Battery Life Extender.
+Este recurso existe por que muitas vezes para o equipamento carregar até 100% pode aumentar e muito a temperatura do equipamento e 
+da bateria, diminuindo assim a vida útil desta bateria.
+Então se isto estiver ocorrendo com o cliente informe a eles sobre 
+esta possibilidade e de acordo com a marca do equipamento, 
+existe um nome e um caminho diferente para esta função, 
+mas que são facilmente encontrados no Google.
+
+Dúvidas?

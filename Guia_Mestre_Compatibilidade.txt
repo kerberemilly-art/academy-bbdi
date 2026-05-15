@@ -1,0 +1,100 @@
+
+MANUAL DE COMPATIBILIDADE
+
+PARTE 1: 
+
+1.1 ONDE ESTA A "IDENTIDADE" DA PECA?
+Imagine que cada peca tem um RG. Esse RG e o PART NUMBER (PN).
+- ONDE ENCONTRAR: Quase sempre em uma etiqueta branca ou 
+  prateada colada na própria peca.
+- COMO ELE E: Geralmente e uma mistura de letras e números. 
+  (Exemplo: NT156WHM-N42 ou M5Y1K).
+- A REGRA: Se você achar o PN, 90% do seu trabalho esta feito.
+
+1.2 O QUE FAZER PRIMEIRO? (FLUXO DE DECISAO)
+1. Cliente quer uma peca? -> PECA FOTO DA ETIQUETA DA PECA ANTIGA.
+2. Ele mandou a foto? 
+   -> SE SIM: Procure pelo código da foto no sistema.
+   -> SE NAO: Explique que modelos de notebook mudam as pecas 
+      internamente. Peca para ele trazer o aparelho para abrir.
+
+PARTE 2: CONHECENDO AS PECAS (IDENTIFICACAO VISUAL)
+
+
+1. TELAS (O "vidro" do notebook)
+As telas parecem iguais, mas estes detalhes são "fatais":
+
+- O CONECTOR (Onde liga o cabo): E uma barra dourada com 
+  vários "dentinhos".
+  * 30 PINOS: A barra dourada e CURTA (cerca de 2cm).
+  * 40 PINOS: A barra dourada e LONGA (cerca de 3cm).
+  ATENCAO: Nunca tente encaixar o cabo errado, você vai
+  estragar a tela e o notebook!
+
+- AS "ABAS" (Orelhas): Olhe se a tela tem buraquinhos para 
+  parafusar em cima e embaixo.
+  * SLIM COM ABA: Tem as orelhinhas de metal.
+  * SLIM SEM ABA: E lisa nas bordas (geralmente vai colada).
+
+2. FONTES (O "carregador")
+O segredo não e a caixa preta, e a PONTA (o plugue):
+
+- O PINO:
+  * PINO COM AGULHA: Olhe dentro do buraco do plugue da fonte.
+    Se houver um "espeto" ou agulha lá no fundo, e um modelo 
+    especifico (comum em Dell e HP).
+  * PINO OCO: Parece um canudinho. Você precisa medir a 
+    largura dele (o de 5.5mm e o mais grosso e comum).
+
+- VOLTAGEM (V) vs AMPERAGEM (A):
+  * VOLTAGEM (V): E a "forca" da tomada. Tem que ser IGUAL.
+  * AMPERAGEM (A): E a "quantidade de combustível". Pode ser 
+    IGUAL OU MAIOR. Nunca menor.
+
+3. BATERIAS (A energia interna)
+- EXTERNA: Tem travas que o cliente solta por fora.
+- INTERNA: O notebook precisa ser aberto para ver.
+- IDENTIFICACAO: Procure pelas palavras TYPE, MODEL ou 
+  REPLACE. Ex: "TYPE M5Y1K". Esse código garante que os 
+  parafusos vão bater no lugar certo.
+
+4. TECLADOS (Onde digitamos)
+O erro mais comum e o desenho das teclas:
+
+- O "ENTER":
+  * FORMATO DE "L" (OU BOTA): E o padrão Brasileiro (ABNT2). 
+    Tem a tecla "C" com cedilha (C).
+  * FORMATO RETINHO: E o padrão Americano (US). NAO tem "C".
+
+- O FRAME (GRADE):
+  * Se você vê o plástico da carcaça do notebook entre as 
+    teclas, ele e "SEM FRAME" (ele entra por baixo).
+  * Se o teclado já vem com uma gradezinha em volta de cada 
+    tecla, ele e "COM FRAME".
+
+
+PARTE 3: MEMORIA E SSD 
+
+
+SSD (O "disco" novo)
+- SSD 2.5 polegadas: Parece um celular antigo, quadradinho.
+- M.2 (Parece um chiclete):
+  * NVMe: Tem apenas UM CORTE no conector. E o mais rápido.
+  * SATA: Tem DOIS CORTES no conector. E o modelo antigo.
+
+MEMORIA RAM (A velocidade)
+- DDR3 vs DDR4: Elas tem um "cortinho" na parte dourada em 
+  lugares diferentes. Se tentar encaixar a errada, o dente 
+  da placa-mãe impede o encaixe.
+- DDR3L: O "L" significa Low (Baixa voltagem). Na duvida, 
+  venda sempre a DDR3L, pois ela funciona em quase tudo.
+
+
+DICAS DE OURO PARA INICIANTES
+
+1. FOTO E VIDA: Nunca confie apenas no que o cliente fala. 
+   Peca sempre a foto do adesivo colado na peca original.
+2. NAO FORCE: Pecas de notebook sao frageis. Se nao encaixou 
+   suavemente, algo esta errado. Pare e verifique.
+3. FOSCA vs BRILHANTE: Pergunte ao cliente se a tela dele
+   reflete como um espelho (Brilhante) ou se e opaca (Fosca).

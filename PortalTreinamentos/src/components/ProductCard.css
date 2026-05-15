@@ -1,0 +1,75 @@
+.product-card {
+  overflow: hidden;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  position: relative;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+  border-color: var(--accent-color);
+}
+
+.product-card:hover .card-action svg {
+  color: var(--accent-color);
+  transform: translateX(4px);
+}
+
+.card-content {
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: #f3f4f6; /* Fundo neutro inicial */
+}
+
+.card-info {
+  flex-grow: 1;
+}
+
+.card-info h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+  color: #111827;
+}
+
+.card-info p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.card-action {
+  color: #d1d5db;
+}
+
+.card-action svg {
+  transition: var(--transition-smooth);
+}
+
+.progress-bar-container {
+  height: 6px;
+  background: #f3f4f6;
+  width: 100%;
+  border-top: 1px solid #f3f4f6;
+}
+
+.progress-bar {
+  height: 100%;
+  transition: width 1s ease-in-out;
+}

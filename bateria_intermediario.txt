@@ -1,0 +1,95 @@
+
+Como identificar o Part Number de uma bateria
+A primeira informação que precisamos saber é que nenhuma bateria na verdade é produzida pelo fabricante do notebook, ou 
+seja, Acer, Dell, HP, não produzem as peças dos notebooks. 
+Estas peças são produzidos por outros fornecedores que disponibilizam uma referência em seus produtos para identificar 
+esta peça ao fabricante de notebook, para que este saiba qual modelo deve ser utilizado em X modelo de notebook.
+Esta referência são conhecidas como Part Number.
+Pelo Part number sempre é possível identificar com 
+certeza se a bateria será compatível com o equipamento.
+Em geral esta informação consta na parte da bateria que fica interna no 
+equipamento, ou seja, é necessário a retirada da bateria do notebook.
+
+Principais padrões de um Part Number
+Ao lado vamos listar estes padrões de part
+numbers de acordo com as principais 
+marcas de notebooks comercializados no 
+mercado nacional.
+(Não se aplicam a todos os Part Numbers 
+destas marcas, mas em sua maioria)
+
+Como calcular o número de células de uma bateria
+Princípios básicos: Ligações em Paralelo e ligações em serial
+Uma célula sempre irá ter dois polos de ligações, um positivo que é que passa a corrente elétrica e outro negativo que fecha o 
+circuito.
+Dependo da forma como é feita esta ligação o calculo é diferente.
+Ligação de positivo com negativo (Ligação em serie) - Soma-se as voltagens e mantêm-se as amperagens
+Ligação de positivo com positivo (Ligação em paralelo) - Soma-se as amperagem e mantêm-se as voltagens
+Em uma célula de litio-ion vai constar as 
+especificações de voltagem (3.6V) e de 
+amperagem (2200mAh) aproximadamente.
++                        _
+
+Em casos de baterias múltiplas de 3, fazemos inicialmente uma ligação serial de positivo com o negativo, e neste caso 
+fazemos a soma das voltagens das baterias, e mantemos a amperagem.
+Ou seja:
+3.7V + 3.7V + 3.7V = 11.1V
+Ligação em série
+Sendo assim o resultado final é de uma bateria com 11.1V e 2200mAh (lembrando que mantem-se a amperagem)
+
+Para chegarmos ao caso de uma bateria de 6 células pegamos duas baterias de ligações de 3 células e fazemos 
+uma ligação em paralelo para somar a miliamperagem das baterias
+Ligação serial + 
+ligação paralela
+Sendo assim o resultado final é de uma bateria com 11.1V e 4400mAh 
+(somamos voltagem, depois juntamos e soma-se amperagem) 
+Ligação em Paralelo + em Série
+
+DIFERENÇA DE 10.8V E 11.1V
+Como vimos antes em uma célula de uma bateria pode constar a voltagem de 3.7V, mas há casos de que estas célula pode ter 
+3.6V então o fabricante pode colocar com 3.6V ou 3.7V.
+Com isso, pode haver certas variações como:
+10.8V ou de 11.1V
+14.4V ou de 14.8V
+OBS: Esta regra serve para baterias internas e externas.
+COMO CALCULAR O NUMERO DE CÉLULAS DE UMA BATERIA
+
+Baterias de capacidades estendidas
+Vimos antes que as baterias mais comuns, que em geral possuem entre 6 e 8 células.
+Porém em alguns casos , temos modelos onde é possível substituir a bateria por um modelo com uma capacidade de carga
+estendida, ou seja, que tenham uma autonomia superior ao modelo antigo. 
+Para que isto ocorra estas baterias terão que ter um numero superior de células
+Nos modelos de baterias externas este numero de células a mais deixará a bateria com uma saliência para fora do equipamento, 
+mas que não irá atrapalhar a compatibilidade do produto
+Bateria comum (Standard)
+6 células
+Bateria Alta capacidade
+12 células
+=
++
+
+BATERIAS INTERNAS
+Quando pode ser utilizado o modelo de capacidade estendida
+Nota-se que elas não ficam pra fora do notebook, então é necessário ver se o notebook comporta uma bateria de alta 
+capacidade
+4 células
+3 células
+Área de conflito
+Um exemplo de caso pode ser o Dell Latitude E5250
+Na imagem podemos ver que o notebook 
+não comporta por causa do HD
+
+SISTEMA PAI E FILHO NA VTEX/SITE
+Existem produtos que possuem variações, sejam elas de cor, voltagem, células e etc.
+Definimos esse produtos como Pais e Filhos. Tem esse nome pois possuem alguma diferença, que NÃO irá influenciar na sua 
+compatibilidade 
+Logo, todas as informações de um produto são incluídos no Pai e assim replicados no Filho
+EXEMPLO
+Na foto é possível identificar que dentro da mesma 
+bateria encontramos duas características diferentes:
+
+Em duas cores: Preto e Branco
+
+Em duas voltagens: 11.1v e 14.8v
+
+Mas dentro do Protheus eles serão encontrados como quatro referencias separadas:
