@@ -14,14 +14,20 @@
             {
               title: 'Função da memória RAM',
               content: 'A memória RAM influencia diretamente na velocidade do notebook e na capacidade de manter programas em execução.\n\nDiferente de HD ou SSD, a RAM não armazena arquivos de forma permanente. Ela executa dados temporários para que o sistema e os programas funcionem com mais agilidade.',
+              image: '/images/memória/memoria_ram_p6_i3.jpeg',
+              imagePlacement: 'afterContent',
             },
             {
               title: 'Famílias de memória',
               content: 'As memórias são divididas em famílias, como DDR2, DDR3, DDR3L, DDR4 e DDR5.\n\nCada família possui características próprias, principalmente tensão e posição do encaixe.\n\nDDR2 é mais antiga e trabalha com 1,8V. DDR3 trabalha com 1,5V. DDR4 trabalha com 1,2V.\n\nDDR5 é mais moderna e melhora bastante o desempenho, mas o material indica que não será trabalhada no momento.',
+              image: '/images/memória/memoria_ram_p2_i2.jpeg',
+              imagePlacement: 'afterContent',
             },
             {
               title: 'Compatibilidade básica',
               content: 'A família da memória é o principal critério de compatibilidade.\n\nMemórias de famílias diferentes não devem ser misturadas, pois possuem tensões e encaixes diferentes.\n\nIdentificar corretamente a família evita grande parte dos erros de venda.',
+              image: '/images/memória/memoria_ram_p4_i2.jpeg',
+              imagePlacement: 'afterContent',
             },
           ],
           quiz: {
@@ -136,10 +142,14 @@
             {
               title: 'Caso especial DDR3L',
               content: 'DDR3L significa Low Voltage e trabalha com 1,35V.\n\nDDR3L funciona em dispositivos compatíveis com DDR3L e também em dispositivos que usam DDR3 convencional.\n\nO inverso não é seguro: memória DDR3 convencional não funciona em dispositivos que exigem DDR3L.\n\nEsse é o principal caso de substituição entre variações próximas de família.',
+              image: '/images/memória/memoria_ram_p4_i3.jpeg',
+              imagePlacement: 'afterContent',
             },
             {
               title: 'Frequência e upgrade',
               content: 'A frequência é medida em MHz.\n\nA frequência não costuma causar incompatibilidade quando a família está correta.\n\nEm upgrade com duas memórias de frequências diferentes, o conjunto trabalha na frequência mais baixa entre elas.\n\nExemplo: se uma memória é mais rápida e a outra mais lenta, ambas tendem a operar na velocidade da mais lenta.',
+              image: '/images/memória/memoria_ram_p7_i2.jpeg',
+              imagePlacement: 'afterContent',
             },
             {
               title: 'Padrões comuns',
@@ -258,10 +268,14 @@
             {
               title: 'Consulta pelo modelo do notebook',
               content: 'Depois de identificar o modelo do notebook, consulte bases de compatibilidade para confirmar família, frequência e capacidade suportada.\n\nSe a base indicada não retornar resultado, pesquise diretamente pelo modelo do notebook em fontes confiáveis.\n\nA consulta deve confirmar a família compatível antes de qualquer oferta.',
+              image: '/images/memória/memoria_ram_p9_i2.jpeg',
+              imagePlacement: 'afterContent',
             },
             {
               title: 'Upgrade com uma ou duas memórias',
               content: 'O upgrade pode ser feito adicionando uma memória extra ou substituindo a original.\n\nAntes de indicar, verifique se o notebook tem slot disponível, qual família aceita e qual capacidade máxima suporta.\n\nNão basta saber que o cliente quer mais desempenho; a placa precisa aceitar a configuração.',
+              image: '/images/memória/memoria_ram_p6_i3.jpeg',
+              imagePlacement: 'afterContent',
             },
             {
               title: 'Resumo de decisão',
@@ -273,6 +287,78 @@
             questions: [
               {
                 id: 'memorias-avancado-q1',
+                question: 'Qual é o primeiro dado usado na consulta de compatibilidade de memória?',
+                options: [
+                  'Modelo do notebook',
+                  'Cor do teclado',
+                  'Marca da fonte',
+                  'Tipo de backlight da tela'
+                ],
+                correctAnswer: 0,
+                explanation: 'O material orienta começar pelo modelo do notebook antes de consultar a memória compatível.'
+              },
+              {
+                id: 'memorias-avancado-q2',
+                question: 'Se a base indicada não retornar resultado, o que fazer?',
+                options: [
+                  'Pesquisar diretamente pelo modelo do notebook em fontes confiáveis',
+                  'Vender qualquer DDR4',
+                  'Ignorar o modelo',
+                  'Trocar por SSD SATA'
+                ],
+                correctAnswer: 0,
+                explanation: 'O material orienta usar o modelo do notebook como referência de busca quando a base não trouxer o resultado.'
+              },
+              {
+                id: 'memorias-avancado-q3',
+                question: 'O que o site de consulta mostra sobre a memória compatível?',
+                options: [
+                  'Família e frequência',
+                  'Somente a cor da placa',
+                  'A potência da fonte',
+                  'O layout do teclado'
+                ],
+                correctAnswer: 0,
+                explanation: 'A tela de consulta destaca a família e a frequência compatíveis da memória.'
+              },
+              {
+                id: 'memorias-avancado-q4',
+                question: 'Qual é a orientação do material depois de saber o modelo do notebook?',
+                options: [
+                  'Usar o link/site de consulta para verificar a compatibilidade',
+                  'Escolher a maior frequência possível sem consulta',
+                  'Ignorar a família da memória',
+                  'Trocar por DDR2'
+                ],
+                correctAnswer: 0,
+                explanation: 'O material destaca o uso do link de consulta para confirmar a memória correta.'
+              },
+              {
+                id: 'memorias-avancado-q5',
+                question: 'Qual frase resume melhor a venda de memória RAM?',
+                options: [
+                  'É venda de compatibilidade técnica, não apenas de capacidade',
+                  'É só escolher o maior GB disponível',
+                  'Qualquer DDR serve em qualquer notebook',
+                  'Frequência é o único fator relevante'
+                ],
+                correctAnswer: 0,
+                explanation: 'Capacidade maior só faz sentido quando família e notebook são compatíveis.'
+              },
+              {
+                id: 'memorias-avancado-q6',
+                question: 'O upgrade de memória pode ser feito de quais formas?',
+                options: [
+                  'Adicionando uma memória extra ou substituindo a original',
+                  'Trocando a tela por Full HD',
+                  'Mudando o layout do teclado',
+                  'Aumentando a voltagem da fonte'
+                ],
+                correctAnswer: 0,
+                explanation: 'O material cita as duas formas de upgrade: inserir uma memória ou trocar a original.'
+              },
+              {
+                id: 'memorias-avancado-q7',
                 question: 'Qual informação deve ser confirmada antes de ofertar uma memória?',
                 options: [
                   'Família compatível com o notebook',
@@ -284,67 +370,7 @@
                 explanation: 'A família define encaixe e tensão, sendo o filtro mais importante.'
               },
               {
-                id: 'memorias-avancado-q2',
-                question: 'O que verificar antes de sugerir adicionar uma segunda memória?',
-                options: [
-                  'Se há slot disponível e capacidade suportada',
-                  'Se a tela é narrow frame',
-                  'Se a fonte tem pino bullet',
-                  'Se o teclado tem Ç'
-                ],
-                correctAnswer: 0,
-                explanation: 'Upgrade depende de slot livre e limite técnico do notebook.'
-              },
-              {
-                id: 'memorias-avancado-q3',
-                question: 'Qual frase resume melhor a venda de memória RAM?',
-                options: [
-                  'É venda de compatibilidade técnica, não apenas de capacidade',
-                  'É só escolher o maior GB disponível',
-                  'Qualquer DDR serve em qualquer notebook',
-                  'Frequência é o único fator relevante'
-                ],
-                correctAnswer: 0,
-                explanation: 'Capacidade maior só faz sentido quando família, slot e limite são compatíveis.'
-              },
-              {
-                id: 'memorias-avancado-q4',
-                question: 'Se não encontrar o modelo na base indicada, o que fazer?',
-                options: [
-                  'Pesquisar pelo modelo do notebook em outras fontes confiáveis',
-                  'Vender qualquer DDR4',
-                  'Ignorar o modelo',
-                  'Trocar por SSD SATA'
-                ],
-                correctAnswer: 0,
-                explanation: 'A busca complementar ajuda a confirmar compatibilidade antes da venda.'
-              },
-              {
-                id: 'memorias-avancado-q5',
-                question: 'Um cliente quer o máximo de GB possível. Qual resposta é tecnicamente correta?',
-                options: [
-                  'Verificar primeiro o limite máximo suportado pelo notebook',
-                  'Vender a maior memória disponível sem consulta',
-                  'Trocar automaticamente por DDR5',
-                  'Ignorar a família da memória'
-                ],
-                correctAnswer: 0,
-                explanation: 'Capacidade maior só é válida se o notebook suportar essa quantidade e família.'
-              },
-              {
-                id: 'memorias-avancado-q6',
-                question: 'Qual conjunto de dados forma um checklist mais completo para upgrade?',
-                options: [
-                  'Modelo, família, capacidade, frequência, slots e limite máximo',
-                  'Pino, voltagem da fonte, brackets e Magsafe',
-                  'Tecla Wi-Fi, Enter, Shift e backlight',
-                  'Resolução, IPS, narrow e taxa de atualização'
-                ],
-                correctAnswer: 0,
-                explanation: 'Esses dados cobrem compatibilidade física, elétrica e limite de upgrade.'
-              },
-              {
-                id: 'memorias-avancado-q7',
+                id: 'memorias-avancado-q8',
                 question: 'Qual risco existe ao indicar memória apenas pela frequência?',
                 options: [
                   'Errar a família e vender uma peça incompatível',
@@ -354,18 +380,6 @@
                 ],
                 correctAnswer: 0,
                 explanation: 'Frequência é secundária; família errada impede a compatibilidade.'
-              },
-              {
-                id: 'memorias-avancado-q8',
-                question: 'Qual decisão é adequada quando o notebook não tem slot livre?',
-                options: [
-                  'Avaliar substituição da memória original por uma de maior capacidade compatível',
-                  'Adicionar outra memória mesmo sem slot',
-                  'Trocar a tela por uma narrow frame',
-                  'Indicar DDR2 para qualquer caso'
-                ],
-                correctAnswer: 0,
-                explanation: 'Sem slot disponível, o upgrade pode depender de substituir a memória existente, se o equipamento suportar.'
               }
             ]
           }

@@ -439,15 +439,11 @@
           steps: [
             {
               title: 'O que é um Part Number de tela',
-              content: 'Part Numbers de tela são códigos atribuídos a modelos específicos de painéis.\n\nEles são usados para identificação técnica e ajudam a garantir compatibilidade, facilitar manutenção e evitar compras incorretas.\n\nAlém de identificar o modelo, o Part Number pode revelar tecnologia, tamanho, resolução, fabricante, versão e revisão da tela.',
-              image: '/images/telas/partnumbers_telas_para_notebook_p6_i2.png',
-              imagePlacement: 'afterContent',
+              content: 'Part Numbers de tela são códigos atribuídos a modelos específicos de painéis.\n\nEles são usados para identificação técnica e ajudam a garantir compatibilidade, facilitar manutenção e evitar compras incorretas.\n\nAlém de identificar o modelo, o Part Number pode revelar tecnologia, tamanho, resolução, fabricante, versão e revisão da tela.\n\nNesta trilha, a leitura do código é tratada como uma ferramenta de apoio. Ela não substitui a conferência da ficha técnica nem a validação física do painel.',
             },
             {
               title: 'Por que Part Numbers são importantes',
               content: 'O Part Number ajuda a confirmar se uma tela é realmente compatível com o notebook do cliente.\n\nEle facilita a comparação entre modelos equivalentes, orienta compras corretas e permite entender diferenças de tecnologia ou revisão.\n\nNa prática, ele não substitui a análise completa. O atendimento ainda precisa validar tamanho, resolução, pinagem, encaixe, tipo de painel e variações físicas.',
-              image: '/images/telas/partnumbers_telas_para_notebook_p6_i2.png',
-              imagePlacement: 'afterContent',
             },
             {
               title: 'Como desmembrar um Part Number',
@@ -482,8 +478,6 @@
             {
               title: 'Como usar no atendimento',
               content: 'Use o Part Number como ponto de partida técnico para consultar equivalências, validar revisões e comparar características.\n\nSe dois Part Numbers forem parecidos, mas tiverem sufixos diferentes, não assuma compatibilidade automaticamente.\n\nCompare resolução, pinagem, interface, brilho, tecnologia do painel, tamanho físico, brackets, posição do conector e aplicação no notebook.\n\nQuando houver dúvida entre revisões, a decisão mais segura é confirmar em base técnica e, se necessário, pedir foto da tela antiga ou consultar o estoque pelo Part Number do fabricante.',
-              image: '/images/telas/partnumbers_telas_para_notebook_p6_i2.png',
-              imagePlacement: 'afterContent',
             },
           ],
           quiz: {

@@ -14,18 +14,26 @@
             {
               title: 'Função e identificação inicial',
               content: 'O teclado é uma das peças de notebook que mais precisa de substituição, principalmente por defeitos ou acidentes.\n\nNa parte traseira, observe Part Number, cabo flat, parafusos, encaixe e, quando existir, backlight.\n\nO Part Number ajuda, mas não deve ser usado sozinho, porque layout e padrão do teclado nem sempre aparecem apenas pelo código.',
+              image: '/images/teclado/teclado_básico_p4_i2.jpeg',
+              imagePlacement: 'afterContent',
             },
             {
               title: 'Tipos de encaixe',
               content: 'Existem dois cenários principais de encaixe.\n\nEncaixe por cima: a peça completa do teclado é acoplada no local destinado na carcaça.\n\nTeclado por baixo: o teclado é encaixado de dentro para fora, muitas vezes preso à carcaça ou usado com frame antigo.\n\nO tipo de encaixe define se uma troca de layout ou variação física será viável.',
+              image: '/images/teclado/teclado_básico_p7_i2.jpeg',
+              imagePlacement: 'afterContent',
             },
             {
               title: 'Layout e teclado numérico',
               content: 'No Brasil, o padrão comum é ABNT2, com disposição QWERTY.\n\nOs layouts mais citados são BR, US e PO. Eles mudam idioma, posição e formato de algumas teclas.\n\nEm geral, notebooks de até 14 polegadas não usam teclado numérico lateral. Modelos de 15,6 e 17 polegadas costumam ter teclado numérico.',
+              image: '/images/teclado/teclado_básico_p8_i3.jpeg',
+              imagePlacement: 'afterContent',
             },
             {
               title: 'Topcase',
               content: 'Alguns teclados são vendidos junto com a carcaça superior do notebook. Essas peças completas são chamadas de topcase.\n\nQuando a peça já vem completa, a análise de encaixe de teclado isolado perde importância, porque o conjunto já inclui a carcaça correspondente.\n\nAinda assim, é necessário validar compatibilidade com o modelo do notebook.',
+              image: '/images/teclado/teclado_básico_p5_i2.jpeg',
+              imagePlacement: 'afterContent',
             },
           ],
           quiz: {
@@ -144,14 +152,20 @@
             {
               title: 'Diferenças de layout',
               content: 'BR/ABNT: costuma ter Enter em L, tecla Ç e o ? na parte inferior, perto do Enter.\n\nUS/Americano: costuma ter Enter longo e não possui Ç.\n\nPO/Português Portugal: pode ter Enter em L, Ç e o ? em posição superior.\n\nO ideal é vender o mesmo layout antigo. Mudança de layout só deve ser feita com análise física e alinhamento com o cliente.',
+              image: '/images/teclado/teclado_intermediario_p3_i2.jpeg',
+              imagePlacement: 'afterContent',
             },
             {
               title: 'Frame e encaixe acoplado',
               content: 'Frame é a moldura que acompanha o teclado e dá acabamento, deixando menos espaço entre as teclas.\n\nQuando o teclado tem frame ou é acoplado à carcaça, a posição e o formato das teclas precisam bater com os espaços da carcaça.\n\nNesses casos, diferenças entre BR e US, como formato do Enter e Shift, podem inviabilizar a troca.',
+              image: '/images/teclado/teclado_intermediario_p6_i4.jpeg',
+              imagePlacement: 'afterContent',
             },
             {
               title: 'Teclas de função e backlight',
               content: 'Teclas superiores podem ter funções diferentes, como Wi-Fi, volume e brilho.\n\nO desenho na tecla não dita a função real. A função segue o que o notebook espera do teclado original.\n\nBacklight é a iluminação do teclado. Ele costuma ser identificado por um cabo fino laranja ou preto, paralelo ao cabo flat normal.',
+              image: '/images/teclado/teclado_intermediario_p10_i2.jpeg',
+              imagePlacement: 'afterContent',
             },
           ],
           quiz: {
@@ -195,7 +209,7 @@
               },
               {
                 id: 'teclados-intermediario-q4',
-                question: 'O que identifica um teclado com backlight?',
+                question: 'O que ajuda a identificar um teclado com backlight?',
                 options: [
                   'Cabo fino extra, laranja ou preto, paralelo ao cabo flat normal',
                   'Pino de fonte 7,4mm',
@@ -266,18 +280,26 @@
             {
               title: 'Quando aceitar layout diferente',
               content: 'A troca por layout diferente só deve ser considerada quando o encaixe da peça inteira permite a substituição e quando o modelo não depende de frame ou recortes rígidos da carcaça.\n\nMesmo quando fisicamente compatível, explique ao cliente que símbolos e posição de teclas podem mudar.',
+              image: '/images/teclado/teclado_básico_p10_i2.jpeg',
+              imagePlacement: 'afterContent',
             },
             {
               title: 'Quando descartar a substituição',
               content: 'Descarte a substituição quando o teclado usa frame ou encaixe acoplado e a disposição das teclas não bate com os espaços físicos.\n\nDiferenças no Enter, Shift, Ç e ? são sinais de atenção.\n\nEm caso de dúvida, solicitar foto do teclado antigo ajuda a confirmar layout e encaixe.',
+              image: '/images/teclado/teclado_intermediario_p7_i4.jpeg',
+              imagePlacement: 'afterContent',
             },
             {
               title: 'Pointstick e variações antigas',
               content: 'Pointstick, TrackPoint ou TouchStick é um sistema antigo com botão entre teclas que funciona como sensor de movimento do cursor.\n\nHoje ele foi substituído pelo touchpad na maioria dos equipamentos, mas ainda pode aparecer em modelos específicos.\n\nSe o teclado antigo possui esse recurso, a substituição precisa considerar essa característica.',
+              image: '/images/teclado/teclado_intermediario_p6_i2.jpeg',
+              imagePlacement: 'afterContent',
             },
             {
               title: 'Checklist de atendimento',
               content: 'Antes de indicar o teclado, confirme modelo do notebook, layout, presença de frame, tipo de encaixe, cabo flat, backlight, teclado numérico e funções especiais.\n\nQuando houver mais de uma opção no site, use referências visuais como posição da tecla Wi-Fi e compare com o teclado antigo do cliente.\n\nA peça mais segura é a que replica o teclado original.',
+              image: '/images/teclado/teclado_básico_p10_i3.jpeg',
+              imagePlacement: 'afterContent',
             },
           ],
           quiz: {
@@ -285,7 +307,7 @@
             questions: [
               {
                 id: 'teclados-avancado-q1',
-                question: 'Qual situação favorece aceitar um layout diferente?',
+                question: 'Em que condição um layout diferente pode ser aceito com mais segurança?',
                 options: [
                   'Peça inteira encaixa sem depender de frame rígido',
                   'Teclado usa frame com recortes diferentes',
