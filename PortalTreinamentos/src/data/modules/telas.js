@@ -13,19 +13,33 @@
           steps: [
             {
               title: 'Características principais',
-              content: 'A tela é a principal forma de apresentação das informações do notebook.\n\nPara identificar corretamente uma tela, comece por cinco critérios básicos: tamanho, tipo de iluminação, resolução, pinagem e tipo de encaixe ou suporte.\n\nEsses critérios formam a base da compatibilidade, mas ainda podem existir variações adicionais em modelos mais específicos.',
+              content: 'A tela é a principal forma de apresentação das informações do notebook.\n\nPara identificar corretamente uma tela, o atendimento começa por cinco pontos: tamanho, iluminação, resolução, pinagem e encaixe.\n\nEsses critérios formam a base da compatibilidade e ajudam a separar modelos parecidos logo na primeira análise.',
+              image: '/images/telas/telas_básico_p3_i2.jpeg',
+              imagePlacement: 'afterContent',
             },
             {
               title: 'Tamanho e iluminação',
-              content: 'O tamanho da tela é medido em polegadas. Há modelos de 10,1 até 17,3 polegadas, mas os mais comuns são 14,0 e 15,6 polegadas.\n\nA iluminação, ou backlight, pode ser CCFL, LED ou LED Slim.\n\nCCFL: tecnologia antiga com lâmpada fluorescente e cabo extra de alimentação.\n\nLED: usa LEDs e recebe energia pelo cabo flat.\n\nLED Slim: evolução mais fina do LED, com placa PCB na parte inferior e conector geralmente na parte de baixo da tela.',
+              content: 'O tamanho da tela é medido em polegadas. Há modelos de 10,1 até 17,3 polegadas, mas os mais comuns são 14,0 e 15,6 polegadas.\n\nA iluminação, ou backlight, pode ser CCFL, LED ou LED Slim.\n\nCCFL usa lâmpada fluorescente e normalmente exige cabo extra de alimentação.\n\nLED recebe energia pelo cabo flat.\n\nLED Slim é uma evolução mais fina, com placa PCB na parte inferior e conector geralmente na base da tela.',
+              image: '/images/telas/telas_básico_p5_i2.jpeg',
+              imagePlacement: 'afterContent',
             },
             {
               title: 'Resolução e pinagem',
               content: 'Resolução é a quantidade de pixels da tela. Quanto maior a quantidade de pixels, maior a definição de imagem.\n\nExemplo: 1366 x 768 indica 1366 colunas por 768 linhas de pixels.\n\nAs resoluções mais comuns em notebook são HD 1366 x 768 e Full HD 1920 x 1080.\n\nA pinagem é o conector usado pelo cabo flat. Os padrões mais comuns são 30 pinos e 40 pinos.',
+              image: '/images/telas/telas_básico_p8_i2.jpeg',
+              imagePlacement: 'afterContent',
             },
             {
               title: 'Encaixe, brackets e Part Number',
-              content: 'O encaixe da tela na carcaça pode usar suportes laterais, superiores, inferiores ou não ter suporte. Esses suportes são chamados de brackets.\n\nO Part Number é a forma mais segura de validar compatibilidade. Ele fica na parte traseira da tela, então normalmente é preciso remover a tela do notebook para consultar.\n\nPode haver mais de um Part Number com características equivalentes, por causa de fabricantes diferentes em lotes diferentes. Nesses casos, compare as características técnicas.',
+              content: 'O encaixe da tela na carcaça pode usar suportes laterais, superiores, inferiores ou não ter suporte. Esses suportes são chamados de brackets.\n\nO Part Number é a forma mais segura de validar compatibilidade. Ele fica na parte traseira da tela, então normalmente é preciso remover a peça para consultar.\n\nPode haver mais de um Part Number com características equivalentes por causa de fabricantes e lotes diferentes. Nesses casos, a comparação técnica continua sendo obrigatória.',
+              image: '/images/telas/telas_básico_p13_i3.jpeg',
+              imagePlacement: 'afterContent',
+            },
+            {
+              title: 'Fabricantes e terminações',
+              content: 'A tabela de fabricantes ajuda a ler o início do Part Number e a entender variações de terminação.\n\nPrefixos como LP, B, N, LTN, LQ, CLAA e outros indicam fabricantes ou padrões internos.\n\nAs terminações podem ou não influenciar compatibilidade, por isso não devem ser ignoradas quando o código parecer muito parecido.\n\nNa prática, o Part Number precisa ser comparado junto com tamanho, resolução, pinagem e encaixe.',
+              image: '/images/telas/telas_básico_p13_i3.jpeg',
+              imagePlacement: 'afterContent',
             },
           ],
           quiz: {
@@ -140,18 +154,32 @@
             {
               title: 'Ferramentas de identificação',
               content: 'A identificação pode começar pela planilha de telas, filtrando características como tamanho, iluminação, resolução e pinagem.\n\nAo filtrar esses parâmetros, normalmente restam apenas variações adicionais, como suportes, IPS ou narrow frame.\n\nPara comparar Part Numbers ou modelos informados pelo cliente, use ferramentas como LaptopScreen para visão comercial e Panelook para análise mais técnica.',
+              image: '/images/telas/telas_intermediário_p4_i2.png',
+              imagePlacement: 'afterContent',
+            },
+            {
+              title: 'LaptopScreen e busca comercial',
+              content: 'O LaptopScreen é útil para uma primeira leitura de mercado e para localizar modelos parecidos pelo nome ou pelo Part Number.\n\nEle ajuda a confirmar se a tela existe em versões com a mesma medida e a entender rapidamente a aplicação comercial do painel.\n\nQuando a consulta precisa ser mais detalhada, a pesquisa deve avançar para bases técnicas.',
+              image: '/images/telas/telas_intermediário_p3_i2.png',
+              imagePlacement: 'afterContent',
             },
             {
               title: 'IPS x TN',
               content: 'Telas IPS oferecem melhor qualidade de imagem e cores em comparação com telas TN mais antigas.\n\nA diferença técnica está no alinhamento dos pixels: TN usa alinhamento vertical, enquanto IPS usa alinhamento horizontal.\n\nQuando o modelo for IPS, essa informação costuma aparecer em bases de consulta como LaptopScreen.',
+              image: '/images/telas/telas_intermediário_p5_i2.png',
+              imagePlacement: 'afterContent',
             },
             {
               title: 'Narrow frame',
               content: 'Telas narrow frame são modelos de borda fina ou borda infinita, comuns em notebooks mais compactos.\n\nApesar de parecerem maiores visualmente, suas dimensões físicas são menores que as telas convencionais, em torno de alguns milímetros.\n\nModelos que usam narrow frame não devem ser substituídos por telas convencionais, pois o encaixe e as dimensões não batem.',
+              image: '/images/telas/telas_intermediário_p6_i2.png',
+              imagePlacement: 'afterContent',
             },
             {
               title: 'Touch screen',
               content: 'Telas touch em notebooks podem ter o touch separado da tela ou acoplado à tela.\n\nA BBDI trabalha com modelos em que o touch já vem acoplado à tela.\n\nNo material, os modelos touch disponíveis são de 14,0 e 15,6 polegadas e usam conectores de 40 pinos.',
+              image: '/images/telas/telas_intermediário_p11_i2.jpeg',
+              imagePlacement: 'afterContent',
             },
           ],
           quiz: {
@@ -266,22 +294,38 @@
             {
               title: 'Narrow frame e brackets',
               content: 'Telas narrow frame podem ter ou não suportes, também chamados de brackets.\n\nNa maioria dos casos é possível identificar essa informação pelo Part Number, mas há suportes removíveis. Por isso, o físico pode divergir da compatibilidade cadastrada.\n\nA melhor forma de confirmar é solicitar fotos da tela antiga ao cliente quando houver dúvida.',
+              image: '/images/telas/telas_avançado_p2_i2.jpeg',
+              imagePlacement: 'afterContent',
+            },
+            {
+              title: 'Diferença entre narrow e normal',
+              content: 'A diferença entre uma tela narrow e uma tela normal pode parecer pequena, mas altera o tamanho físico e o encaixe.\n\nNo material, essa diferença é destacada em milímetros e precisa ser considerada quando o notebook usa borda fina.\n\nSe o suporte ou o quadro externo não baterem, a tela pode até ligar, mas não ficará corretamente fixada.',
+              image: '/images/telas/telas_avançado_p9_i2.jpeg',
+              imagePlacement: 'afterContent',
             },
             {
               title: 'Taxa de atualização',
               content: 'A taxa de atualização indica quantas vezes a imagem é atualizada por segundo e é medida em Hertz (Hz).\n\nUsuários comuns normalmente não percebem tanta diferença, mas usuários de jogos valorizam taxas maiores.\n\nA maioria dos notebooks comerciais usa 60Hz. Para confirmar a taxa, identifique o Part Number original da tela em estoque e consulte no Panelook.',
+              image: '/images/telas/telas_avançado_p5_i2.jpeg',
+              imagePlacement: 'afterContent',
             },
             {
               title: 'Troca entre HD e Full HD',
               content: 'As resoluções mais comuns são HD 1366 x 768 e Full HD 1920 x 1080.\n\nTrocar Full HD por HD geralmente funciona, mas a qualidade cai e o cliente tende a perceber a diferença.\n\nTrocar HD por Full HD pode parecer atrativo, mas depende de suporte da máquina. Muitos notebooks não suportam a quantidade maior de pixels e podem apagar a tela ou desligar.',
+              image: '/images/telas/telas_avançado_p10_i2.jpeg',
+              imagePlacement: 'afterContent',
             },
             {
               title: 'Caso B140XW02-V.1',
               content: 'O modelo B140XW02-V.1 atende muitos notebooks, mas há exceções.\n\nB140XW02-V.1: compatível com vários modelos, exceto alguns Dell e Lenovo S400.\n\nB140XW03-V.0: compatível com modelos Dell nesse caso.\n\nN140BGE-LB2: compatível com Lenovo S400.\n\nEsse caso reforça que Part Number equivalente e aplicação por modelo precisam ser validados juntos.',
+              image: '/images/telas/telas_avançado_p8_i1.jpeg',
+              imagePlacement: 'afterContent',
             },
             {
               title: 'Como ler Part Numbers de tela',
               content: 'Part Numbers de tela ajudam a entender fabricante, tamanho, resolução, tecnologia e revisão.\n\nExemplo: B156XW04-V.8 pode ser lido como fabricante AUO, tela 15,6 polegadas, resolução HD e revisão específica.\n\nPrefixos comuns incluem B, LP, LTN, NV, LQ, CLAA e N. Sufixos podem indicar revisão, mudanças elétricas, pinos, acabamento, brilho ou interface.\n\nEssa leitura é apoio técnico, mas deve ser combinada com consulta de compatibilidade.',
+              image: '/images/telas/telas_avançado_p6_i3.png',
+              imagePlacement: 'afterContent',
             },
           ],
           quiz: {
@@ -396,34 +440,50 @@
             {
               title: 'O que é um Part Number de tela',
               content: 'Part Numbers de tela são códigos atribuídos a modelos específicos de painéis.\n\nEles são usados para identificação técnica e ajudam a garantir compatibilidade, facilitar manutenção e evitar compras incorretas.\n\nAlém de identificar o modelo, o Part Number pode revelar tecnologia, tamanho, resolução, fabricante, versão e revisão da tela.',
+              image: '/images/telas/partnumbers_telas_para_notebook_p6_i2.png',
+              imagePlacement: 'afterContent',
             },
             {
               title: 'Por que Part Numbers são importantes',
               content: 'O Part Number ajuda a confirmar se uma tela é realmente compatível com o notebook do cliente.\n\nEle facilita a comparação entre modelos equivalentes, orienta compras corretas e permite entender diferenças de tecnologia ou revisão.\n\nNa prática, ele não substitui a análise completa. O atendimento ainda precisa validar tamanho, resolução, pinagem, encaixe, tipo de painel e variações físicas.',
+              image: '/images/telas/partnumbers_telas_para_notebook_p6_i2.png',
+              imagePlacement: 'afterContent',
             },
             {
               title: 'Como desmembrar um Part Number',
               content: 'Um Part Number costuma trazer vários blocos de informação.\n\nPrefixo alfabético: indica fabricante ou padrão interno. Exemplos comuns: B, LP, LTN, NV, LQ, CLAA e N.\n\nTamanho da tela: aparece em décimos de polegada. Exemplo: 140 indica 14,0 polegadas; 156 indica 15,6 polegadas.\n\nResolução ou tecnologia: aparece como abreviação técnica, como XW, WF, WH, FHM, QAN, HAN, HL, JW, WFG ou UHD.\n\nCódigo variante: diferencia modelos dentro da mesma série.\n\nSufixo ou revisão: indica versão técnica, atualização, acabamento, controle, brilho, interface, pinos ou mudanças elétricas.',
+              image: '/images/telas/partnumbers_telas_para_notebook_p6_i10.png',
+              imagePlacement: 'afterContent',
             },
             {
               title: 'Exemplo prático: B156XW04-V.8',
               content: 'No exemplo B156XW04-V.8, cada trecho ajuda a entender a tela.\n\nB: fabricante AU Optronics, também conhecido como AUO.\n\n156: tamanho de 15,6 polegadas.\n\nXW: padrão de resolução HD 1366 x 768 em nomenclatura AUO.\n\nW: painel widescreen, com proporção 16:9.\n\n04: versão específica dentro da série.\n\nV.8: revisão específica da tela.\n\nEsse tipo de leitura acelera a análise, mas a compatibilidade final deve ser validada em base técnica e pela aplicação no notebook.',
+              image: '/images/telas/partnumbers_telas_para_notebook_p6_i4.png',
+              imagePlacement: 'afterContent',
             },
             {
               title: 'Fabricantes e prefixos comuns',
-              content: 'Alguns prefixos aparecem com frequência em Part Numbers de tela.\n\nB: exemplo B156XW02-V.2.\n\nLP: exemplo LP156WF9-SPK1.\n\nLTN: exemplo LTN156HL01-102.\n\nNV: exemplo NV140FHM-N4K.\n\nLQ: exemplo LQ154K1LA0A.\n\nCLAA: exemplo CLAA133WA01A.\n\nN: exemplo N156HCA-EBA.\n\nEsses prefixos ajudam a reconhecer o padrão do fabricante, mas não devem ser usados isoladamente para decidir compatibilidade.',
+              content: 'Alguns prefixos aparecem com frequência em Part Numbers de tela.\n\nB, LP, LTN, NV, LQ, CLAA e N ajudam a reconhecer o padrão do fabricante.\n\nAs imagens de tela também ajudam a identificar se o painel é HD, Full HD, IPS ou uma variação de tamanho específica.\n\nEsses prefixos ajudam na leitura, mas não devem ser usados isoladamente para decidir compatibilidade.',
+              image: '/images/telas/partnumbers_telas_para_notebook_p6_i6.png',
+              imagePlacement: 'afterContent',
             },
             {
               title: 'Tecnologia e resolução no código',
-              content: 'Alguns segmentos indicam resolução ou tecnologia do painel.\n\nXW: HD 1366 x 768, comum em modelos AUO.\n\nWF: Full HD, IPS ou TN, Wide Full HD.\n\nWH: HD, TN, comum em modelos antigos.\n\nFHM: Full HD, IPS ou TN, geralmente fosco.\n\nQAN: QHD, IPS, painel premium.\n\nHAN: Full HD, IPS, eDP 30 ou 40 pinos.\n\nHL: Full HD, TN ou IPS, normalmente LED.\n\nJW: QHD, painel TN.\n\nWFG: Full HD com variações de tecnologia e resolução.\n\nUHD: 4K Ultra HD, normalmente IPS ou OLED.',
+              content: 'Alguns segmentos indicam resolução ou tecnologia do painel.\n\nXW e WH aparecem em modelos HD.\n\nWF, FHM, HAN, HL e WFG podem indicar variações de Full HD e tecnologia do painel.\n\nQAN, JW e UHD entram em modelos de maior definição.\n\nA leitura do código ajuda, mas sempre precisa ser conferida com a aplicação real da tela.',
+              image: '/images/telas/partnumbers_telas_para_notebook_p6_i12.png',
+              imagePlacement: 'afterContent',
             },
             {
-              title: 'Revisões e sufixos',
-              content: 'Sufixos e revisões podem indicar diferenças importantes.\n\nEAB, EA1 e EAC podem indicar configurações de pinos.\n\nSPB1, SPB2 e SPK1 podem indicar revisões com mudanças elétricas ou de pinos.\n\nTLN1, TLA1 e TLB1 podem indicar diferenças sutis de acabamento ou controle.\n\nN4K, N4B, N4G e N3E podem indicar revisão com variações de frequência, brilho ou interface.\n\nA01, A02 e A03 podem indicar versões internas de engenharia.\n\n101, 102 e 203 podem indicar mudanças de conector ou interface.\n\nJW31, JW33 e JW37 podem indicar diferenças de brilho ou backlight.\n\nE01 e EB1 podem indicar revisões usadas em séries especiais para fabricantes como HP e Lenovo.',
+              title: 'Variações por tamanho',
+              content: 'O mesmo tipo de análise vale para telas de tamanhos diferentes.\n\nNo material aparecem exemplos de 13,3, 15,4 e 15,6 polegadas, com resoluções e tecnologias distintas.\n\nIsso mostra por que o tamanho sozinho não define compatibilidade.\n\nSempre compare tamanho, resolução, interface e revisão antes de confirmar a troca.',
+              image: '/images/telas/partnumbers_telas_para_notebook_p6_i14.png',
+              imagePlacement: 'afterContent',
             },
             {
-              title: 'Como usar Part Number no atendimento',
+              title: 'Como usar no atendimento',
               content: 'Use o Part Number como ponto de partida técnico para consultar equivalências, validar revisões e comparar características.\n\nSe dois Part Numbers forem parecidos, mas tiverem sufixos diferentes, não assuma compatibilidade automaticamente.\n\nCompare resolução, pinagem, interface, brilho, tecnologia do painel, tamanho físico, brackets, posição do conector e aplicação no notebook.\n\nQuando houver dúvida entre revisões, a decisão mais segura é confirmar em base técnica e, se necessário, pedir foto da tela antiga ou consultar o estoque pelo Part Number do fabricante.',
+              image: '/images/telas/partnumbers_telas_para_notebook_p6_i2.png',
+              imagePlacement: 'afterContent',
             },
           ],
           quiz: {

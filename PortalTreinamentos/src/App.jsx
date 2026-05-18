@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useState } from 'react';
+import { Moon, Sun } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ModuleDetail from './pages/ModuleDetail';
@@ -9,9 +10,28 @@ import AdminProgress from './pages/AdminProgress';
 import Trainings from './pages/Trainings';
 import { authenticateUser, clearCurrentUser, getCurrentUser } from './data/usersStorage';
 
+const THEME_STORAGE_KEY = 'portalTreinamentos.theme';
+
+const getInitialTheme = () => {
+  const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+
+  if (storedTheme === 'dark' || storedTheme === 'light') {
+    return storedTheme;
+  }
+
+  return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+};
+
 function App() {
   const [currentUser, setCurrentUser] = useState(() => getCurrentUser());
+  const [theme, setTheme] = useState(getInitialTheme);
   const isAuthenticated = Boolean(currentUser);
+  const isDarkTheme = theme === 'dark';
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
+  }, [theme]);
 
   const handleLogin = (email, password) => {
     const user = authenticateUser(email, password.trim());
@@ -28,8 +48,22 @@ function App() {
     setCurrentUser(null);
   };
 
+  const toggleTheme = () => {
+    setTheme((currentTheme) => (currentTheme === 'dark' ? 'light' : 'dark'));
+  };
+
   return (
     <Router>
+      <button
+        type="button"
+        className="theme-toggle"
+        onClick={toggleTheme}
+        aria-label={isDarkTheme ? 'Ativar modo claro' : 'Ativar modo noturno'}
+        title={isDarkTheme ? 'Modo claro' : 'Modo noturno'}
+      >
+        {isDarkTheme ? <Sun size={20} /> : <Moon size={20} />}
+        <span>{isDarkTheme ? 'Claro' : 'Noturno'}</span>
+      </button>
       <Routes>
         <Route 
           path="/login" 

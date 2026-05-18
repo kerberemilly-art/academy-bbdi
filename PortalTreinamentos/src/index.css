@@ -1,23 +1,38 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  --bg-primary: #f3f4f6; /* Gray 100 - Fundo ultra claro */
-  --bg-secondary: #ffffff; /* Branco sólido */
-  --text-primary: #1f2937; /* Gray 800 - Texto principal */
-  --text-secondary: #6b7280; /* Gray 500 - Texto secundário */
-  
-  --accent-color: #1e40af; /* Blue 800 - Azul Corporativo */
-  --accent-hover: #1e3a8a; /* Blue 900 */
+  --bg-primary: #f3f4f6;
+  --bg-secondary: #ffffff;
+  --text-primary: #000000;
+  --text-secondary: #000000;
+  --accent-color: #1e40af;
+  --accent-hover: #1e3a8a;
   --accent-glow: rgba(30, 64, 175, 0.2);
-
-  --success-color: #059669; /* Emerald 600 */
-  --error-color: #dc2626; /* Red 600 */
-  
+  --success-color: #059669;
+  --error-color: #dc2626;
   --panel-bg: #ffffff;
   --panel-border: #e5e7eb;
   --panel-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  
+  --soft-surface: #f9fafb;
+  --soft-surface-strong: #f3f4f6;
   --transition-smooth: all 0.2s ease-in-out;
+}
+
+:root[data-theme='dark'] {
+  --bg-primary: #0b1220;
+  --bg-secondary: #111827;
+  --text-primary: #ffffff;
+  --text-secondary: #ffffff;
+  --accent-color: #60a5fa;
+  --accent-hover: #93c5fd;
+  --accent-glow: rgba(96, 165, 250, 0.22);
+  --success-color: #34d399;
+  --error-color: #f87171;
+  --panel-bg: #111827;
+  --panel-border: #263244;
+  --panel-shadow: 0 18px 45px rgba(0, 0, 0, 0.28);
+  --soft-surface: rgba(255, 255, 255, 0.04);
+  --soft-surface-strong: rgba(255, 255, 255, 0.08);
 }
 
 * {
@@ -32,18 +47,80 @@ body {
   color: var(--text-primary);
   min-height: 100vh;
   overflow-x: hidden;
-  background-image: none; /* Removendo degradês noturnos */
+  background-image: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* New Clean Panel Utility */
-.glass-panel, .clean-panel {
-  background: var(--bg-secondary);
+:root[data-theme='light'] body,
+:root[data-theme='light'] p,
+:root[data-theme='light'] span,
+:root[data-theme='light'] label,
+:root[data-theme='light'] strong,
+:root[data-theme='light'] small,
+:root[data-theme='light'] li,
+:root[data-theme='light'] input,
+:root[data-theme='light'] button,
+:root[data-theme='light'] textarea,
+:root[data-theme='light'] select,
+:root[data-theme='light'] .card-info h3,
+:root[data-theme='light'] .card-info p,
+:root[data-theme='light'] .welcome-section p,
+:root[data-theme='light'] .login-header h1,
+:root[data-theme='light'] .login-header p,
+:root[data-theme='light'] .login-footer,
+:root[data-theme='light'] .lesson-content h2,
+:root[data-theme='light'] .step-body p,
+:root[data-theme='light'] .question-card h3,
+:root[data-theme='light'] .quiz-option,
+:root[data-theme='light'] .master-metrics strong,
+:root[data-theme='light'] .master-metrics span,
+:root[data-theme='light'] .collaborator-name span,
+:root[data-theme='light'] .score-percent {
+  color: #000000;
+}
+
+:root[data-theme='dark'] body {
+  background-image:
+    radial-gradient(circle at top left, rgba(96, 165, 250, 0.16), transparent 34rem),
+    radial-gradient(circle at bottom right, rgba(20, 184, 166, 0.12), transparent 30rem);
+}
+
+:root[data-theme='dark'] body,
+:root[data-theme='dark'] p,
+:root[data-theme='dark'] span,
+:root[data-theme='dark'] label,
+:root[data-theme='dark'] strong,
+:root[data-theme='dark'] small,
+:root[data-theme='dark'] li,
+:root[data-theme='dark'] input,
+:root[data-theme='dark'] button,
+:root[data-theme='dark'] textarea,
+:root[data-theme='dark'] select,
+:root[data-theme='dark'] .card-info h3,
+:root[data-theme='dark'] .card-info p,
+:root[data-theme='dark'] .welcome-section p,
+:root[data-theme='dark'] .login-header h1,
+:root[data-theme='dark'] .login-header p,
+:root[data-theme='dark'] .login-footer,
+:root[data-theme='dark'] .lesson-content h2,
+:root[data-theme='dark'] .step-body p,
+:root[data-theme='dark'] .question-card h3,
+:root[data-theme='dark'] .quiz-option,
+:root[data-theme='dark'] .master-metrics strong,
+:root[data-theme='dark'] .master-metrics span,
+:root[data-theme='dark'] .collaborator-name span,
+:root[data-theme='dark'] .score-percent {
+  color: #ffffff;
+}
+
+.glass-panel,
+.clean-panel {
+  background: var(--panel-bg);
   border: 1px solid var(--panel-border);
   box-shadow: var(--panel-shadow);
   border-radius: 12px;
 }
 
-/* Buttons */
 .btn-primary {
   background-color: var(--accent-color);
   color: white;
@@ -70,7 +147,7 @@ body {
 }
 
 .btn-outline {
-  background: white;
+  background: var(--bg-secondary);
   border: 1px solid var(--panel-border);
   color: var(--text-primary);
   padding: 10px 20px;
@@ -86,13 +163,12 @@ body {
 
 .btn-outline:hover:not(:disabled) {
   background: var(--bg-primary);
-  border-color: #d1d5db;
+  border-color: var(--accent-color);
 }
 
-/* Inputs */
 .input-field {
   width: 100%;
-  background: white;
+  background: var(--bg-secondary);
   border: 1px solid var(--panel-border);
   color: var(--text-primary);
   padding: 12px 14px;
@@ -107,41 +183,190 @@ body {
   box-shadow: 0 0 0 3px var(--accent-glow);
 }
 
-/* Typography */
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary);
   letter-spacing: -0.025em;
 }
 
-/* Layout Utilities */
+.theme-toggle {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 1000;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: var(--panel-bg);
+  color: var(--text-primary);
+  box-shadow: var(--panel-shadow);
+  cursor: pointer;
+  font-weight: 700;
+  transition: var(--transition-smooth);
+}
+
+.theme-toggle:hover {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+  transform: translateY(-1px);
+}
+
 .container {
   max-width: 1100px;
   margin: 0 auto;
   padding: 0 20px;
 }
 
-/* Micro-animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fade-in {
   animation: fadeIn 0.4s ease-out forwards;
 }
 
-/* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
+
 ::-webkit-scrollbar-track {
-  background: var(--bg-primary); 
+  background: var(--bg-primary);
 }
+
 ::-webkit-scrollbar-thumb {
-  background: #d1d5db; 
+  background: #d1d5db;
   border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af; 
+  background: #9ca3af;
+}
+
+:root[data-theme='dark'] ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
+:root[data-theme='dark'] .theme-toggle,
+:root[data-theme='dark'] .dashboard-header,
+:root[data-theme='dark'] .lesson-header,
+:root[data-theme='dark'] .detail-header,
+:root[data-theme='dark'] .admin-users-header,
+:root[data-theme='dark'] .admin-progress-header {
+  background: rgba(17, 24, 39, 0.92);
+  border-color: var(--panel-border);
+  backdrop-filter: blur(12px);
+}
+
+:root[data-theme='dark'] .login-wrapper,
+:root[data-theme='dark'] .dashboard-wrapper,
+:root[data-theme='dark'] .lesson-wrapper {
+  background: transparent;
+}
+
+:root[data-theme='dark'] .login-container,
+:root[data-theme='dark'] .product-card,
+:root[data-theme='dark'] .lesson-content,
+:root[data-theme='dark'] .quiz-container,
+:root[data-theme='dark'] .level-card,
+:root[data-theme='dark'] .master-progress-panel,
+:root[data-theme='dark'] .master-collaborators,
+:root[data-theme='dark'] .training-folder,
+:root[data-theme='dark'] .user-form-panel,
+:root[data-theme='dark'] .users-list-panel,
+:root[data-theme='dark'] .collaborator-progress,
+:root[data-theme='dark'] .test-detail-panel,
+:root[data-theme='dark'] .progress-metric,
+:root[data-theme='dark'] .summary-metric {
+  background: var(--panel-bg);
+  border-color: var(--panel-border);
+  box-shadow: var(--panel-shadow);
+}
+
+:root[data-theme='dark'] .user-profile,
+:root[data-theme='dark'] .btn-users,
+:root[data-theme='dark'] .folder-icon,
+:root[data-theme='dark'] .master-metrics div,
+:root[data-theme='dark'] .master-collaborator-row,
+:root[data-theme='dark'] .icon-wrapper,
+:root[data-theme='dark'] .progress-bar-container,
+:root[data-theme='dark'] .step-image,
+:root[data-theme='dark'] .quiz-option,
+:root[data-theme='dark'] .login-icon,
+:root[data-theme='dark'] .answer-feedback {
+  background: var(--soft-surface);
+  border-color: var(--panel-border);
+}
+
+:root[data-theme='dark'] .btn-users:hover,
+:root[data-theme='dark'] .master-collaborator-row:hover,
+:root[data-theme='dark'] .quiz-option:hover:not(:disabled) {
+  background: rgba(96, 165, 250, 0.09);
+  border-color: rgba(96, 165, 250, 0.32);
+}
+
+:root[data-theme='dark'] .card-info h3,
+:root[data-theme='dark'] .master-metrics strong,
+:root[data-theme='dark'] .lesson-content h2,
+:root[data-theme='dark'] .question-card h3,
+:root[data-theme='dark'] .login-header h1,
+:root[data-theme='dark'] .step-body p,
+:root[data-theme='dark'] .quiz-option,
+:root[data-theme='dark'] .user-profile span {
+  color: var(--text-primary);
+}
+
+:root[data-theme='dark'] .lesson-actions,
+:root[data-theme='dark'] .question-card,
+:root[data-theme='dark'] .progress-bar-container {
+  border-color: var(--panel-border);
+}
+
+:root[data-theme='dark'] .quiz-option.selected {
+  background: rgba(37, 99, 235, 0.42);
+  border-color: #93c5fd;
+  color: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(147, 197, 253, 0.55);
+}
+
+:root[data-theme='dark'] .quiz-option.selected:hover:not(:disabled) {
+  background: rgba(37, 99, 235, 0.56);
+  border-color: #bfdbfe;
+  color: #ffffff;
+}
+
+:root[data-theme='dark'] .quiz-option.correct,
+:root[data-theme='dark'] .answer-feedback.is-correct {
+  background: rgba(16, 185, 129, 0.13) !important;
+  border-color: rgba(52, 211, 153, 0.45) !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme='dark'] .quiz-option.incorrect {
+  background: rgba(239, 68, 68, 0.13) !important;
+  border-color: rgba(248, 113, 113, 0.45) !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme='dark'] .answer-feedback.is-incorrect {
+  background: rgba(245, 158, 11, 0.13);
+  border-color: rgba(251, 191, 36, 0.45);
+  color: #ffffff;
+}
+
+:root[data-theme='dark'] .btn-logout:hover {
+  background: rgba(248, 113, 113, 0.14);
 }

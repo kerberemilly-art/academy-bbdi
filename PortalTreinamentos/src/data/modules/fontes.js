@@ -13,19 +13,48 @@
           steps: [
             {
               title: 'Função da fonte',
+              image: '/images/fontes/slides/fontes_basico_funcao_fluxo.png',
+              imagePlacement: 'afterContent',
               content: 'A fonte para notebook, também chamada de carregador, converte a energia alternada da tomada em energia contínua adequada ao equipamento.\n\nA entrada normalmente é bivolt, na faixa de 100V a 240V. A saída costuma variar entre 15V e 24V, conforme o modelo do notebook.\n\nSem a fonte correta, o notebook pode não ligar, não carregar a bateria ou apresentar falhas de alimentação.',
             },
             {
               title: 'Características de identificação',
+              image: '/images/fontes/fontes_básico_p3_i1.jpeg',
               content: 'Para identificar uma fonte corretamente, observe quatro critérios principais:\n\nVoltagem: tensão de saída da fonte, indicada em V.\n\nAmperagem: corrente fornecida pela fonte, indicada em A.\n\nPotência: resultado da multiplicação entre voltagem e amperagem, indicada em W.\n\nPino de conexão: formato físico do conector que entra no notebook.',
             },
             {
               title: 'Potência da fonte',
+              image: '/images/fontes/fontes_básico_p4_i2.jpeg',
               content: 'A potência de uma fonte é calculada da mesma forma que em baterias:\n\nW = V x A\n\nModelos comuns de notebook usam fontes de 65W a 90W. Equipamentos com maior demanda de energia podem usar 120W, 150W ou até potências próximas de 280W.\n\nExemplo: uma fonte de 20V e 3,25A entrega 65W.',
             },
             {
               title: 'Cabos e pinos',
+              image: [
+                '/images/fontes/fontes_básico_p5_i1.jpeg',
+                '/images/fontes/fontes_básico_p5_i2.jpeg'
+              ],
               content: 'O cabo que liga a fonte à tomada pode ser bipolar ou tripolar. Isso não define a compatibilidade da fonte com o notebook.\n\nO ponto crítico é o pino de conexão. Ele pode variar por marca, modelo e geração.\n\nA medição do conector considera o diâmetro externo e o diâmetro interno. Também existem conectores macho e fêmea, dependendo de onde fica o pino físico.',
+            },
+            {
+              title: 'Pinos de conexão',
+              image: [
+                '/images/fontes/fontes_básico_p6_i2.jpeg',
+                '/images/fontes/fontes_básico_p6_i3.jpeg'
+              ],
+              content: 'O pino da fonte é a identificação física mais importante do conector que entra no notebook.\n\nA medida costuma ser indicada pelo diâmetro externo e pelo diâmetro interno. No exemplo do material, o pino é identificado como 5.5mm x 2.5mm.\n\nAo comparar fontes, valide sempre se o formato do pino e as medidas batem com o equipamento do cliente.',
+            },
+            {
+              title: 'Pino macho e pino fêmea',
+              image: [
+                '/images/fontes/fontes_básico_p7_i2.jpeg',
+                '/images/fontes/fontes_básico_p7_i3.jpeg'
+              ],
+              content: 'Alguns conectores possuem pino central e outros possuem encaixe sem pino central visível.\n\nNo material, o conector macho possui pino saliente. O conector fêmea não possui esse pino saliente, mas ainda pode ter variações internas.\n\nEssa diferença visual precisa ser conferida antes da oferta, porque conectores parecidos podem não encaixar corretamente.',
+            },
+            {
+              title: 'Pinos mais comuns',
+              image: '/images/fontes/fontes_básico_p8_i2.png',
+              content: 'O treinamento apresenta uma tabela com pinos comuns por marca.\n\nExemplos citados incluem Acer 5.5mm x 1.7mm, Dell 7.4mm x 5.0mm, HP 7.4mm x 5.0mm e modelos nacionais com 5.5mm x 2.5mm.\n\nA tabela ajuda na triagem inicial, mas não substitui a validação por modelo, voltagem, amperagem e potência.',
             },
           ],
           quiz: {
@@ -139,19 +168,42 @@
           steps: [
             {
               title: 'Analisando uma fonte no site',
+              image: '/images/fontes/slides/fontes_intermediario_site_especificacoes.png',
+              imagePlacement: 'afterContent',
               content: 'Ao analisar uma fonte no site da BB Baterias, confirme voltagem, amperagem, potência e pino de conexão.\n\nQuando houver relação Pai e Filho, as duas informações podem aparecer. Mesmo assim, valide se a variação atende ao notebook do cliente.',
             },
             {
               title: 'Tabela de pinos',
-              content: 'A tabela de pinos organiza os modelos de fontes pelo tamanho do conector, do menor para o maior.\n\nEla ajuda a identificar o pino correto e também mostra quais fontes compartilham o mesmo pino, mas podem ter variações de voltagem e amperagem.\n\nUse a tabela como apoio de consulta, não como único critério. A fonte correta ainda precisa respeitar especificação elétrica.',
+              image: [
+                '/images/fontes/slides/fontes_intermediario_tabela_link.png',
+                '/images/fontes/slides/fontes_intermediario_tabela_exemplo.png'
+              ],
+              imagePlacement: 'afterContent',
+              content: 'A tabela deve ser usada filtrando primeiro o pino da fonte e depois validando as especificações elétricas.\n\nNo exemplo do material, a tabela organiza fontes por marca, referência, voltagem, amperagem e potência.\n\nO objetivo é facilitar a busca de referências equivalentes sem perder o controle dos critérios técnicos.',
+            },
+            {
+              title: 'Pesquisa pelo pino de conexão',
+              image: '/images/fontes/slides/fontes_intermediario_pinos_principais.png',
+              imagePlacement: 'afterContent',
+              content: 'Além da consulta por modelo do notebook, o treinamento mostra a pesquisa pelo pino de conexão.\n\nEsse tipo de busca ajuda quando o cliente possui a fonte antiga em mãos ou quando é possível medir o conector.\n\nMesmo assim, a pesquisa por pino precisa ser cruzada com a marca, modelo e especificações elétricas.',
             },
             {
               title: 'Tipos de conectores',
+              image: '/images/fontes/slides/fontes_intermediario_tipos_conectores.png',
+              imagePlacement: 'afterContent',
               content: 'Entre os conectores comuns estão pinos agulha, bullet e USB-C.\n\nAgulha: extremamente fino, exige atenção visual.\n\nBullet: possui trava e pode gerar incompatibilidade em alguns casos.\n\nUSB-C: padrão novo usado em diversos equipamentos, mas exige validação de potência e aplicação.',
             },
             {
               title: 'Fontes para Apple MacBook',
+              image: '/images/fontes/slides/fontes_intermediario_apple_conectores.png',
+              imagePlacement: 'afterContent',
               content: 'MacBooks usam conectores diferentes das demais marcas.\n\nMagsafe 1: usado em modelos mais antigos, com pino central menor que os demais.\n\nMagsafe 2: todos os pinos internos têm tamanho semelhante.\n\nUSB-C: usado em modelos mais recentes. A partir desse padrão, a potência e a origem da fonte precisam ser validadas com mais cuidado.',
+            },
+            {
+              title: 'Diferença entre Magsafe 1 e Magsafe 2',
+              image: '/images/fontes/slides/fontes_intermediario_magsafe_diferenca.png',
+              imagePlacement: 'afterContent',
+              content: 'A diferença visual entre Magsafe 1 e Magsafe 2 está no formato interno dos pinos.\n\nNo Magsafe 1, o pino central é menor que os demais. No Magsafe 2, todos os pinos têm tamanho semelhante.\n\nEssa comparação evita confundir conectores Apple visualmente parecidos.',
             },
           ],
           quiz: {
@@ -265,18 +317,41 @@
           steps: [
             {
               title: 'Dell x HP com mesmo diâmetro',
+              image: '/images/fontes/slides/fontes_avancado_dell_hp_limpo.png',
+              imagePlacement: 'afterContent',
               content: 'Existem fontes Dell e HP com o mesmo diâmetro de pino: 7,4mm x 5,0mm.\n\nMesmo parecendo iguais fisicamente, não são compatíveis entre si. Fontes HP não são reconhecidas em notebooks Dell nesses casos.\n\nEsse é um exemplo claro de que pino físico não deve ser o único critério de venda.',
             },
             {
               title: 'Troca por voltagem diferente',
+              image: [
+                '/images/fontes/slides/fontes_avancado_voltagem_exemplos_limpo.png',
+                '/images/fontes/slides/fontes_avancado_voltagem_regra.png'
+              ],
+              imagePlacement: 'afterContent',
               content: 'Muitas fontes de notebook ficam entre 18V e 20V e podem ser intercambiáveis quando a potência é respeitada.\n\nExemplo compatível: 20V 3,25A 65W e 19V 3,42A 65W.\n\nDiferenças grandes, como 15V para 19V ou 20V, não são aconselhadas. Mesmo que funcione inicialmente, pode danificar o equipamento com o tempo.\n\nRegra prática do treinamento: substituir apenas quando a diferença for de no máximo 1,5V.',
             },
             {
+              title: 'Novos modelos Sony e Positivo',
+              image: '/images/fontes/slides/fontes_avancado_sony_positivo_pinos.png',
+              imagePlacement: 'afterContent',
+              content: 'O material destaca novos modelos de fontes para Sony e Positivo com conectores muito parecidos entre si.\n\nAlguns modelos antigos usam 5.5mm x 2.5mm, enquanto novos modelos podem usar 4.8mm x 1.7mm ou 4.0mm x 1.7mm.\n\nA diferença é pequena visualmente, então a validação por diâmetro e modelo é essencial.',
+            },
+            {
               title: 'Quando ofertar maior potência',
+              image: '/images/fontes/slides/fontes_avancado_bateria_estendida_exemplo.png',
+              imagePlacement: 'afterContent',
               content: 'Em alguns casos, pode ser aconselhável substituir uma fonte de 65W por uma de 90W.\n\nIsso pode ocorrer quando o cliente usa uma bateria de capacidade estendida ou quando relata aquecimento excessivo da fonte.\n\nA fonte de 90W pode trabalhar fornecendo os 65W necessários ao notebook, mantendo folga de potência.\n\nNão é uma regra automática. A análise deve considerar o modelo e a necessidade do equipamento.',
             },
             {
+              title: 'Troca de potência por aquecimento',
+              image: '/images/fontes/slides/fontes_avancado_aquecimento_exemplo.png',
+              imagePlacement: 'afterContent',
+              content: 'Fontes aquecem naturalmente durante o uso, mas aquecimento excessivo pode indicar que a fonte está trabalhando no limite.\n\nQuando o modelo permite, uma fonte de maior potência pode trabalhar com mais folga e reduzir esforço térmico.\n\nEssa substituição precisa preservar voltagem, pino correto e compatibilidade do notebook.',
+            },
+            {
               title: 'USB-C e casos especiais',
+              image: '/images/fontes/slides/fontes_avancado_usbc_exemplo.png',
+              imagePlacement: 'afterContent',
               content: 'USB-C permite carregar notebooks, tablets e smartphones, mas a potência precisa ser respeitada.\n\nNão é correto usar uma fonte de smartphone de 29W em um notebook que precisa de 65W.\n\nEquipamentos Apple podem exigir fonte compatível com Apple. Por isso, há modelos USB-C específicos para Apple e modelos para demais marcas.\n\nTambém existem casos Sony/Positivo com padrões de pinagem diferentes dos padrões antigos, exigindo validação cuidadosa.',
             },
           ],

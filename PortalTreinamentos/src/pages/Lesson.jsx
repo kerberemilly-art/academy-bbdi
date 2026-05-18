@@ -71,6 +71,25 @@ const Lesson = ({ currentUser }) => {
   const totalQuestions = lesson.quiz.questions.length;
   const score = calculateScore();
   const scorePercent = Math.round((score / totalQuestions) * 100);
+  const currentLessonStep = lesson.steps[currentStep];
+
+  const renderStepImages = () => {
+    if (!currentLessonStep.image) return null;
+
+    const images = Array.isArray(currentLessonStep.image)
+      ? currentLessonStep.image
+      : [currentLessonStep.image];
+
+    return (
+      <div className="step-image-container">
+        {images.map((img, index) => (
+          <div key={img} className="step-image">
+            <img src={img} alt={`${currentLessonStep.title} - ${index + 1}`} />
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <div className="lesson-wrapper">
@@ -97,27 +116,14 @@ const Lesson = ({ currentUser }) => {
             <span className="step-indicator" style={{ color: moduleInfo.color }}>
               Passo {currentStep + 1} de {lesson.steps.length}
             </span>
-            <h2>{lesson.steps[currentStep].title}</h2>
+            <h2>{currentLessonStep.title}</h2>
             
             <div className="step-body">
-              {lesson.steps[currentStep].image && (
-                <div className="step-image-container">
-                  {Array.isArray(lesson.steps[currentStep].image) ? (
-                    lesson.steps[currentStep].image.map((img, index) => (
-                      <div key={index} className="step-image">
-                        <img src={img} alt={`${lesson.steps[currentStep].title} - ${index + 1}`} />
-                      </div>
-                    ))
-                  ) : (
-                    <div className="step-image">
-                      <img src={lesson.steps[currentStep].image} alt={lesson.steps[currentStep].title} />
-                    </div>
-                  )}
-                </div>
-              )}
-              {lesson.steps[currentStep].content.split('\n').map((paragraph, idx) => (
+              {currentLessonStep.imagePlacement !== 'afterContent' && renderStepImages()}
+              {currentLessonStep.content.split('\n').map((paragraph, idx) => (
                 <p key={idx}>{paragraph}</p>
               ))}
+              {currentLessonStep.imagePlacement === 'afterContent' && renderStepImages()}
             </div>
 
             <div className="lesson-actions">

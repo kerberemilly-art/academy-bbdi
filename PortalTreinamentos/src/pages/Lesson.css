@@ -252,3 +252,16 @@
   gap: 16px;
   margin-top: 32px;
 }
+
+:root[data-theme='dark'] .quiz-option.selected,
+:root[data-theme='dark'] .quiz-option.selected:hover:not(:disabled) {
+  background: rgba(37, 99, 235, 0.56) !important;
+  border-color: #bfdbfe !important;
+  color: #ffffff !important;
+  box-shadow: inset 0 0 0 1px rgba(147, 197, 253, 0.65);
+}
+
+:root[data-theme='dark'] .quiz-option:hover:not(:disabled),
+:root[data-theme='dark'] .quiz-option:focus-visible {
+  color: #ffffff !important;
+}
