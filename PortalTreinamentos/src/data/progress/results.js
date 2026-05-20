@@ -14,9 +14,10 @@ export const recordQuizResult = ({
 }) => {
   if (!user) return null;
 
-  const percent = Math.round((score / totalQuestions) * 100);
+  const safeTotalQuestions = totalQuestions > 0 ? totalQuestions : 0;
+  const percent = safeTotalQuestions ? Math.round((score / safeTotalQuestions) * 100) : 0;
   const result = {
-    id: createId(),
+    id: createId('result'),
     userId: user.id,
     userName: user.name,
     userEmail: user.email,

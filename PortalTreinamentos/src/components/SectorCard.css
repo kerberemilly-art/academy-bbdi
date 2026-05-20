@@ -1,0 +1,118 @@
+.sector-card {
+  width: 100%;
+  text-align: left;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(248, 250, 252, 0.72));
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  min-height: 220px;
+}
+
+.sector-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent-color);
+  box-shadow: 0 20px 35px -20px rgba(15, 23, 42, 0.32);
+}
+
+.sector-card:disabled {
+  cursor: not-allowed;
+  transform: none;
+}
+
+.sector-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.sector-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sector-badge {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.sector-badge.is-active {
+  background: rgba(219, 234, 254, 0.8);
+  color: #1d4ed8;
+}
+
+.sector-badge.is-highlighted {
+  background: rgba(16, 185, 129, 0.14);
+  color: #059669;
+}
+
+.sector-badge.is-locked {
+  background: rgba(148, 163, 184, 0.16);
+  color: #94a3b8;
+}
+
+.sector-badge.is-planned {
+  background: rgba(241, 245, 249, 0.88);
+  color: #6b7280;
+}
+
+.sector-card-body h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--text-primary);
+}
+
+.sector-card-body p {
+  color: var(--text-secondary);
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+
+.sector-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.sector-action {
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+}
+
+.sector-card:hover .sector-action {
+  color: var(--accent-color);
+}
+
+.sector-card.is-locked {
+  opacity: 0.72;
+}
+
+.sector-card.is-highlighted {
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+@media (max-width: 768px) {
+  .sector-card {
+    padding: 20px;
+  }
+}

@@ -1,7 +1,7 @@
 ﻿export const memoriasModule = {
     id: 5,
     title: 'Memórias',
-    icon: 'Cpu',
+    icon: 'MemoryStick',
     color: '#ef4444',
     description: 'Trilha para orientar compatibilidade e upgrade de memória RAM por família, tensão, frequência e capacidade.',
     levels: [
@@ -142,7 +142,6 @@
             {
               title: 'Caso especial DDR3L',
               content: 'DDR3L significa Low Voltage e trabalha com 1,35V.\n\nDDR3L funciona em dispositivos compatíveis com DDR3L e também em dispositivos que usam DDR3 convencional.\n\nO inverso não é seguro: memória DDR3 convencional não funciona em dispositivos que exigem DDR3L.\n\nEsse é o principal caso de substituição entre variações próximas de família.',
-              image: '/images/memória/memoria_ram_p4_i3.jpeg',
               imagePlacement: 'afterContent',
             },
             {

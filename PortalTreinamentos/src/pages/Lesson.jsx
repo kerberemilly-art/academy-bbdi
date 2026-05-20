@@ -1,17 +1,23 @@
 import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { CheckCircle, ChevronRight, ChevronLeft, Award, RefreshCcw } from 'lucide-react';
 import { modulesData } from '../data/modulesData';
+import { getMarketingLevelStatus } from '../data/trainingPath';
+import { getMarketingCertificateStatus } from '../data/certificateEligibility';
 import { recordQuizResult } from '../data/progressStorage';
+import { issueMarketingCertificateIfEligible } from '../data/certificateActions';
 import './Lesson.css';
 
 const Lesson = ({ currentUser }) => {
   const { moduleId, levelId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const backPath = location.state?.backPath || '/dashboard';
   
   const moduleInfo = modulesData[moduleId];
   const levelInfo = moduleInfo?.levels.find(l => l.id === levelId);
   const lesson = levelInfo?.lesson;
+  const levelStatus = getMarketingLevelStatus(currentUser, moduleId, levelId);
 
   const [currentStep, setCurrentStep] = useState(0);
   const [showQuiz, setShowQuiz] = useState(false);
@@ -19,6 +25,29 @@ const Lesson = ({ currentUser }) => {
   const [quizSubmitted, setQuizSubmitted] = useState(false);
 
   if (!lesson) return <div className="container" style={{padding: '2rem'}}>Aula não encontrada.</div>;
+
+  if (currentUser?.role !== 'master' && levelStatus.isLocked) {
+    const requiredModuleTitle = levelStatus.requiredModuleId
+      ? modulesData[levelStatus.requiredModuleId]?.title
+      : 'o módulo anterior';
+    const requiredLevelTitle = levelStatus.requiredLevelId
+      ? modulesData[levelStatus.requiredModuleId]?.levels.find((level) => level.id === levelStatus.requiredLevelId)?.title
+      : null;
+
+    return (
+      <div className="container" style={{ textAlign: 'center', marginTop: '50px' }}>
+        <h2>Você ainda não pode acessar esta aula.</h2>
+        <p style={{ marginTop: '12px' }}>
+          {requiredLevelTitle
+            ? `Conclua ${requiredLevelTitle} em ${requiredModuleTitle} para liberar esta aula.`
+            : `Conclua ${requiredModuleTitle} para liberar ${moduleInfo?.title ?? 'esta aula'}.`}
+        </p>
+        <button className="btn-primary" onClick={() => navigate(backPath)} style={{ marginTop: '20px' }}>
+          Voltar
+        </button>
+      </div>
+    );
+  }
 
   const handleNext = () => {
     if (currentStep < lesson.steps.length - 1) {
@@ -41,7 +70,7 @@ const Lesson = ({ currentUser }) => {
 
   const handleQuizSubmit = () => {
     const finalScore = calculateScore();
-    recordQuizResult({
+    const result = recordQuizResult({
       user: currentUser,
       moduleId,
       moduleTitle: moduleInfo.title,
@@ -51,6 +80,20 @@ const Lesson = ({ currentUser }) => {
       score: finalScore,
       totalQuestions: lesson.quiz.questions.length,
     });
+
+    if (result) {
+      const certificate = issueMarketingCertificateIfEligible(currentUser, {
+        score: result.score,
+        totalQuestions: result.totalQuestions,
+        percent: result.percent,
+      });
+
+      if (certificate) {
+        navigate('/certificate');
+        return;
+      }
+    }
+
     setQuizSubmitted(true);
   };
 
@@ -72,6 +115,7 @@ const Lesson = ({ currentUser }) => {
   const score = calculateScore();
   const scorePercent = Math.round((score / totalQuestions) * 100);
   const currentLessonStep = lesson.steps[currentStep];
+  const certificateStatus = getMarketingCertificateStatus(currentUser.id);
 
   const renderStepImages = () => {
     if (!currentLessonStep.image) return null;
@@ -95,7 +139,7 @@ const Lesson = ({ currentUser }) => {
     <div className="lesson-wrapper">
       <header className="lesson-header glass-panel">
         <div className="container">
-          <button className="btn-back" onClick={() => navigate(`/module/${moduleId}`)}>
+          <button className="btn-back" onClick={() => navigate(`/module/${moduleId}`, { state: { backPath } })}>
             <ChevronLeft size={20} /> Voltar para Níveis
           </button>
           <div className="progress-bar-container">
@@ -211,6 +255,12 @@ const Lesson = ({ currentUser }) => {
                 <span className="score-percent">{scorePercent}% de aproveitamento</span>
                 <h3>Quiz Concluído!</h3>
                 <p>Ótimo trabalho! Você finalizou este nível de treinamento.</p>
+                {(moduleId === '7' || moduleId === '8') && !certificateStatus.isEligible && (
+                  <p className="certificate-lock-note">
+                    O certificado de Marketing de Produtos será liberado quando a Avaliação Final Produtos e a
+                    Compatibilidade estiverem concluídas.
+                  </p>
+                )}
                 <div className="quiz-result-actions">
                   <button 
                     className="btn-outline"
@@ -220,7 +270,7 @@ const Lesson = ({ currentUser }) => {
                   </button>
                   <button 
                     className="btn-primary"
-                    onClick={() => navigate(`/module/${moduleId}`)}
+                    onClick={() => navigate(`/module/${moduleId}`, { state: { backPath } })}
                     style={{ backgroundColor: moduleInfo.color }}
                   >
                     <CheckCircle size={20} /> Voltar ao Módulo

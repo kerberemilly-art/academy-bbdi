@@ -8,18 +8,27 @@ import Lesson from './pages/Lesson';
 import AdminUsers from './pages/AdminUsers';
 import AdminProgress from './pages/AdminProgress';
 import Trainings from './pages/Trainings';
+import Certificate from './pages/Certificate';
+import Preview from './pages/Preview';
+import CertificateShowcase from './pages/CertificateShowcase';
+import SectorDetail from './pages/SectorDetail';
 import { authenticateUser, clearCurrentUser, getCurrentUser } from './data/usersStorage';
+import { readStorageValue, writeStorageValue } from './data/runtime';
 
 const THEME_STORAGE_KEY = 'portalTreinamentos.theme';
 
 const getInitialTheme = () => {
-  const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+  const storedTheme = readStorageValue(THEME_STORAGE_KEY, null);
 
   if (storedTheme === 'dark' || storedTheme === 'light') {
     return storedTheme;
   }
 
-  return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-color-scheme: dark)').matches) {
+    return 'dark';
+  }
+
+  return 'light';
 };
 
 function App() {
@@ -29,8 +38,11 @@ function App() {
   const isDarkTheme = theme === 'dark';
 
   useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-    localStorage.setItem(THEME_STORAGE_KEY, theme);
+    if (typeof document !== 'undefined') {
+      document.documentElement.dataset.theme = theme;
+    }
+
+    writeStorageValue(THEME_STORAGE_KEY, theme);
   }, [theme]);
 
   const handleLogin = (email, password) => {
@@ -65,6 +77,9 @@ function App() {
         <span>{isDarkTheme ? 'Claro' : 'Noturno'}</span>
       </button>
       <Routes>
+        <Route path="/" element={<CertificateShowcase />} />
+        <Route path="/certificate-showcase" element={<CertificateShowcase />} />
+        <Route path="/preview" element={<Preview />} />
         <Route 
           path="/login" 
           element={
@@ -84,6 +99,12 @@ function App() {
           }
         />
         <Route
+          path="/sector/:id"
+          element={
+            isAuthenticated ? <SectorDetail currentUser={currentUser} onLogout={handleLogout} /> : <Navigate to="/login" />
+          }
+        />
+        <Route
           path="/admin/users"
           element={
             currentUser?.role === 'master'
@@ -99,11 +120,15 @@ function App() {
               : <Navigate to={isAuthenticated ? '/dashboard' : '/login'} />
           }
         />
-        <Route 
+        <Route
           path="/module/:id" 
           element={
-            isAuthenticated ? <ModuleDetail /> : <Navigate to="/login" />
+            isAuthenticated ? <ModuleDetail currentUser={currentUser} /> : <Navigate to="/login" />
           } 
+        />
+        <Route
+          path="/certificate"
+          element={<Certificate currentUser={currentUser} onLogout={handleLogout} />}
         />
         <Route 
           path="/lesson/:moduleId/:levelId" 

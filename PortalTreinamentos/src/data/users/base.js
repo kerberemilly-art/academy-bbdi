@@ -1,12 +1,13 @@
-import { MASTER_USER, readStoredUsers, writeUsers } from './shared';
+import { MASTER_USER, normalizeStoredUser, readStoredUsers, writeUsers } from './shared';
 
 export const getUsers = () => {
-  const users = readStoredUsers();
+  const users = readStoredUsers().map(normalizeStoredUser).filter(Boolean);
   const hasMaster = users.some((user) => user.id === MASTER_USER.id);
-  const normalizedUsers = hasMaster
-    ? users.map((user) => (user.id === MASTER_USER.id ? { ...MASTER_USER, ...user, ...MASTER_USER } : user))
-    : [MASTER_USER, ...users];
+  const normalizedUsers = hasMaster ? users : [MASTER_USER, ...users];
+  const uniqueUsers = Array.from(
+    new Map(normalizedUsers.map((user) => [user.id, user])).values(),
+  ).map(normalizeStoredUser).filter(Boolean);
 
-  writeUsers(normalizedUsers);
-  return normalizedUsers;
+  writeUsers(uniqueUsers);
+  return uniqueUsers;
 };

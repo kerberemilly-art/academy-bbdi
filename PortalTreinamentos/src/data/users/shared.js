@@ -1,9 +1,21 @@
+import {
+  DEFAULT_COLLABORATOR_DEPARTMENT_ID,
+  getNormalizedDepartmentId,
+  getNormalizedDepartmentIds,
+} from '../sectorAccess';
+import {
+  normalizeEmail,
+  readStorageJSON,
+  safeTrim,
+  writeStorageJSON,
+} from '../runtime';
+
 const USERS_STORAGE_KEY = 'portalTreinamentos.users';
 const SESSION_STORAGE_KEY = 'portalTreinamentos.currentUserId';
 
 export const MASTER_CREDENTIALS = {
   email: 'master@treinamentos.local',
-  password: 'Master@123',
+  password: 'MASTER_PASSWORD_REMOVED',
 };
 
 export const MASTER_USER = {
@@ -14,29 +26,52 @@ export const MASTER_USER = {
   role: 'master',
   active: true,
   createdAt: '2026-05-15T00:00:00.000Z',
-};
-
-export const normalizeEmail = (email) => email.trim().toLowerCase();
-
-export const createId = () => {
-  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-    return crypto.randomUUID();
-  }
-
-  return `user-${Date.now()}`;
+  departmentId: null,
+  departmentIds: [],
 };
 
 export const readStoredUsers = () => {
-  try {
-    const storedUsers = localStorage.getItem(USERS_STORAGE_KEY);
-    return storedUsers ? JSON.parse(storedUsers) : [];
-  } catch {
-    return [];
-  }
+  const storedUsers = readStorageJSON(USERS_STORAGE_KEY, []);
+
+  return Array.isArray(storedUsers) ? storedUsers : [];
 };
 
 export const writeUsers = (users) => {
-  localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+  writeStorageJSON(USERS_STORAGE_KEY, users);
 };
 
 export const getSessionStorageKey = () => SESSION_STORAGE_KEY;
+
+export const normalizeStoredUser = (user) => {
+  if (!user || typeof user !== 'object') {
+    return null;
+  }
+
+  if (user.role === 'master') {
+    return {
+      ...MASTER_USER,
+      ...user,
+      email: MASTER_CREDENTIALS.email,
+      password: MASTER_CREDENTIALS.password,
+      departmentId: null,
+      departmentIds: [],
+    };
+  }
+
+  const normalizedDepartmentIds = getNormalizedDepartmentIds(
+    user.departmentIds ?? user.departmentId ?? DEFAULT_COLLABORATOR_DEPARTMENT_ID,
+  );
+  const normalizedName = safeTrim(user.name, 'Colaborador');
+  const normalizedEmail = normalizeEmail(user.email);
+
+  return {
+    ...user,
+    name: normalizedName,
+    email: normalizedEmail,
+    departmentId: getNormalizedDepartmentId(normalizedDepartmentIds[0]),
+    departmentIds: normalizedDepartmentIds,
+  };
+};
+
+export { normalizeEmail } from '../runtime';
+export { createId } from '../runtime';

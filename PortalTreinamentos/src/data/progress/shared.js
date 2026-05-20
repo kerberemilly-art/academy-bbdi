@@ -1,22 +1,15 @@
+import { readStorageJSON, writeStorageJSON } from '../runtime';
+
 const QUIZ_RESULTS_STORAGE_KEY = 'portalTreinamentos.quizResults';
 
 export const readResults = () => {
-  try {
-    const storedResults = localStorage.getItem(QUIZ_RESULTS_STORAGE_KEY);
-    return storedResults ? JSON.parse(storedResults) : [];
-  } catch {
-    return [];
-  }
+  const storedResults = readStorageJSON(QUIZ_RESULTS_STORAGE_KEY, []);
+
+  return Array.isArray(storedResults) ? storedResults : [];
 };
 
 export const writeResults = (results) => {
-  localStorage.setItem(QUIZ_RESULTS_STORAGE_KEY, JSON.stringify(results));
+  writeStorageJSON(QUIZ_RESULTS_STORAGE_KEY, results);
 };
 
-export const createId = () => {
-  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-    return crypto.randomUUID();
-  }
-
-  return `result-${Date.now()}`;
-};
+export { createId } from '../runtime';
