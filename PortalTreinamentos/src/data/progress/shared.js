@@ -1,15 +1,13 @@
-import { readStorageJSON, writeStorageJSON } from '../runtime';
-
-const QUIZ_RESULTS_STORAGE_KEY = 'portalTreinamentos.quizResults';
+import { readBackendSlice, writeBackendSlice } from '../backendSync';
 
 export const readResults = () => {
-  const storedResults = readStorageJSON(QUIZ_RESULTS_STORAGE_KEY, []);
+  const storedResults = readBackendSlice('results', []);
 
   return Array.isArray(storedResults) ? storedResults : [];
 };
 
 export const writeResults = (results) => {
-  writeStorageJSON(QUIZ_RESULTS_STORAGE_KEY, results);
+  writeBackendSlice('results', results);
 };
 
 export { createId } from '../runtime';

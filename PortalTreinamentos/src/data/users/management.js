@@ -1,13 +1,88 @@
 import { normalizeEmail, writeUsers } from './shared';
 import { getUsers } from './base';
-import { getNormalizedDepartmentId, getNormalizedDepartmentIds } from '../sectorAccess';
+import {
+  canManageSector,
+  getNormalizedDepartmentId,
+  getNormalizedDepartmentIds,
+  getUserDepartmentIds,
+  isSuperAdmin,
+} from '../sectorAccess';
 import { createId, isValidEmail, safeTrim } from '../runtime';
 
-export const createUser = ({ name, email, password, departmentId, departmentIds }) => {
+const normalizeRole = (role) => (role === 'admin' ? 'admin' : 'collaborator');
+
+const getActorDepartmentIds = (actorUser) => {
+  if (!actorUser || isSuperAdmin(actorUser)) {
+    return [];
+  }
+
+  return getUserDepartmentIds(actorUser);
+};
+
+const normalizeDepartmentSelectionForActor = (actorUser, role, departmentId, departmentIds) => {
+  const normalizedDepartmentIds = getNormalizedDepartmentIds(departmentIds ?? departmentId);
+  const actorDepartmentIds = getActorDepartmentIds(actorUser);
+
+  if (!actorUser) {
+    return normalizedDepartmentIds;
+  }
+
+  if (role === 'admin') {
+    const requestedDepartmentId = normalizedDepartmentIds[0];
+
+    if (isSuperAdmin(actorUser) || canManageSector(actorUser, requestedDepartmentId)) {
+      return [requestedDepartmentId];
+    }
+
+    return [actorDepartmentIds[0]];
+  }
+
+  if (actorDepartmentIds.length === 0) {
+    return normalizedDepartmentIds;
+  }
+
+  const restrictedDepartmentIds = normalizedDepartmentIds.filter((currentDepartmentId) => (
+    actorDepartmentIds.includes(currentDepartmentId)
+  ));
+
+  return restrictedDepartmentIds.length > 0
+    ? restrictedDepartmentIds
+    : [actorDepartmentIds[0]];
+};
+
+const normalizeDepartmentSelectionForUpdate = (actorUser, role, departmentId, departmentIds) => {
+  if (isSuperAdmin(actorUser)) {
+    return normalizeDepartmentSelectionForActor(actorUser, role, departmentId, departmentIds);
+  }
+
+  const actorDepartmentIds = getActorDepartmentIds(actorUser);
+  const normalizedDepartmentIds = normalizeDepartmentSelectionForActor(actorUser, role, departmentId, departmentIds);
+
+  return normalizedDepartmentIds.filter((currentDepartmentId) => actorDepartmentIds.includes(currentDepartmentId));
+};
+
+const ensureActorScopedDepartments = (actorUser, departmentIds) => {
+  if (!actorUser || isSuperAdmin(actorUser)) {
+    return departmentIds;
+  }
+
+  const actorDepartmentIds = getActorDepartmentIds(actorUser);
+  const scopedDepartmentIds = departmentIds.filter((currentDepartmentId) => (
+    actorDepartmentIds.includes(currentDepartmentId)
+  ));
+
+  return scopedDepartmentIds.length > 0 ? scopedDepartmentIds : actorDepartmentIds.slice(0, 1);
+};
+
+export const createUser = ({ name, email, password, role, departmentId, departmentIds }, actorUser = null) => {
   const normalizedName = safeTrim(name);
   const normalizedEmail = normalizeEmail(email);
   const normalizedPassword = safeTrim(password);
-  const normalizedDepartmentIds = getNormalizedDepartmentIds(departmentIds ?? departmentId);
+  const normalizedRole = normalizeRole(role);
+  const normalizedDepartmentIds = ensureActorScopedDepartments(
+    actorUser,
+    normalizeDepartmentSelectionForActor(actorUser, normalizedRole, departmentId, departmentIds),
+  );
   const normalizedDepartmentId = getNormalizedDepartmentId(normalizedDepartmentIds[0]);
   const users = getUsers();
 
@@ -32,7 +107,7 @@ export const createUser = ({ name, email, password, departmentId, departmentIds 
     name: normalizedName,
     email: normalizedEmail,
     password: normalizedPassword,
-    role: 'collaborator',
+    role: normalizedRole,
     active: true,
     createdAt: new Date().toISOString(),
     departmentId: normalizedDepartmentId,
@@ -43,11 +118,15 @@ export const createUser = ({ name, email, password, departmentId, departmentIds 
   return { ok: true, user };
 };
 
-export const updateUser = (userId, { name, email, password, departmentId, departmentIds }) => {
+export const updateUser = (userId, { name, email, password, role, departmentId, departmentIds }, actorUser = null) => {
   const normalizedName = safeTrim(name);
   const normalizedEmail = normalizeEmail(email);
   const normalizedPassword = safeTrim(password);
-  const normalizedDepartmentIds = getNormalizedDepartmentIds(departmentIds ?? departmentId);
+  const normalizedRole = normalizeRole(role);
+  const normalizedDepartmentIds = ensureActorScopedDepartments(
+    actorUser,
+    normalizeDepartmentSelectionForUpdate(actorUser, normalizedRole, departmentId, departmentIds),
+  );
   const normalizedDepartmentId = getNormalizedDepartmentId(normalizedDepartmentIds[0]);
   const users = getUsers();
   const existingUser = users.find((user) => user.id === userId);
@@ -79,6 +158,7 @@ export const updateUser = (userId, { name, email, password, departmentId, depart
       ...user,
       name: normalizedName,
       email: normalizedEmail,
+      role: normalizedRole,
       ...(normalizedPassword ? { password: normalizedPassword } : {}),
       departmentId: normalizedDepartmentId,
       departmentIds: normalizedDepartmentIds,
@@ -89,8 +169,11 @@ export const updateUser = (userId, { name, email, password, departmentId, depart
   return { ok: true, user: updatedUsers.find((user) => user.id === userId) };
 };
 
-export const updateUserDepartments = (userId, departmentIds) => {
-  const normalizedDepartmentIds = getNormalizedDepartmentIds(departmentIds);
+export const updateUserDepartments = (userId, departmentIds, actorUser = null) => {
+  const normalizedDepartmentIds = ensureActorScopedDepartments(
+    actorUser,
+    getNormalizedDepartmentIds(departmentIds),
+  );
   const normalizedDepartmentId = getNormalizedDepartmentId(normalizedDepartmentIds[0]);
   const users = getUsers();
 
@@ -108,10 +191,17 @@ export const updateUserDepartments = (userId, departmentIds) => {
   return { ok: true, user: updatedUsers.find((user) => user.id === userId) };
 };
 
-export const setUserActive = (userId, active) => {
+export const setUserActive = (userId, active, actorUser = null) => {
   const users = getUsers();
   const updatedUsers = users.map((user) => {
     if (user.id !== userId || user.role === 'master') return user;
+
+    if (!isSuperAdmin(actorUser) && !getActorDepartmentIds(actorUser).some((departmentId) => (
+      getNormalizedDepartmentIds(user.departmentIds ?? user.departmentId).includes(departmentId)
+    ))) {
+      return user;
+    }
+
     return { ...user, active };
   });
 
@@ -119,8 +209,22 @@ export const setUserActive = (userId, active) => {
   return updatedUsers;
 };
 
-export const deleteUser = (userId) => {
-  const updatedUsers = getUsers().filter((user) => user.id !== userId || user.role === 'master');
+export const deleteUser = (userId, actorUser = null) => {
+  const updatedUsers = getUsers().filter((user) => {
+    if (user.id === userId && user.role !== 'master') {
+      if (isSuperAdmin(actorUser)) {
+        return false;
+      }
+
+      const actorDepartmentIds = getActorDepartmentIds(actorUser);
+      const userDepartmentIds = getNormalizedDepartmentIds(user.departmentIds ?? user.departmentId);
+      const canDelete = actorDepartmentIds.some((departmentId) => userDepartmentIds.includes(departmentId));
+
+      return !canDelete;
+    }
+
+    return true;
+  });
   writeUsers(updatedUsers);
   return updatedUsers;
 };

@@ -15,6 +15,7 @@ import { getSectorSummaries } from '../data/trainingCatalog';
 import { getMarketingTrainingProgress } from '../data/trainingPath';
 import { getLatestResultsByUser, getQuizResults, getTrainingTests } from '../data/progressStorage';
 import { getUsers } from '../data/usersStorage';
+import { canAccessAdminArea, canAccessSector } from '../data/sectorAccess';
 import './Dashboard.css';
 
 const Dashboard = ({ currentUser, onLogout }) => {
@@ -76,6 +77,9 @@ const Dashboard = ({ currentUser, onLogout }) => {
   };
 
   const isMaster = currentUser.role === 'master';
+  const visibleSectors = isMaster
+    ? sectors
+    : sectors.filter((sector) => canAccessSector(currentUser, sector.id));
 
   return (
     <div className="dashboard-wrapper">
@@ -90,7 +94,7 @@ const Dashboard = ({ currentUser, onLogout }) => {
               <div className="avatar">{displayName.charAt(0).toUpperCase()}</div>
               <span>{displayName}</span>
             </div>
-            {currentUser.role === 'master' && (
+            {canAccessAdminArea(currentUser) && (
               <>
                 <button
                   onClick={() => navigate('/admin/progress')}
@@ -260,7 +264,7 @@ const Dashboard = ({ currentUser, onLogout }) => {
             </section>
 
             <div className="modules-grid">
-              {sectors.map((sector) => (
+              {visibleSectors.map((sector) => (
                 <SectorCard key={sector.id} sector={sector} currentUser={currentUser} />
               ))}
             </div>

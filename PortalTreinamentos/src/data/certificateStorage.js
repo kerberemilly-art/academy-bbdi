@@ -1,15 +1,14 @@
-import { createId, readStorageJSON, writeStorageJSON } from './runtime';
-
-const CERTIFICATES_STORAGE_KEY = 'portalTreinamentos.certificates';
+import { createId } from './runtime';
+import { readBackendSlice, writeBackendSlice } from './backendSync';
 
 const readCertificates = () => {
-  const storedCertificates = readStorageJSON(CERTIFICATES_STORAGE_KEY, []);
+  const storedCertificates = readBackendSlice('certificates', []);
 
   return Array.isArray(storedCertificates) ? storedCertificates : [];
 };
 
 const writeCertificates = (certificates) => {
-  writeStorageJSON(CERTIFICATES_STORAGE_KEY, certificates);
+  writeBackendSlice('certificates', certificates);
 };
 
 export const recordCertificate = ({

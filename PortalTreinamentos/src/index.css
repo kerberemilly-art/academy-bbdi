@@ -242,6 +242,21 @@ h4 {
   padding: 0 20px;
 }
 
+.app-bootstrap-screen {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.app-bootstrap-card {
+  min-width: min(420px, 100%);
+  padding: 24px 28px;
+  text-align: center;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

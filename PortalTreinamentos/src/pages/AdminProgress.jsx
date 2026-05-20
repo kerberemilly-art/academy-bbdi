@@ -4,6 +4,8 @@ import { ArrowLeft, BarChart3, CheckCircle, ClipboardList, Target, Users } from 
 import { modulesData } from '../data/modulesData';
 import { getLatestResultsByUser, getQuizResults, getTrainingTests } from '../data/progressStorage';
 import { getUsers } from '../data/usersStorage';
+import { sectorsData } from '../data/sectorsData';
+import { getUserDepartmentIds, isSuperAdmin } from '../data/sectorAccess';
 import './AdminProgress.css';
 
 const formatDateTime = (date) => {
@@ -24,16 +26,31 @@ const getStatusLabel = (percent) => {
   return 'Revisar';
 };
 
-const AdminProgress = () => {
+const AdminProgress = ({ currentUser }) => {
   const navigate = useNavigate();
   const [selectedUserId, setSelectedUserId] = useState('');
   const [results] = useState(() => getQuizResults());
   const [users] = useState(() => getUsers());
+  const isMaster = isSuperAdmin(currentUser);
+  const accessibleDepartmentIds = isMaster
+    ? sectorsData.map((sector) => sector.id)
+    : getUserDepartmentIds(currentUser);
+  const accessibleModuleIds = useMemo(() => {
+    const moduleIds = sectorsData
+      .filter((sector) => accessibleDepartmentIds.includes(sector.id))
+      .flatMap((sector) => sector.moduleIds ?? []);
 
-  const tests = useMemo(() => getTrainingTests(modulesData), []);
+    return [...new Set(moduleIds.map((moduleId) => String(moduleId)))];
+  }, [accessibleDepartmentIds]);
+
+  const tests = useMemo(() => getTrainingTests(modulesData).filter(
+    (test) => accessibleModuleIds.includes(test.moduleId),
+  ), [accessibleModuleIds]);
   const collaborators = useMemo(
-    () => users.filter((user) => user.role !== 'master'),
-    [users],
+    () => users.filter((user) => user.role !== 'master' && (
+      isMaster || getUserDepartmentIds(user).some((departmentId) => accessibleDepartmentIds.includes(departmentId))
+    )),
+    [accessibleDepartmentIds, isMaster, users],
   );
   const latestResults = useMemo(() => getLatestResultsByUser(results), [results]);
 

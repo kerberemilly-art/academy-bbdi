@@ -16,19 +16,25 @@ import {
 } from 'lucide-react';
 import { createUser, deleteUser, getUsers, setUserActive, updateUser, updateUserDepartments } from '../data/usersStorage';
 import { sectorsData } from '../data/sectorsData';
-import { getUserDepartmentIds, getUserDepartmentLabels } from '../data/sectorAccess';
+import { getUserDepartmentIds, getUserDepartmentLabels, isSuperAdmin } from '../data/sectorAccess';
 import './AdminUsers.css';
 
 const formatDate = (date) => new Intl.DateTimeFormat('pt-BR').format(new Date(date));
 
-const AdminUsers = () => {
+const AdminUsers = ({ currentUser }) => {
   const navigate = useNavigate();
   const [users, setUsers] = useState(() => getUsers());
+  const isMaster = isSuperAdmin(currentUser);
+  const adminLabel = isMaster ? 'Administrador master' : 'Administrador de setor';
+  const accessibleDepartmentIds = isMaster
+    ? sectorsData.map((sector) => sector.id)
+    : getUserDepartmentIds(currentUser);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
-    departmentIds: ['marketing-produtos'],
+    role: 'collaborator',
+    departmentIds: [accessibleDepartmentIds[0] ?? 'marketing-produtos'],
   });
   const [editingUserId, setEditingUserId] = useState(null);
   const [editingScope, setEditingScope] = useState(null);
@@ -39,23 +45,27 @@ const AdminUsers = () => {
 
   const isEditing = Boolean(editingUserId);
   const isEditingAreas = editingScope === 'areas';
-  const allDepartmentIds = sectorsData.map((sector) => sector.id);
+  const allDepartmentIds = accessibleDepartmentIds;
   const editingUser = useMemo(
     () => users.find((user) => user.id === editingUserId) ?? null,
     [editingUserId, users],
   );
 
   const collaborators = useMemo(
-    () => users.filter((user) => user.role !== 'master'),
-    [users],
+    () => users.filter((user) => user.role !== 'master' && (
+      isMaster || getUserDepartmentIds(user).some((departmentId) => accessibleDepartmentIds.includes(departmentId))
+    )),
+    [accessibleDepartmentIds, isMaster, users],
   );
 
   const visibleUsers = useMemo(() => {
     const normalizedSearch = searchTerm.trim().toLowerCase();
 
-    return users.filter((user) => {
+    return (isMaster ? users : users.filter((user) => (
+      user.role !== 'master'
+      && getUserDepartmentIds(user).some((departmentId) => accessibleDepartmentIds.includes(departmentId))
+    ))).filter((user) => {
       const matchesDepartment = departmentFilterId === 'all'
-        || user.role === 'master'
         || getUserDepartmentIds(user).includes(departmentFilterId);
 
       const matchesSearch = !normalizedSearch
@@ -64,7 +74,7 @@ const AdminUsers = () => {
 
       return matchesDepartment && matchesSearch;
     });
-  }, [departmentFilterId, searchTerm, users]);
+  }, [accessibleDepartmentIds, departmentFilterId, isMaster, searchTerm, users]);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -73,6 +83,13 @@ const AdminUsers = () => {
 
   const handleDepartmentToggle = (departmentId) => {
     setFormData((current) => {
+      if (current.role === 'admin') {
+        return {
+          ...current,
+          departmentIds: [departmentId],
+        };
+      }
+
       const isSelected = current.departmentIds.includes(departmentId);
       const nextDepartmentIds = isSelected
         ? current.departmentIds.filter((currentId) => currentId !== departmentId)
@@ -95,15 +112,15 @@ const AdminUsers = () => {
   const handleClearDepartments = () => {
     setFormData((current) => ({
       ...current,
-      departmentIds: ['marketing-produtos'],
+      departmentIds: [accessibleDepartmentIds[0] ?? 'marketing-produtos'],
     }));
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
     const result = isEditing
-      ? updateUser(editingUserId, formData)
-      : createUser(formData);
+      ? updateUser(editingUserId, formData, currentUser)
+      : createUser(formData, currentUser);
 
     if (!result.ok) {
       setFeedback({ type: 'error', message: result.error });
@@ -112,7 +129,13 @@ const AdminUsers = () => {
 
     setUsers(getUsers());
     setEditingUserId(null);
-    setFormData({ name: '', email: '', password: '', departmentIds: ['marketing-produtos'] });
+    setFormData({
+      name: '',
+      email: '',
+      password: '',
+      role: 'collaborator',
+      departmentIds: [accessibleDepartmentIds[0] ?? 'marketing-produtos'],
+    });
     setFeedback({
       type: 'success',
       message: isEditing
@@ -123,17 +146,23 @@ const AdminUsers = () => {
 
   const handleToggleActive = (user) => {
     setOpenActionsUserId(null);
-    setUsers(setUserActive(user.id, !user.active));
+    setUsers(setUserActive(user.id, !user.active, currentUser));
   };
 
   const handleDelete = (user) => {
     if (editingUserId === user.id) {
       setEditingUserId(null);
-      setFormData({ name: '', email: '', password: '', departmentIds: ['marketing-produtos'] });
+      setFormData({
+        name: '',
+        email: '',
+        password: '',
+        role: 'collaborator',
+        departmentIds: [accessibleDepartmentIds[0] ?? 'marketing-produtos'],
+      });
     }
 
     setOpenActionsUserId(null);
-    setUsers(deleteUser(user.id));
+    setUsers(deleteUser(user.id, currentUser));
     setFeedback({ type: 'success', message: `Usuário ${user.email} removido.` });
   };
 
@@ -153,7 +182,7 @@ const AdminUsers = () => {
     }
 
     const nextDepartmentIds = currentDepartmentIds.filter((currentId) => currentId !== departmentId);
-    const result = updateUserDepartments(user.id, nextDepartmentIds);
+    const result = updateUserDepartments(user.id, nextDepartmentIds, currentUser);
 
     if (!result.ok) {
       setFeedback({ type: 'error', message: result.error });
@@ -175,11 +204,12 @@ const AdminUsers = () => {
       name: user.name ?? '',
       email: user.email ?? '',
       password: '',
+      role: user.role === 'admin' ? 'admin' : 'collaborator',
       departmentIds: user.departmentIds?.length > 0
         ? user.departmentIds
         : user.departmentId
           ? [user.departmentId]
-          : ['marketing-produtos'],
+          : [accessibleDepartmentIds[0] ?? 'marketing-produtos'],
     });
     setFeedback({ type: '', message: '' });
   };
@@ -188,7 +218,13 @@ const AdminUsers = () => {
     setEditingUserId(null);
     setEditingScope(null);
     setOpenActionsUserId(null);
-    setFormData({ name: '', email: '', password: '', departmentIds: ['marketing-produtos'] });
+    setFormData({
+      name: '',
+      email: '',
+      password: '',
+      role: 'collaborator',
+      departmentIds: [accessibleDepartmentIds[0] ?? 'marketing-produtos'],
+    });
     setFeedback({ type: '', message: '' });
   };
 
@@ -214,9 +250,11 @@ const AdminUsers = () => {
       <main className="container admin-users-main">
         <section className="admin-summary glass-panel">
           <div>
-            <span className="section-kicker">Administrador master</span>
+            <span className="section-kicker">{adminLabel}</span>
             <h1>Cadastro de colaboradores</h1>
-            <p>Crie acessos individuais por e-mail e senha para os próximos treinamentos.</p>
+            <p>
+              Crie acessos individuais por e-mail e senha para os treinamentos do setor permitido.
+            </p>
           </div>
           <div className="admin-summary-actions">
             <button className="btn-progress-link" onClick={() => navigate('/admin/progress')}>
@@ -293,18 +331,37 @@ const AdminUsers = () => {
                 />
               </label>
 
+              {isMaster && (
+                <label>
+                  Papel
+                  <select
+                    name="role"
+                    className="input-field"
+                    value={formData.role}
+                    onChange={handleInputChange}
+                  >
+                    <option value="collaborator">Colaborador</option>
+                    <option value="admin">Admin de setor</option>
+                  </select>
+                </label>
+              )}
+
               <div className="department-selector">
                 <div className="department-selector-header">
                   <div>
                     <span className="field-label">Área do colaborador</span>
                     <p className="field-hint">
-                      Selecione uma ou mais áreas.
+                      {formData.role === 'admin' || !isMaster
+                        ? 'Selecione apenas uma área.'
+                        : 'Selecione uma ou mais áreas.'}
                     </p>
                   </div>
                   <div className="department-selector-actions">
-                    <button type="button" className="btn-small" onClick={handleSelectAllDepartments}>
-                      Todas
-                    </button>
+                    {isMaster && (
+                      <button type="button" className="btn-small" onClick={handleSelectAllDepartments}>
+                        Todas
+                      </button>
+                    )}
                     <button type="button" className="btn-small" onClick={handleClearDepartments}>
                       Padrão
                     </button>
@@ -319,7 +376,9 @@ const AdminUsers = () => {
                 </div>
 
                 <div className="department-chip-grid">
-                  {sectorsData.map((sector) => {
+                  {sectorsData
+                    .filter((sector) => isMaster || accessibleDepartmentIds.includes(sector.id))
+                    .map((sector) => {
                     const checked = formData.departmentIds.includes(sector.id);
                     const Icon = sector.icon;
 
@@ -401,7 +460,7 @@ const AdminUsers = () => {
                     onChange={(event) => setDepartmentFilterId(event.target.value)}
                   >
                     <option value="all">Todos os departamentos</option>
-                    {sectorsData.map((sector) => (
+                    {(isMaster ? sectorsData : sectorsData.filter((sector) => accessibleDepartmentIds.includes(sector.id))).map((sector) => (
                       <option key={sector.id} value={sector.id}>
                         {sector.title}
                       </option>
@@ -435,7 +494,7 @@ const AdminUsers = () => {
 
                   <div className="user-meta">
                     <span className={`role-badge ${user.role}`}>
-                      {user.role === 'master' ? 'Master' : 'Colaborador'}
+                      {user.role === 'master' ? 'Master' : user.role === 'admin' ? 'Admin' : 'Colaborador'}
                     </span>
                     <span className={`status-badge ${user.active ? 'active' : 'inactive'}`}>
                       {user.active ? 'Ativo' : 'Inativo'}

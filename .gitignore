@@ -1,6 +1,7 @@
 # Gitignore raiz
 PortalTreinamentos/node_modules/
 PortalTreinamentos/dist/
+PortalTreinamentos/backend/data/*.sqlite
 .vscode/
 .idea/
 *.log

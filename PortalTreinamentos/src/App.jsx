@@ -13,7 +13,9 @@ import Preview from './pages/Preview';
 import CertificateShowcase from './pages/CertificateShowcase';
 import SectorDetail from './pages/SectorDetail';
 import { authenticateUser, clearCurrentUser, getCurrentUser } from './data/usersStorage';
+import { canAccessAdminArea } from './data/sectorAccess';
 import { readStorageValue, writeStorageValue } from './data/runtime';
+import { bootstrapBackendSnapshot } from './data/backendSync';
 
 const THEME_STORAGE_KEY = 'portalTreinamentos.theme';
 
@@ -34,8 +36,26 @@ const getInitialTheme = () => {
 function App() {
   const [currentUser, setCurrentUser] = useState(() => getCurrentUser());
   const [theme, setTheme] = useState(getInitialTheme);
+  const [appReady, setAppReady] = useState(false);
   const isAuthenticated = Boolean(currentUser);
   const isDarkTheme = theme === 'dark';
+
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      await bootstrapBackendSnapshot();
+
+      if (!cancelled) {
+        setCurrentUser(getCurrentUser());
+        setAppReady(true);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
@@ -63,6 +83,16 @@ function App() {
   const toggleTheme = () => {
     setTheme((currentTheme) => (currentTheme === 'dark' ? 'light' : 'dark'));
   };
+
+  if (!appReady) {
+    return (
+      <div className="app-bootstrap-screen">
+        <div className="app-bootstrap-card glass-panel">
+          <span>Carregando aplicação...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Router>
@@ -107,16 +137,16 @@ function App() {
         <Route
           path="/admin/users"
           element={
-            currentUser?.role === 'master'
-              ? <AdminUsers />
+            canAccessAdminArea(currentUser)
+              ? <AdminUsers currentUser={currentUser} />
               : <Navigate to={isAuthenticated ? '/dashboard' : '/login'} />
           }
         />
         <Route
           path="/admin/progress"
           element={
-            currentUser?.role === 'master'
-              ? <AdminProgress />
+            canAccessAdminArea(currentUser)
+              ? <AdminProgress currentUser={currentUser} />
               : <Navigate to={isAuthenticated ? '/dashboard' : '/login'} />
           }
         />

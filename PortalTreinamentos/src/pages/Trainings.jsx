@@ -2,12 +2,13 @@ import { ArrowLeft, BookOpen, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import SectorCard from '../components/SectorCard';
 import { getSectorSummaries } from '../data/trainingCatalog';
+import { canAccessSector } from '../data/sectorAccess';
 import './Dashboard.css';
 
 const Trainings = ({ currentUser, onLogout }) => {
   const navigate = useNavigate();
   const displayName = currentUser.name?.trim() || 'Usuário';
-  const sectors = getSectorSummaries();
+  const sectors = getSectorSummaries().filter((sector) => canAccessSector(currentUser, sector.id));
 
   return (
     <div className="dashboard-wrapper">

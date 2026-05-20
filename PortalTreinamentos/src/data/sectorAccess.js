@@ -1,6 +1,7 @@
 import { sectorsData } from './sectorsData';
 
 export const DEFAULT_COLLABORATOR_DEPARTMENT_ID = 'marketing-produtos';
+export const DEFAULT_ADMIN_ROLE = 'admin';
 
 export const getDepartmentById = (departmentId) => (
   sectorsData.find((sector) => sector.id === departmentId) ?? null
@@ -52,8 +53,26 @@ export const getUserDepartmentSummary = (user) => {
   return departmentLabels.length > 0 ? departmentLabels.join(', ') : 'Sem departamento';
 };
 
+export const isSuperAdmin = (user) => user?.role === 'master';
+
+export const isSectorAdmin = (user) => user?.role === 'admin';
+
+export const canAccessAdminArea = (user) => isSuperAdmin(user) || isSectorAdmin(user);
+
+export const canManageSector = (user, sectorId) => {
+  if (isSuperAdmin(user)) {
+    return true;
+  }
+
+  if (!isSectorAdmin(user)) {
+    return false;
+  }
+
+  return getUserDepartmentIds(user).includes(sectorId);
+};
+
 export const canAccessSector = (user, sectorId) => {
-  if (user?.role === 'master') {
+  if (isSuperAdmin(user)) {
     return true;
   }
 

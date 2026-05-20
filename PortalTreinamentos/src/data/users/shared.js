@@ -5,12 +5,10 @@ import {
 } from '../sectorAccess';
 import {
   normalizeEmail,
-  readStorageJSON,
   safeTrim,
-  writeStorageJSON,
 } from '../runtime';
+import { readBackendSlice, writeBackendSlice } from '../backendSync';
 
-const USERS_STORAGE_KEY = 'portalTreinamentos.users';
 const SESSION_STORAGE_KEY = 'portalTreinamentos.currentUserId';
 
 export const MASTER_CREDENTIALS = {
@@ -31,13 +29,13 @@ export const MASTER_USER = {
 };
 
 export const readStoredUsers = () => {
-  const storedUsers = readStorageJSON(USERS_STORAGE_KEY, []);
+  const storedUsers = readBackendSlice('users', []);
 
   return Array.isArray(storedUsers) ? storedUsers : [];
 };
 
 export const writeUsers = (users) => {
-  writeStorageJSON(USERS_STORAGE_KEY, users);
+  writeBackendSlice('users', users);
 };
 
 export const getSessionStorageKey = () => SESSION_STORAGE_KEY;
@@ -63,11 +61,13 @@ export const normalizeStoredUser = (user) => {
   );
   const normalizedName = safeTrim(user.name, 'Colaborador');
   const normalizedEmail = normalizeEmail(user.email);
+  const normalizedRole = user.role === 'admin' ? 'admin' : 'collaborator';
 
   return {
     ...user,
     name: normalizedName,
     email: normalizedEmail,
+    role: normalizedRole,
     departmentId: getNormalizedDepartmentId(normalizedDepartmentIds[0]),
     departmentIds: normalizedDepartmentIds,
   };
