@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, BookOpen, LogOut, PencilLine, ShieldCheck } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import { getSectorSummary } from '../data/trainingCatalog';
+import { modulesData } from '../data/modulesData';
 import { canAccessMarketingModule, getMarketingModuleProgress, getMarketingModuleStatus, getMarketingTrainingProgress } from '../data/trainingPath';
 import {
   canAccessSector,
@@ -71,17 +72,26 @@ const SectorDetail = ({ currentUser, onLogout }) => {
     const dynamicModulesList = Object.values(dynamicModulesMap);
     const combinedModules = [...sector.modules, ...dynamicModulesList];
 
+    // Filter to only display modules that have at least one registered training in the DB
+    // OR are the built-in pre-packaged trainings with real content (IDs 1 to 8)
+    // OR have manual lesson content in modulesData
     sector.modules = combinedModules.filter((m) => {
       const idNum = Number(m.id);
       if (!isNaN(idNum) && idNum >= 1 && idNum <= 8) {
         return true;
       }
-      return sectorTrainings.some((t) => {
+      
+      const hasCustomTraining = sectorTrainings.some((t) => {
         const tModLower = String(t.moduleId).trim().toLowerCase();
         const mIdLower = String(m.id).trim().toLowerCase();
         const mTitleLower = String(m.title).trim().toLowerCase();
         return tModLower === mIdLower || tModLower === mTitleLower;
       });
+
+      if (hasCustomTraining) return true;
+
+      const originalMod = modulesData[m.id];
+      return originalMod && originalMod.levels && originalMod.levels.some(l => l.lesson);
     });
   }
 

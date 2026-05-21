@@ -124,16 +124,24 @@ export const getSectorSummary = (sectorId) => {
   }
 
   const modules = getModulesForSector(sectorId);
+  
+  // Only count modules that are "built-in" (1-8) or have actual content in modulesData
+  const filteredModules = modules.filter(m => {
+    const idNum = Number(m.id);
+    if (!isNaN(idNum) && idNum >= 1 && idNum <= 8) return true;
+    
+    const originalMod = modulesData[m.id];
+    return originalMod && originalMod.levels && originalMod.levels.some(l => l.lesson);
+  });
 
   return {
     ...sector,
-    modules,
-    moduleCount: modules.length,
+    modules: filteredModules,
+    moduleCount: filteredModules.length,
   };
 };
 
-export const getSectorSummaries = () => sectorsData.map((sector) => ({
-  ...sector,
-  modules: getModulesForSector(sector.id),
-  moduleCount: getModulesForSector(sector.id).length,
-}));
+export const getSectorSummaries = () => sectorsData.map((sector) => {
+  const summary = getSectorSummary(sector.id);
+  return summary;
+});
