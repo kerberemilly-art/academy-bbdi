@@ -71,7 +71,7 @@ const Preview = () => {
               <Sparkles size={14} />
               Esboço corporativo
             </span>
-            <h1>Portal de Treinamentos por setor, com governança central.</h1>
+            <h1>BBDI ACADEMY — Treinamentos por setor, com governança central.</h1>
             <p>
               Esta versão é apenas um protótipo visual. O portal atual continua intacto, enquanto
               esta tela mostra como a estrutura corporativa pode ser organizada.

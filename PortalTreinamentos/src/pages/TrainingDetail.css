@@ -1,0 +1,283 @@
+.training-detail-wrapper {
+  min-height: 100vh;
+  padding-bottom: 48px;
+}
+
+.training-detail-header {
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  border-radius: 0;
+}
+
+.training-detail-header-content,
+.training-detail-profile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 68px;
+}
+
+.training-detail-main {
+  margin-top: 32px;
+  display: grid;
+  gap: 22px;
+}
+
+.training-hero,
+.training-content-panel,
+.training-detail-empty {
+  padding: 28px;
+  border-radius: 20px;
+}
+
+.training-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
+  gap: 20px;
+  align-items: stretch;
+  background:
+    radial-gradient(circle at top right, rgba(96, 165, 250, 0.12), transparent 16rem),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(248, 250, 252, 0.84));
+}
+
+.training-hero-copy {
+  display: grid;
+  gap: 12px;
+}
+
+.training-hero-copy h1 {
+  font-size: clamp(2rem, 3vw, 3rem);
+  line-height: 1.05;
+}
+
+.training-hero-copy p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 56rem;
+}
+
+.training-hero-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.training-hero-meta span {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--panel-border);
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.training-hero-side {
+  display: grid;
+  gap: 12px;
+}
+
+.training-hero-card {
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid var(--panel-border);
+  display: grid;
+  gap: 6px;
+  align-content: start;
+}
+
+.training-hero-card svg {
+  color: var(--accent-color);
+}
+
+.training-hero-card strong {
+  font-size: 1rem;
+}
+
+.training-hero-card span {
+  color: var(--text-secondary);
+}
+
+.training-hero-card.accent {
+  background: linear-gradient(180deg, var(--accent-color), #2563eb);
+}
+
+.training-hero-card.accent svg,
+.training-hero-card.accent strong,
+.training-hero-card.accent span {
+  color: #ffffff;
+}
+
+.training-content-heading {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 16px;
+  align-items: start;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.training-content-icon {
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--accent-color);
+}
+
+.training-content-heading h1 {
+  font-size: 2rem;
+  margin: 4px 0 10px;
+}
+
+.training-content-heading h2 {
+  font-size: 1.8rem;
+  margin: 4px 0 0;
+}
+
+.training-content-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.training-content-meta span {
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--soft-surface);
+  border: 1px solid var(--panel-border);
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.training-content-description {
+  margin: 22px 0;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  font-size: 1rem;
+}
+
+.training-content-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  color: var(--text-primary);
+  line-height: 1.75;
+}
+
+.training-markdown {
+  display: grid;
+  gap: 12px;
+  color: var(--text-primary);
+  line-height: 1.7;
+}
+
+.training-markdown h1,
+.training-markdown h2,
+.training-markdown h3,
+.training-markdown h4 {
+  margin: 0;
+  line-height: 1.15;
+}
+
+.training-markdown h1 {
+  font-size: 1.6rem;
+}
+
+.training-markdown h2 {
+  font-size: 1.35rem;
+}
+
+.training-markdown p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.training-markdown ul,
+.training-markdown ol {
+  margin: 0;
+  padding-left: 1.3rem;
+  color: var(--text-secondary);
+}
+
+.training-markdown blockquote {
+  margin: 0;
+  padding: 0.8rem 1rem;
+  border-left: 4px solid var(--accent-color);
+  border-radius: 10px;
+  background: rgba(29, 78, 216, 0.08);
+}
+
+.training-markdown code {
+  padding: 0.15rem 0.4rem;
+  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.08);
+  color: var(--accent-color);
+  font-family: inherit;
+  font-weight: 700;
+}
+
+.training-markdown pre {
+  margin: 0;
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.04);
+  overflow: auto;
+}
+
+.training-detail-empty {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.training-detail-empty p {
+  color: var(--text-secondary);
+}
+
+@media (max-width: 720px) {
+  .training-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .training-content-heading {
+    grid-template-columns: 1fr;
+  }
+
+  .training-content-heading h1 {
+    font-size: 1.5rem;
+  }
+}
+
+:root[data-theme='dark'] .training-hero,
+:root[data-theme='dark'] .training-hero-card,
+:root[data-theme='dark'] .training-content-panel,
+:root[data-theme='dark'] .training-detail-empty {
+  background: var(--panel-bg);
+  border-color: var(--panel-border);
+}
+
+:root[data-theme='dark'] .training-hero {
+  background:
+    radial-gradient(circle at top right, rgba(96, 165, 250, 0.12), transparent 16rem),
+    rgba(17, 24, 39, 0.92);
+}
+
+:root[data-theme='dark'] .training-markdown p,
+:root[data-theme='dark'] .training-markdown ul,
+:root[data-theme='dark'] .training-markdown ol,
+:root[data-theme='dark'] .training-markdown blockquote {
+  color: var(--text-primary);
+}
+
+:root[data-theme='dark'] .training-markdown code {
+  background: rgba(255, 255, 255, 0.08);
+  color: #bfdbfe;
+}

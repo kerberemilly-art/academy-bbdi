@@ -1,10 +1,35 @@
 import { modulesData } from './modulesData';
 import { getLatestResultsByUser, getQuizResults } from './progressStorage';
+import { sectorsData } from './sectorsData';
+import { getCachedTrainings } from './trainingAdminApi';
+
+export const getSectorForModule = (moduleId) => {
+  const idNum = Number(moduleId);
+  if (!isNaN(idNum)) {
+    const sect = sectorsData.find((s) => s.moduleIds.includes(idNum));
+    if (sect) return sect;
+  }
+
+  // Look up in custom trainings for custom module names
+  const trainings = getCachedTrainings();
+  const matched = trainings.find((t) => String(t.moduleId).trim().toLowerCase() === String(moduleId).trim().toLowerCase());
+  if (matched) {
+    return sectorsData.find((s) => s.id === matched.departmentId);
+  }
+
+  return null;
+};
+
+export const getSectorModuleSequence = (sectorId) => {
+  const sector = sectorsData.find((s) => s.id === sectorId);
+  return sector ? sector.moduleIds.map(String) : [];
+};
 
 export const MARKETING_MODULE_SEQUENCE = ['1', '2', '3', '4', '5', '6', '7', '8'];
 
-export const getMarketingTrainingSequence = () => (
-  MARKETING_MODULE_SEQUENCE.flatMap((moduleId) => {
+export const getMarketingTrainingSequence = (sectorId = 'marketing-produtos') => {
+  const sequence = getSectorModuleSequence(sectorId);
+  return sequence.flatMap((moduleId) => {
     const moduleInfo = modulesData[moduleId];
 
     if (!moduleInfo) {
@@ -17,14 +42,14 @@ export const getMarketingTrainingSequence = () => (
       levelId: level.id,
       levelTitle: level.title,
       levelIndex,
-      moduleOrder: MARKETING_MODULE_SEQUENCE.indexOf(String(moduleInfo.id)),
+      moduleOrder: sequence.indexOf(String(moduleInfo.id)),
     }));
-  })
-);
+  });
+};
 
-const buildStepStatusMap = (userId) => {
+const buildStepStatusMap = (userId, sectorId) => {
   const latestResults = getLatestResultsByUser(getQuizResults());
-  const sequence = getMarketingTrainingSequence();
+  const sequence = getMarketingTrainingSequence(sectorId);
   const statusMap = new Map();
 
   sequence.forEach((step, index) => {
@@ -36,9 +61,9 @@ const buildStepStatusMap = (userId) => {
   return { latestResults, sequence, statusMap };
 };
 
-export const getMarketingTrainingProgress = (userId) => {
-  const sequence = getMarketingTrainingSequence();
-  const { latestResults } = buildStepStatusMap(userId);
+export const getMarketingTrainingProgress = (userId, sectorId = 'marketing-produtos') => {
+  const sequence = getMarketingTrainingSequence(sectorId);
+  const { latestResults } = buildStepStatusMap(userId, sectorId);
   let completedSteps = 0;
   let nextStep = null;
 
@@ -55,7 +80,8 @@ export const getMarketingTrainingProgress = (userId) => {
   }
 
   const totalSteps = sequence.length;
-  const completedModules = MARKETING_MODULE_SEQUENCE.reduce((count, moduleId) => {
+  const moduleSequence = getSectorModuleSequence(sectorId);
+  const completedModules = moduleSequence.reduce((count, moduleId) => {
     const moduleInfo = modulesData[moduleId];
 
     if (!moduleInfo) {
@@ -79,7 +105,7 @@ export const getMarketingTrainingProgress = (userId) => {
 };
 
 export const canAccessMarketingModule = (user, moduleId) => {
-  if (user?.role === 'master') {
+  if (user?.role === 'master' || user?.role === 'admin') {
     return true;
   }
 
@@ -87,15 +113,27 @@ export const canAccessMarketingModule = (user, moduleId) => {
     return false;
   }
 
-  const progress = getMarketingTrainingProgress(user.id);
+  const idNum = Number(moduleId);
+  if (isNaN(idNum)) {
+    // Custom modules are unlocked by default
+    return true;
+  }
+
+  const sector = getSectorForModule(moduleId);
+  if (!sector) {
+    return false;
+  }
+
+  const progress = getMarketingTrainingProgress(user.id, sector.id);
 
   if (!progress.nextStep) {
     return true;
   }
 
   const normalizedModuleId = String(moduleId);
-  const moduleIndex = MARKETING_MODULE_SEQUENCE.indexOf(normalizedModuleId);
-  const nextModuleIndex = MARKETING_MODULE_SEQUENCE.indexOf(progress.nextStep.moduleId);
+  const sequence = getSectorModuleSequence(sector.id);
+  const moduleIndex = sequence.indexOf(normalizedModuleId);
+  const nextModuleIndex = sequence.indexOf(progress.nextStep.moduleId);
 
   if (moduleIndex === -1 || nextModuleIndex === -1) {
     return false;
@@ -105,7 +143,23 @@ export const canAccessMarketingModule = (user, moduleId) => {
 };
 
 export const getMarketingModuleProgress = (userId, moduleId) => {
-  const moduleInfo = modulesData[String(moduleId)];
+  let moduleInfo = modulesData[String(moduleId)];
+  if (!moduleInfo) {
+    // Resolve dynamic custom module
+    const trainings = getCachedTrainings();
+    const matched = trainings.find((t) => String(t.moduleId).trim().toLowerCase() === String(moduleId).trim().toLowerCase());
+    if (matched) {
+      moduleInfo = {
+        id: matched.moduleId,
+        levels: [
+          { id: 'basico' },
+          { id: 'intermediario' },
+          { id: 'avancado' }
+        ]
+      };
+    }
+  }
+
   const latestResults = getLatestResultsByUser(getQuizResults());
 
   if (!moduleInfo) {
@@ -121,15 +175,34 @@ export const getMarketingModuleProgress = (userId, moduleId) => {
 
 export const getMarketingLevelStatus = (user, moduleId, levelId) => {
   const normalizedModuleId = String(moduleId);
-  const moduleInfo = modulesData[normalizedModuleId];
-  const progress = user?.role === 'master'
+  let moduleInfo = modulesData[normalizedModuleId];
+  if (!moduleInfo) {
+    // Resolve dynamic custom module
+    const trainings = getCachedTrainings();
+    const matched = trainings.find((t) => String(t.moduleId).trim().toLowerCase() === String(moduleId).trim().toLowerCase());
+    if (matched) {
+      moduleInfo = {
+        id: matched.moduleId,
+        levels: [
+          { id: 'basico', title: 'Básico' },
+          { id: 'intermediario', title: 'Intermediário' },
+          { id: 'avancado', title: 'Avançado' }
+        ]
+      };
+    }
+  }
+
+  const sector = getSectorForModule(moduleId);
+  
+  const progress = (user?.role === 'master' || user?.role === 'admin')
     ? { nextStep: null }
-    : getMarketingTrainingProgress(user?.id);
+    : getMarketingTrainingProgress(user?.id, sector?.id || 'marketing-produtos');
 
   const currentLevelIndex = moduleInfo?.levels.findIndex((level) => level.id === levelId) ?? -1;
   const nextStep = progress.nextStep;
-  const moduleOrder = MARKETING_MODULE_SEQUENCE.indexOf(normalizedModuleId);
-  const nextModuleOrder = nextStep ? MARKETING_MODULE_SEQUENCE.indexOf(nextStep.moduleId) : Number.POSITIVE_INFINITY;
+  const sequence = sector ? getSectorModuleSequence(sector.id) : MARKETING_MODULE_SEQUENCE;
+  const moduleOrder = sequence.indexOf(normalizedModuleId);
+  const nextModuleOrder = nextStep ? sequence.indexOf(nextStep.moduleId) : Number.POSITIVE_INFINITY;
   const nextLevelIndex = nextStep && nextStep.moduleId === normalizedModuleId
     ? moduleInfo?.levels.findIndex((level) => level.id === nextStep.levelId) ?? -1
     : Number.POSITIVE_INFINITY;
@@ -141,9 +214,11 @@ export const getMarketingLevelStatus = (user, moduleId, levelId) => {
     && getLatestResultsByUser(getQuizResults()).has(`${user.id}:${normalizedModuleId}:${levelId}`)
   );
 
-  const isLocked = user?.role !== 'master' && (
-    moduleOrder > nextModuleOrder
-    || (moduleOrder === nextModuleOrder && currentLevelIndex > nextLevelIndex)
+  const idNum = Number(moduleId);
+  const isLocked = user?.role !== 'master' && user?.role !== 'admin' && (
+    !isNaN(idNum) ? (
+      moduleOrder > nextModuleOrder || (moduleOrder === nextModuleOrder && currentLevelIndex > nextLevelIndex)
+    ) : false
   );
 
   return {
@@ -151,8 +226,8 @@ export const getMarketingLevelStatus = (user, moduleId, levelId) => {
     levelId,
     isLocked,
     isCompleted,
-    requiredModuleId: user?.role === 'master' ? null : nextStep?.moduleId ?? null,
-    requiredLevelId: user?.role === 'master' ? null : nextStep?.levelId ?? null,
+    requiredModuleId: (user?.role === 'master' || user?.role === 'admin') ? null : nextStep?.moduleId ?? null,
+    requiredLevelId: (user?.role === 'master' || user?.role === 'admin') ? null : nextStep?.levelId ?? null,
     moduleInfo,
     currentLevelIndex,
     nextLevelIndex,
@@ -161,25 +236,50 @@ export const getMarketingLevelStatus = (user, moduleId, levelId) => {
 
 export const getMarketingModuleStatus = (user, moduleId) => {
   const normalizedModuleId = String(moduleId);
-  const progress = user?.role === 'master'
-    ? { nextStep: null, completedModules: MARKETING_MODULE_SEQUENCE.length }
-    : getMarketingTrainingProgress(user?.id);
+  const sector = getSectorForModule(moduleId);
+  const sequence = sector ? getSectorModuleSequence(sector.id) : MARKETING_MODULE_SEQUENCE;
+  
+  const progress = (user?.role === 'master' || user?.role === 'admin')
+    ? { nextStep: null, completedModules: sequence.length }
+    : getMarketingTrainingProgress(user?.id, sector?.id || 'marketing-produtos');
   const nextStep = progress.nextStep;
-  const moduleOrder = MARKETING_MODULE_SEQUENCE.indexOf(normalizedModuleId);
-  const nextModuleOrder = nextStep ? MARKETING_MODULE_SEQUENCE.indexOf(nextStep.moduleId) : Number.POSITIVE_INFINITY;
-  const moduleInfo = modulesData[normalizedModuleId];
+  const moduleOrder = sequence.indexOf(normalizedModuleId);
+  const nextModuleOrder = nextStep ? sequence.indexOf(nextStep.moduleId) : Number.POSITIVE_INFINITY;
+  
+  let moduleInfo = modulesData[normalizedModuleId];
+  if (!moduleInfo) {
+    // Resolve dynamic custom module
+    const trainings = getCachedTrainings();
+    const matched = trainings.find((t) => String(t.moduleId).trim().toLowerCase() === String(moduleId).trim().toLowerCase());
+    if (matched) {
+      moduleInfo = {
+        id: matched.moduleId,
+        levels: [
+          { id: 'basico' },
+          { id: 'intermediario' },
+          { id: 'avancado' }
+        ]
+      };
+    }
+  }
+
   const latestResults = getLatestResultsByUser(getQuizResults());
 
   const isCompleted = Boolean(user?.id && moduleInfo && moduleInfo.levels.every((level) => (
     latestResults.has(`${user.id}:${normalizedModuleId}:${level.id}`)
   )));
 
+  const idNum = Number(moduleId);
+  const isLocked = user?.role !== 'master' && user?.role !== 'admin' && (
+    !isNaN(idNum) ? moduleOrder > nextModuleOrder : false
+  );
+
   return {
     moduleId: normalizedModuleId,
     moduleIndex: moduleOrder,
-    isLocked: user?.role !== 'master' && moduleOrder > nextModuleOrder,
+    isLocked,
     isCompleted,
-    requiredModuleId: user?.role === 'master' ? null : nextStep?.moduleId ?? null,
+    requiredModuleId: (user?.role === 'master' || user?.role === 'admin') ? null : nextStep?.moduleId ?? null,
     nextModuleId: nextStep?.moduleId ?? null,
     progress,
     moduleInfo,

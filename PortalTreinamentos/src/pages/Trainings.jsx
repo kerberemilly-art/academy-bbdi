@@ -19,8 +19,11 @@ const Trainings = ({ currentUser, onLogout }) => {
               <ArrowLeft size={20} />
               <span>Voltar</span>
             </button>
-            <BookOpen size={28} color="var(--accent-color)" />
-            <h2>Portal de Treinamentos</h2>
+            <div className="bbdi-logo-mark header-logo-mark">
+              <span className="bbdi-logo-bb">BBDI</span>
+              <span className="bbdi-logo-divider">|</span>
+              <span className="bbdi-logo-academy">ACADEMY</span>
+            </div>
           </div>
           <div className="header-actions">
             <div className="user-profile">

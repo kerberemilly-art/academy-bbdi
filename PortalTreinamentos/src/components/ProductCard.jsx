@@ -1,14 +1,18 @@
-import { ChevronRight, CheckCircle, Lock } from 'lucide-react';
+import { ChevronRight, CheckCircle, Lock, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import './ProductCard.css';
 
-const ProductCard = ({ module, backTo = '/dashboard', locked = false, completed = false }) => {
-  const Icon = module.icon;
+const ProductCard = ({ module, backTo = '/dashboard', locked = false, completed = false, isTraining = false }) => {
+  const Icon = module.icon || FileText;
   const navigate = useNavigate();
   const progressValue = completed ? 100 : module.progress ?? 0;
   const handleClick = () => {
     if (locked) return;
-    navigate(`/module/${module.id}`, { state: { backPath: backTo } });
+    if (isTraining) {
+      navigate(`/training/${module.id}`, { state: { backPath: backTo } });
+    } else {
+      navigate(`/module/${module.id}`, { state: { backPath: backTo } });
+    }
   };
   
   return (
@@ -29,7 +33,7 @@ const ProductCard = ({ module, backTo = '/dashboard', locked = false, completed 
         
         <div className="card-info">
           <h3>{module.title}</h3>
-          <p>{module.count} níveis disponíveis</p>
+          <p>{module.subtitle || `${module.count} níveis disponíveis`}</p>
         </div>
         
         <div className="card-action">
@@ -43,12 +47,14 @@ const ProductCard = ({ module, backTo = '/dashboard', locked = false, completed 
         </div>
       </div>
       
-      <div className="progress-bar-container">
-        <div 
-          className="progress-bar" 
-          style={{ width: `${progressValue}%`, backgroundColor: module.color }}
-        />
-      </div>
+      {!module.hideProgress && (
+        <div className="progress-bar-container">
+          <div 
+            className="progress-bar" 
+            style={{ width: `${progressValue}%`, backgroundColor: module.color }}
+          />
+        </div>
+      )}
     </button>
   );
 };

@@ -1,4 +1,4 @@
-import { Document, Page, StyleSheet, Text, View, Image } from '@react-pdf/renderer';
+import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
 import { certificateTemplates, fillTemplate } from '../../data/certificateTemplates';
 
 const styles = StyleSheet.create({

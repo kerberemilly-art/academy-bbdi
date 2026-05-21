@@ -91,74 +91,272 @@
   box-shadow: 0 0 18px rgba(96, 165, 250, 0.22);
 }
 
-.levels-grid {
+/* Roadmap Container & Timeline Neon styles */
+.roadmap-container {
+  position: relative;
+  max-width: 860px;
+  margin: 48px auto;
+  height: 540px; /* 3 rows * 180px */
+}
+
+.roadmap-svg-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.roadmap-row {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 180px;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
-}
-
-.level-card {
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  border-left: 4px solid transparent;
-  transition: transform 0.3s ease, border-color 0.3s ease;
-}
-
-.level-card:hover {
-  transform: translateY(-5px);
-  border-left-color: var(--accent-color);
-}
-
-.level-card {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 250, 252, 0.78));
-  border: 1px solid rgba(148, 163, 184, 0.2);
-}
-
-.level-info h3 {
-  font-size: 1.3rem;
-  margin-bottom: 0.5rem;
-  color: var(--text-color);
-}
-
-.level-info p {
-  color: var(--text-muted);
-  font-size: 0.95rem;
-  line-height: 1.5;
-  margin-bottom: 2rem;
-}
-
-.level-status {
-  display: inline-flex;
+  grid-template-columns: 1fr 120px 1fr;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  z-index: 2;
+}
+
+.roadmap-row-1 { top: 0; }
+.roadmap-row-2 { top: 180px; }
+.roadmap-row-3 { top: 360px; }
+
+.roadmap-col {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.roadmap-left {
+  justify-content: flex-end;
+  padding-right: 32px;
+}
+
+.roadmap-center {
+  justify-content: center;
+  position: relative;
+}
+
+.roadmap-right {
+  justify-content: flex-start;
+  padding-left: 32px;
+}
+
+/* Staggered Circle nodes styles */
+.node-circle-wrapper {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.node-circle-wrapper.active::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px dashed var(--node-color);
+  animation: rotate-dash 20s linear infinite;
+  opacity: 0.6;
+}
+
+@keyframes rotate-dash {
+  100% { transform: rotate(360deg); }
+}
+
+.node-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: white;
+  border: 4px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.node-circle-wrapper.active .node-circle {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px var(--node-color);
+}
+
+.node-circle-wrapper.active .node-circle:hover {
+  transform: scale(1.15) rotate(5deg);
+  box-shadow: 0 0 30px var(--node-color);
+}
+
+.node-circle-wrapper.locked .node-circle {
+  background: #f1f5f9;
+  border-color: rgba(148, 163, 184, 0.2);
   color: var(--text-secondary);
 }
 
-.btn-start {
-  width: 100%;
-  padding: 1rem;
-  border: none;
-  border-radius: 8px;
+.node-circle-wrapper.completed .node-circle {
+  background: #f0fdf4;
+  border-color: var(--success-color);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+}
+
+.node-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
   color: white;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
+  font-size: 0.75rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.15);
+  z-index: 6;
 }
 
-.btn-start:hover:not(:disabled) {
-  opacity: 0.9;
+/* Timeline Cards */
+.timeline-card {
+  width: 100%;
+  max-width: 320px;
+  border-radius: 18px;
+  padding: 20px !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  border: 1.5px solid;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.btn-start:disabled {
-  background-color: var(--surface-light) !important;
-  color: var(--text-muted);
-  cursor: not-allowed;
-  opacity: 0.7;
+.timeline-card:hover {
+  transform: translateY(-4px) scale(1.02);
+}
+
+.timeline-card.locked-card {
+  opacity: 0.65;
+  background: rgba(248, 250, 252, 0.5) !important;
+  border-color: rgba(148, 163, 184, 0.1) !important;
+  box-shadow: none !important;
+  pointer-events: none;
+}
+
+.timeline-card .level-info h3 {
+  font-size: 1.15rem;
+  margin-top: 4px;
+  font-weight: 700;
+}
+
+.timeline-card .level-info p {
+  font-size: 0.88rem;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+.timeline-card .btn-start {
+  padding: 10px 16px;
+  font-size: 0.88rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+}
+
+/* Micro-animations */
+.play-icon-anim {
+  animation: pulse-play 2s infinite alternate;
+}
+
+.lock-icon-anim {
+  opacity: 0.6;
+}
+
+.check-anim {
+  animation: pop-check 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes pulse-play {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.15); opacity: 1; }
+}
+
+@keyframes pop-check {
+  0% { transform: scale(0); }
+  100% { transform: scale(1); }
+}
+
+/* Mobile & Responsive configurations */
+@media (max-width: 768px) {
+  .roadmap-container {
+    height: auto;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+  
+  .roadmap-svg-line {
+    display: none; /* Hide background curved connection on mobile */
+  }
+  
+  .roadmap-row {
+    position: relative;
+    top: auto;
+    left: auto;
+    height: auto;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 0 16px;
+  }
+  
+  .roadmap-col {
+    width: 100%;
+    justify-content: center;
+    padding: 0;
+  }
+  
+  .node-circle-wrapper {
+    transform: none !important; /* Reset staggered layout offset */
+  }
+  
+  .timeline-card {
+    max-width: 100%;
+  }
+
+  .roadmap-left, .roadmap-right {
+    order: 2; /* Info card always goes below the node circle */
+  }
+
+  .roadmap-center {
+    order: 1;
+  }
+}
+
+/* Dark mode configurations */
+:root[data-theme='dark'] .node-circle {
+  background: var(--panel-bg);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+:root[data-theme='dark'] .node-circle-wrapper.locked .node-circle {
+  background: rgba(31, 41, 55, 0.6);
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+:root[data-theme='dark'] .node-circle-wrapper.completed .node-circle {
+  background: rgba(6, 78, 59, 0.2);
+}
+
+:root[data-theme='dark'] .timeline-card {
+  background: var(--panel-bg) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25) !important;
+}
+
+:root[data-theme='dark'] .timeline-card.locked-card {
+  background: rgba(31, 41, 55, 0.2) !important;
 }

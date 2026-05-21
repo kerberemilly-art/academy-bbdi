@@ -1,9 +1,9 @@
 import { spawn } from 'node:child_process';
 
-const run = (command, args, label) => {
+const run = (command, args, label, useShell = process.platform === 'win32') => {
   const child = spawn(command, args, {
     stdio: 'inherit',
-    shell: process.platform === 'win32',
+    shell: useShell,
   });
 
   child.on('exit', (code) => {
@@ -16,7 +16,9 @@ const run = (command, args, label) => {
   return child;
 };
 
-const backend = run(process.execPath, ['backend/server.mjs'], 'Backend');
+// Node executable does not need a shell wrapper, avoiding spacing issues on Windows
+const backend = run(process.execPath, ['backend/server.mjs'], 'Backend', false);
+// npm on Windows is a cmd/ps script, so it needs shell: true
 const frontend = run('npm', ['run', 'dev', '--', '--host', '127.0.0.1', '--port', '4173'], 'Frontend');
 
 const shutdown = () => {
@@ -27,4 +29,5 @@ const shutdown = () => {
 
 process.on('SIGINT', shutdown);
 process.on('SIGTERM', shutdown);
+
 

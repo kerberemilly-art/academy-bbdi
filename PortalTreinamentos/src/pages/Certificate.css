@@ -44,6 +44,30 @@
     radial-gradient(circle at top left, rgba(96, 165, 250, 0.14), transparent 32%),
     radial-gradient(circle at bottom right, rgba(20, 184, 166, 0.12), transparent 28%),
     var(--panel-bg);
+  transform-style: preserve-3d;
+  transition: transform 0.15s cubic-bezier(0.25, 1, 0.5, 1);
+  box-shadow: 
+    0 30px 60px rgba(15, 23, 42, 0.08), 
+    0 0 0 1px rgba(148, 163, 184, 0.12),
+    inset 0 0 24px rgba(255, 255, 255, 0.05);
+}
+
+.certificate-shine {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 15;
+  mix-blend-mode: overlay;
+  opacity: 0;
+  transition: opacity 0.3s ease, background 0.05s linear;
+}
+
+.certificate-topbar,
+.certificate-body,
+.certificate-footer {
+  transform: translateZ(40px);
+  transform-style: preserve-3d;
 }
 
 .certificate-paper::before {

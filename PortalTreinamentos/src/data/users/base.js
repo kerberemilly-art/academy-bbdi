@@ -8,6 +8,9 @@ export const getUsers = () => {
     new Map(normalizedUsers.map((user) => [user.id, user])).values(),
   ).map(normalizeStoredUser).filter(Boolean);
 
-  writeUsers(uniqueUsers);
+  if (!hasMaster || uniqueUsers.length !== users.length) {
+    writeUsers(uniqueUsers);
+  }
+
   return uniqueUsers;
 };

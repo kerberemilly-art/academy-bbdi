@@ -1,20 +1,93 @@
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, BookOpen, LogOut } from 'lucide-react';
+import { ArrowLeft, BookOpen, LogOut, PencilLine } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import { getSectorSummary } from '../data/trainingCatalog';
 import { canAccessMarketingModule, getMarketingModuleProgress, getMarketingModuleStatus, getMarketingTrainingProgress } from '../data/trainingPath';
 import {
   canAccessSector,
+  canManageSector,
   getUserDepartmentSummary,
 } from '../data/sectorAccess';
+import { fetchTrainings, getCachedTrainings } from '../data/trainingAdminApi';
 import './SectorDetail.css';
 
 const SectorDetail = ({ currentUser, onLogout }) => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const sector = getSectorSummary(id);
+  const initialSector = getSectorSummary(id);
   const displayName = currentUser?.name?.trim() || 'Usuário';
-  const trainingProgress = getMarketingTrainingProgress(currentUser?.id);
+
+  const [customTrainings, setCustomTrainings] = useState(() => getCachedTrainings());
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetchTrainings()
+      .then((items) => {
+        if (!cancelled) {
+          setCustomTrainings(items);
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const sector = initialSector ? { ...initialSector } : null;
+
+  if (sector) {
+    const hardcodedModuleIds = sector.moduleIds.map(String);
+    const sectorTrainings = customTrainings.filter((t) => t.departmentId === sector.id);
+
+    const dynamicModulesMap = {};
+    sectorTrainings.forEach((t) => {
+      const tModIdStr = String(t.moduleId).trim();
+      if (!tModIdStr) return;
+
+      const isHardcoded = hardcodedModuleIds.includes(tModIdStr);
+      if (!isHardcoded) {
+        const lower = tModIdStr.toLowerCase();
+        if (!dynamicModulesMap[lower]) {
+          dynamicModulesMap[lower] = {
+            id: tModIdStr,
+            title: tModIdStr,
+            description: t.description || 'Treinamento personalizado.',
+            icon: BookOpen,
+            color: sector.color || '#3b82f6',
+            count: 3,
+            levels: [
+              { id: 'basico', title: 'Básico' },
+              { id: 'intermediario', title: 'Intermediário' },
+              { id: 'avancado', title: 'Avançado' }
+            ]
+          };
+        }
+      }
+    });
+
+    const dynamicModulesList = Object.values(dynamicModulesMap);
+    const combinedModules = [...sector.modules, ...dynamicModulesList];
+
+    // Filter to only display modules that have at least one registered training in the DB
+    // OR are the built-in pre-packaged trainings with real content (IDs 1 to 8)
+    sector.modules = combinedModules.filter((m) => {
+      const idNum = Number(m.id);
+      if (!isNaN(idNum) && idNum >= 1 && idNum <= 8) {
+        return true;
+      }
+      return sectorTrainings.some((t) => {
+        const tModLower = String(t.moduleId).trim().toLowerCase();
+        const mIdLower = String(m.id).trim().toLowerCase();
+        const mTitleLower = String(m.title).trim().toLowerCase();
+        return tModLower === mIdLower || tModLower === mTitleLower;
+      });
+    });
+  }
+
+  const canManageCurrentSector = sector ? canManageSector(currentUser, sector.id) : false;
 
   if (!sector) {
     return (
@@ -30,6 +103,12 @@ const SectorDetail = ({ currentUser, onLogout }) => {
   const Icon = sector.icon;
   const hasModules = sector.modules.length > 0;
   const isLockedForUser = currentUser?.role !== 'master' && !canAccessSector(currentUser, sector.id);
+  const isAnyAdmin = currentUser?.role === 'master' || currentUser?.role === 'admin';
+
+  // Dynamic progress calculations across all departments using generalized trainingPath.js
+  const trainingProgress = getMarketingTrainingProgress(currentUser?.id, sector.id);
+  const progressPercent = trainingProgress.progressPercent;
+  const remainingSteps = trainingProgress.remainingSteps;
 
   if (isLockedForUser) {
     return (
@@ -96,6 +175,16 @@ const SectorDetail = ({ currentUser, onLogout }) => {
             </div>
           </div>
           <div className="header-actions">
+            {canManageCurrentSector && (
+              <button 
+                className="btn-users" 
+                onClick={() => navigate('/admin/trainings')}
+                style={{ marginRight: '12px', display: 'flex', alignItems: 'center', gap: '6px', height: '38px', padding: '0 16px' }}
+              >
+                <PencilLine size={16} />
+                <span>Gerenciar Treinamentos</span>
+              </button>
+            )}
             <div className="user-profile">
               <div className="avatar">{displayName.charAt(0).toUpperCase()}</div>
               <span>{displayName}</span>
@@ -115,26 +204,26 @@ const SectorDetail = ({ currentUser, onLogout }) => {
             <p>{sector.description}</p>
           </div>
           <div className="sector-hero-stats">
-            {sector.id === 'marketing-produtos' ? (
+            {isAnyAdmin ? (
               <>
                 <div>
-                  <strong>{trainingProgress.progressPercent}%</strong>
-                  <span>progresso</span>
+                  <strong>{sector.modules.length}</strong>
+                  <span>{sector.modules.length === 1 ? 'Módulo' : 'Módulos'}</span>
                 </div>
                 <div>
-                  <strong>{trainingProgress.remainingSteps}</strong>
-                  <span>etapas para terminar</span>
+                  <strong style={{ color: 'var(--accent-color)' }}>Gerenciando</strong>
+                  <span>Função Administrativa</span>
                 </div>
               </>
             ) : (
               <>
                 <div>
-                  <strong>{sector.moduleCount}</strong>
-                  <span>{sector.moduleCount === 1 ? 'treinamento' : 'treinamentos'}</span>
+                  <strong>{progressPercent}%</strong>
+                  <span>progresso</span>
                 </div>
                 <div>
-                  <strong>{sector.status === 'active' ? 'Ativo' : 'Em preparação'}</strong>
-                  <span>status</span>
+                  <strong>{remainingSteps}</strong>
+                  <span>{remainingSteps === 1 ? 'etapa para terminar' : 'etapas para terminar'}</span>
                 </div>
               </>
             )}
@@ -148,11 +237,12 @@ const SectorDetail = ({ currentUser, onLogout }) => {
                 key={module.id}
                 module={{
                   ...module,
-                  progress: getMarketingModuleProgress(currentUser?.id, module.id),
+                  progress: isAnyAdmin ? 0 : getMarketingModuleProgress(currentUser?.id, module.id),
+                  hideProgress: isAnyAdmin,
                 }}
                 backTo={`/sector/${sector.id}`}
-                locked={!currentUser || !canAccessMarketingModule(currentUser, module.id)}
-                completed={getMarketingModuleStatus(currentUser, module.id).isCompleted}
+                locked={isAnyAdmin ? false : (!currentUser || !canAccessMarketingModule(currentUser, module.id))}
+                completed={isAnyAdmin ? false : getMarketingModuleStatus(currentUser, module.id).isCompleted}
               />
             ))}
           </section>
@@ -164,9 +254,15 @@ const SectorDetail = ({ currentUser, onLogout }) => {
               A estrutura já está pronta. Quando os materiais deste setor forem incluídos, eles vão aparecer
               automaticamente nesta tela.
             </p>
-            <button className="btn-primary" onClick={() => navigate('/trainings')}>
-              Voltar para setores
-            </button>
+            {canManageCurrentSector ? (
+              <button className="btn-primary" onClick={() => navigate('/admin/trainings')}>
+                Cadastrar treinamento
+              </button>
+            ) : (
+              <button className="btn-primary" onClick={() => navigate('/trainings')}>
+                Voltar para setores
+              </button>
+            )}
           </section>
         )}
       </main>

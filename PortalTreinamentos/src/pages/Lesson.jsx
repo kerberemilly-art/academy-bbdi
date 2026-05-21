@@ -7,6 +7,8 @@ import { getMarketingCertificateStatus } from '../data/certificateEligibility';
 import { recordQuizResult } from '../data/progressStorage';
 import { issueMarketingCertificateIfEligible } from '../data/certificateActions';
 import './Lesson.css';
+import Confetti from '../components/Confetti';
+import StudyMentor from '../components/StudyMentor';
 
 const Lesson = ({ currentUser }) => {
   const { moduleId, levelId } = useParams();
@@ -26,7 +28,7 @@ const Lesson = ({ currentUser }) => {
 
   if (!lesson) return <div className="container" style={{padding: '2rem'}}>Aula não encontrada.</div>;
 
-  if (currentUser?.role !== 'master' && levelStatus.isLocked) {
+  if (currentUser?.role !== 'master' && currentUser?.role !== 'admin' && levelStatus.isLocked) {
     const requiredModuleTitle = levelStatus.requiredModuleId
       ? modulesData[levelStatus.requiredModuleId]?.title
       : 'o módulo anterior';
@@ -248,6 +250,7 @@ const Lesson = ({ currentUser }) => {
               </button>
             ) : (
               <div className="quiz-results animate-fade-in">
+                <Confetti active={quizSubmitted && scorePercent >= 60} />
                 <div className="score-circle" style={{ borderColor: moduleInfo.color }}>
                   <Award size={40} color={moduleInfo.color} />
                   <span>{score} / {totalQuestions}</span>
@@ -281,6 +284,7 @@ const Lesson = ({ currentUser }) => {
           </div>
         )}
       </main>
+      <StudyMentor lessonContent={currentLessonStep?.content || ''} />
     </div>
   );
 };

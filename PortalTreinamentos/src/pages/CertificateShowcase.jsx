@@ -1,5 +1,5 @@
-import { Download, Printer, ShieldCheck } from 'lucide-react';
-import { useEffect } from 'react';
+import { Download, Printer, ShieldCheck, Layout } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import './CertificateShowcase.css';
 import { certificateTemplates, fillTemplate } from '../data/certificateTemplates';
 import { getCurrentUser } from '../data/usersStorage';
@@ -23,13 +23,15 @@ const formatDate = (date) => new Intl.DateTimeFormat('pt-BR', {
 }).format(new Date(date));
 
 const CertificateShowcase = () => {
-  const template = certificateTemplates.marketingProducts;
+  const [activeTemplateKey, setActiveTemplateKey] = useState('marketingProducts');
+  const template = certificateTemplates[activeTemplateKey];
+  
   const currentUser = getCurrentUser();
   const displayName = currentUser?.name ?? certificate.userName;
-  const displayTrailName = (
-    getDepartmentLabel(getUserDepartmentId(currentUser))
-    || certificate.trainingTrailName
-  );
+  const displayTrailName = activeTemplateKey === 'marketingProducts' 
+    ? (getDepartmentLabel(getUserDepartmentId(currentUser)) || certificate.trainingTrailName)
+    : template.programTitle;
+
   const statement = fillTemplate(template.statement, {
     nome: displayName,
     programa: displayTrailName,
@@ -56,10 +58,27 @@ const CertificateShowcase = () => {
   return (
     <main className="certificate-showcase">
       <section className="showcase-toolbar">
-        <span className="showcase-kicker">
-          <ShieldCheck size={14} />
-          Visualização pública
-        </span>
+        <div className="showcase-left">
+          <span className="showcase-kicker">
+            <ShieldCheck size={14} />
+            Visualização pública
+          </span>
+          <div className="template-switcher">
+            <Layout size={16} />
+            <button 
+              className={activeTemplateKey === 'marketingProducts' ? 'active' : ''} 
+              onClick={() => setActiveTemplateKey('marketingProducts')}
+            >
+              Marketing
+            </button>
+            <button 
+              className={activeTemplateKey === 'generic' ? 'active' : ''} 
+              onClick={() => setActiveTemplateKey('generic')}
+            >
+              Genérico
+            </button>
+          </div>
+        </div>
         <div className="showcase-actions">
           <button type="button" className="btn-outline" onClick={() => window.print()}>
             <Printer size={18} />
@@ -88,13 +107,13 @@ const CertificateShowcase = () => {
         </div>
 
         <div className="certificate-content">
-          <p className="certificate-label">Certificamos que</p>
+          <p className="certificate-label">{template.headline || 'Certificado de Conclusão'}</p>
           <h2>{displayName}</h2>
           <p className="certificate-statement">{statement}</p>
 
           <div className="certificate-grid">
             <article>
-              <span>Trilha</span>
+              <span>{activeTemplateKey === 'marketingProducts' ? 'Trilha' : 'Programa'}</span>
               <strong>{displayTrailName}</strong>
             </article>
             <article>
@@ -115,10 +134,10 @@ const CertificateShowcase = () => {
         <footer className="certificate-footer">
           <div className="signature">
             <div className="signature-line" />
-            <strong>Coordenação de Treinamentos</strong>
-            <span>Portal Treinamentos BBDI</span>
+            <strong>{activeTemplateKey === 'marketingProducts' ? 'Coordenação de Treinamentos' : 'Diretoria Executiva'}</strong>
+            <span>{template.institution}</span>
           </div>
-          <div className="footer-note">Documento emitido automaticamente pelo portal.</div>
+          <div className="footer-note">{template.footerNote || 'Documento emitido automaticamente pelo portal.'}</div>
         </footer>
       </section>
     </main>

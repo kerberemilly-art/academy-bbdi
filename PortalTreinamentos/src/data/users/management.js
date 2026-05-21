@@ -74,6 +74,14 @@ const ensureActorScopedDepartments = (actorUser, departmentIds) => {
   return scopedDepartmentIds.length > 0 ? scopedDepartmentIds : actorDepartmentIds.slice(0, 1);
 };
 
+const hasDepartmentAdmin = (users, departmentId, ignoredUserId = null) => (
+  users.some((user) => (
+    user.id !== ignoredUserId
+    && user.role === 'admin'
+    && getNormalizedDepartmentIds(user.departmentIds ?? user.departmentId).includes(departmentId)
+  ))
+);
+
 export const createUser = ({ name, email, password, role, departmentId, departmentIds }, actorUser = null) => {
   const normalizedName = safeTrim(name);
   const normalizedEmail = normalizeEmail(email);
@@ -100,6 +108,10 @@ export const createUser = ({ name, email, password, role, departmentId, departme
 
   if (users.some((user) => user.email === normalizedEmail)) {
     return { ok: false, error: 'Já existe um usuário com este e-mail.' };
+  }
+
+  if (normalizedRole === 'admin' && hasDepartmentAdmin(users, normalizedDepartmentId)) {
+    return { ok: false, error: 'Este departamento já possui um admin responsável.' };
   }
 
   const user = {
@@ -149,6 +161,10 @@ export const updateUser = (userId, { name, email, password, role, departmentId, 
 
   if (users.some((user) => user.email === normalizedEmail && user.id !== userId)) {
     return { ok: false, error: 'Já existe um usuário com este e-mail.' };
+  }
+
+  if (normalizedRole === 'admin' && hasDepartmentAdmin(users, normalizedDepartmentId, userId)) {
+    return { ok: false, error: 'Este departamento já possui um admin responsável.' };
   }
 
   const updatedUsers = users.map((user) => {

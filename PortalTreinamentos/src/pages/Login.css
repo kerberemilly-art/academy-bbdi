@@ -4,55 +4,79 @@
   justify-content: center;
   min-height: 100vh;
   padding: 20px;
-  background-color: var(--bg-primary);
+  background:
+    radial-gradient(ellipse at top left, rgba(0, 113, 206, 0.35), transparent 55%),
+    radial-gradient(ellipse at bottom right, rgba(0, 30, 90, 0.6), transparent 55%),
+    linear-gradient(160deg, #001e5a 0%, #00102e 60%, #000c22 100%);
+  background-attachment: fixed;
 }
 
 .login-container {
   width: 100%;
   max-width: 420px;
-  padding: 40px;
+  padding: 44px 40px;
   display: flex;
   flex-direction: column;
   gap: 32px;
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(0, 113, 206, 0.25);
+  border-radius: 20px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+/* ── Typographic Logo ── */
+.bbdi-logo-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.bbdi-logo-bb {
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  color: #4dabf7;
+  line-height: 1;
+  text-shadow: 0 0 24px rgba(77, 171, 247, 0.5);
+}
+
+.bbdi-logo-divider {
+  font-size: 1.6rem;
+  font-weight: 300;
+  color: rgba(77, 171, 247, 0.4);
+  line-height: 1;
+}
+
+.bbdi-logo-academy {
+  font-size: 1.1rem;
+  font-weight: 400;
+  letter-spacing: 0.25em;
+  color: rgba(232, 240, 254, 0.7);
+  line-height: 1;
+  text-transform: uppercase;
 }
 
 .login-header {
   text-align: center;
 }
 
-.logo-icon {
-  width: 60px;
-  height: 60px;
-  background: #eff6ff;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 16px;
-  border: 1px solid #dbeafe;
-  color: var(--accent-color);
+.login-tagline {
+  color: rgba(168, 191, 224, 0.8);
+  font-size: 0.9rem;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  margin-top: 4px;
 }
 
-.login-header h1 {
-  font-size: 1.5rem;
-  margin-bottom: 8px;
-  color: #111827;
-}
-
-.login-header p {
-  color: var(--text-secondary);
-  font-size: 0.95rem;
-  font-weight: 500;
-}
-
+/* ── Form ── */
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
 }
 
 .input-group {
@@ -64,24 +88,48 @@
 .input-icon {
   position: absolute;
   left: 16px;
-  color: #9ca3af;
+  color: rgba(168, 191, 224, 0.6);
   pointer-events: none;
 }
 
 .input-field.with-icon {
   padding-left: 48px;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(0, 113, 206, 0.3);
+  color: #e8f0fe;
+}
+
+.input-field.with-icon::placeholder {
+  color: rgba(168, 191, 224, 0.5);
+}
+
+.input-field.with-icon:focus {
+  border-color: #4dabf7;
+  background: rgba(0, 113, 206, 0.1);
+  box-shadow: 0 0 0 3px rgba(77, 171, 247, 0.18);
 }
 
 .login-btn {
-  margin-top: 8px;
-  padding: 12px;
+  margin-top: 6px;
+  padding: 13px;
   font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: linear-gradient(135deg, #0071ce 0%, #005fa3 100%);
+  border: none;
+  box-shadow: 0 4px 18px rgba(0, 113, 206, 0.4);
+}
+
+.login-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0080e8 0%, #0071ce 100%);
+  box-shadow: 0 6px 24px rgba(0, 113, 206, 0.55);
+  transform: translateY(-1px);
 }
 
 .error-message {
-  color: var(--error-color);
-  background: #fef2f2;
-  border: 1px solid #fee2e2;
+  color: #fca5a5;
+  background: rgba(220, 38, 38, 0.12);
+  border: 1px solid rgba(220, 38, 38, 0.3);
   padding: 12px;
   border-radius: 8px;
   font-size: 0.85rem;
@@ -91,8 +139,8 @@
 
 .login-footer {
   text-align: center;
-  margin-top: 8px;
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  font-weight: 500;
+  margin-top: 4px;
+  font-size: 0.8rem;
+  color: rgba(168, 191, 224, 0.5);
+  font-weight: 400;
 }

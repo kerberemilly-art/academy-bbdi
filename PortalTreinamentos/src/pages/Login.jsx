@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Lock, Mail, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Lock, Mail, ArrowRight } from 'lucide-react';
 import { MASTER_CREDENTIALS } from '../data/usersStorage';
 import './Login.css';
 
@@ -27,11 +27,12 @@ const Login = ({ onLogin }) => {
     <div className="login-wrapper">
       <div className="login-container glass-panel animate-fade-in">
         <div className="login-header">
-          <div className="logo-icon">
-            <ShieldCheck size={32} color="var(--accent-color)" />
+          <div className="bbdi-logo-mark">
+            <span className="bbdi-logo-bb">BBDI</span>
+            <span className="bbdi-logo-divider">|</span>
+            <span className="bbdi-logo-academy">ACADEMY</span>
           </div>
-          <h1>Portal de Treinamentos</h1>
-          <p>Acesso exclusivo para a equipe técnica.</p>
+          <p className="login-tagline">Plataforma interna de capacitação técnica.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">

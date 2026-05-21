@@ -12,6 +12,7 @@ import {
   Trash2,
   UserPlus,
   Users,
+  FileText,
   X,
 } from 'lucide-react';
 import { createUser, deleteUser, getUsers, setUserActive, updateUser, updateUserDepartments } from '../data/usersStorage';
@@ -260,6 +261,10 @@ const AdminUsers = ({ currentUser }) => {
             <button className="btn-progress-link" onClick={() => navigate('/admin/progress')}>
               <BarChart3 size={18} />
               Acompanhar progresso
+            </button>
+            <button className="btn-progress-link" onClick={() => navigate('/admin/trainings')}>
+              <FileText size={18} />
+              Gerenciar treinamentos
             </button>
             <div className="summary-metric glass-panel">
               <Users size={24} color="var(--accent-color)" />

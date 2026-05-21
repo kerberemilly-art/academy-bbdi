@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Award, ArrowLeft, BadgeCheck, Download, LogOut, Printer, ShieldCheck } from 'lucide-react';
 import { getLatestCertificateByUser } from '../data/certificateStorage';
@@ -33,6 +33,46 @@ const Certificate = ({ currentUser, onLogout }) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const isPreview = searchParams.get('preview') === 'true';
+
+  const cardRef = useRef(null);
+  const shineRef = useRef(null);
+
+  const handleMouseMove = (e) => {
+    const card = cardRef.current;
+    const shine = shineRef.current;
+    if (!card) return;
+
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    const rotateX = ((centerY - y) / centerY) * 8; // Max 8 degrees tilt
+    const rotateY = ((x - centerX) / centerX) * 8;
+
+    const shineX = (x / rect.width) * 100;
+    const shineY = (y / rect.height) * 100;
+
+    card.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.01, 1.01, 1.01)`;
+    
+    if (shine) {
+      shine.style.background = `radial-gradient(circle at ${shineX}% ${shineY}%, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0) 55%)`;
+      shine.style.opacity = '1';
+    }
+  };
+
+  const handleMouseLeave = () => {
+    const card = cardRef.current;
+    const shine = shineRef.current;
+    if (!card) return;
+
+    card.style.transform = 'perspective(1200px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+    if (shine) {
+      shine.style.opacity = '0';
+    }
+  };
 
   const [PDFDownloadLink, setPDFDownloadLink] = useState(null);
   const [MarketingCertificateDocument, setMarketingCertificateDocument] = useState(null);
@@ -181,7 +221,15 @@ const Certificate = ({ currentUser, onLogout }) => {
       </header>
 
       <main className="container certificate-main animate-fade-in">
-        <section className="certificate-paper glass-panel">
+        <section 
+          ref={cardRef}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          className="certificate-paper glass-panel"
+        >
+          {/* Holographic dynamic metallic reflection overlay */}
+          <div ref={shineRef} className="certificate-shine" />
+          
           <div className="certificate-topbar">
             <span className="certificate-seal">
               <Award size={18} />

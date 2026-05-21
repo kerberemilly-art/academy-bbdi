@@ -47,7 +47,7 @@ const AdminProgress = ({ currentUser }) => {
     (test) => accessibleModuleIds.includes(test.moduleId),
   ), [accessibleModuleIds]);
   const collaborators = useMemo(
-    () => users.filter((user) => user.role !== 'master' && (
+    () => users.filter((user) => user.role !== 'master' && user.role !== 'admin' && (
       isMaster || getUserDepartmentIds(user).some((departmentId) => accessibleDepartmentIds.includes(departmentId))
     )),
     [accessibleDepartmentIds, isMaster, users],

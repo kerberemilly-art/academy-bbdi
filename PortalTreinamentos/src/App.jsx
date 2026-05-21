@@ -7,11 +7,13 @@ import ModuleDetail from './pages/ModuleDetail';
 import Lesson from './pages/Lesson';
 import AdminUsers from './pages/AdminUsers';
 import AdminProgress from './pages/AdminProgress';
+import AdminTrainings from './pages/AdminTrainings';
 import Trainings from './pages/Trainings';
 import Certificate from './pages/Certificate';
 import Preview from './pages/Preview';
 import CertificateShowcase from './pages/CertificateShowcase';
 import SectorDetail from './pages/SectorDetail';
+import TrainingDetail from './pages/TrainingDetail';
 import { authenticateUser, clearCurrentUser, getCurrentUser } from './data/usersStorage';
 import { canAccessAdminArea } from './data/sectorAccess';
 import { readStorageValue, writeStorageValue } from './data/runtime';
@@ -34,7 +36,7 @@ const getInitialTheme = () => {
 };
 
 function App() {
-  const [currentUser, setCurrentUser] = useState(() => getCurrentUser());
+  const [currentUser, setCurrentUser] = useState(null);
   const [theme, setTheme] = useState(getInitialTheme);
   const [appReady, setAppReady] = useState(false);
   const isAuthenticated = Boolean(currentUser);
@@ -135,6 +137,12 @@ function App() {
           }
         />
         <Route
+          path="/training/:id"
+          element={
+            isAuthenticated ? <TrainingDetail currentUser={currentUser} onLogout={handleLogout} /> : <Navigate to="/login" />
+          }
+        />
+        <Route
           path="/admin/users"
           element={
             canAccessAdminArea(currentUser)
@@ -147,6 +155,14 @@ function App() {
           element={
             canAccessAdminArea(currentUser)
               ? <AdminProgress currentUser={currentUser} />
+              : <Navigate to={isAuthenticated ? '/dashboard' : '/login'} />
+          }
+        />
+        <Route
+          path="/admin/trainings"
+          element={
+            canAccessAdminArea(currentUser)
+              ? <AdminTrainings currentUser={currentUser} />
               : <Navigate to={isAuthenticated ? '/dashboard' : '/login'} />
           }
         />

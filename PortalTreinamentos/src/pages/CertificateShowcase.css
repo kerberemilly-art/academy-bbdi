@@ -26,6 +26,46 @@
   gap: 16px;
 }
 
+.showcase-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.template-switcher {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.5);
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid #d6dfe9;
+  color: #64748b;
+}
+
+.template-switcher button {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #64748b;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.template-switcher button:hover {
+  color: #1d4ed8;
+  background: rgba(29, 78, 216, 0.05);
+}
+
+.template-switcher button.active {
+  background: #ffffff;
+  color: #1d4ed8;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
 .showcase-kicker {
   display: inline-flex;
   align-items: center;

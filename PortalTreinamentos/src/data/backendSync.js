@@ -10,12 +10,15 @@ let cachedSnapshot = {
   users: [],
   results: [],
   certificates: [],
+  trainings: [],
 };
+let backendBootstrapped = false;
 
 const readSnapshot = () => ({
   users: readStorageJSON(USERS_STORAGE_KEY, []),
   results: readStorageJSON(RESULTS_STORAGE_KEY, []),
   certificates: readStorageJSON(CERTIFICATES_STORAGE_KEY, []),
+  trainings: [],
 });
 
 const writeSnapshot = (snapshot) => {
@@ -29,6 +32,7 @@ const setCachedSnapshot = (snapshot) => {
     users: Array.isArray(snapshot?.users) ? snapshot.users : [],
     results: Array.isArray(snapshot?.results) ? snapshot.results : [],
     certificates: Array.isArray(snapshot?.certificates) ? snapshot.certificates : [],
+    trainings: Array.isArray(snapshot?.trainings) ? snapshot.trainings : [],
   };
 };
 
@@ -36,6 +40,14 @@ const hasSnapshotData = (snapshot) => (
   Array.isArray(snapshot?.users) && snapshot.users.length > 0
   || Array.isArray(snapshot?.results) && snapshot.results.length > 0
   || Array.isArray(snapshot?.certificates) && snapshot.certificates.length > 0
+  || Array.isArray(snapshot?.trainings) && snapshot.trainings.length > 0
+);
+
+const hasBusinessSnapshotData = (snapshot) => (
+  Array.isArray(snapshot?.users) && snapshot.users.some((user) => user?.id !== 'master')
+  || Array.isArray(snapshot?.results) && snapshot.results.length > 0
+  || Array.isArray(snapshot?.certificates) && snapshot.certificates.length > 0
+  || Array.isArray(snapshot?.trainings) && snapshot.trainings.length > 0
 );
 
 export const loadBackendSnapshot = async () => {
@@ -88,7 +100,18 @@ export const writeBackendSlice = (sliceName, value) => {
     [sliceName]: Array.isArray(value) ? value : [],
   };
 
+  if (!backendBootstrapped) {
+    return;
+  }
+
   void syncBackendSnapshot(cachedSnapshot);
+};
+
+export const cacheBackendSlice = (sliceName, value) => {
+  cachedSnapshot = {
+    ...cachedSnapshot,
+    [sliceName]: Array.isArray(value) ? value : [],
+  };
 };
 
 export const bootstrapBackendSnapshot = async () => {
@@ -97,21 +120,25 @@ export const bootstrapBackendSnapshot = async () => {
   }
 
   const remoteSnapshot = await loadBackendSnapshot();
+  const localSnapshot = readSnapshot();
+  const remoteHasBusinessData = hasBusinessSnapshotData(remoteSnapshot);
+  const localHasBusinessData = hasBusinessSnapshotData(localSnapshot);
 
-  if (hasSnapshotData(remoteSnapshot)) {
+  if (remoteHasBusinessData || (hasSnapshotData(remoteSnapshot) && !localHasBusinessData)) {
     setCachedSnapshot(remoteSnapshot);
     writeSnapshot(remoteSnapshot);
+    backendBootstrapped = true;
     return { source: 'remote' };
   }
 
-  const localSnapshot = readSnapshot();
-
   if (hasSnapshotData(localSnapshot)) {
     setCachedSnapshot(localSnapshot);
+    backendBootstrapped = true;
     await syncBackendSnapshot(cachedSnapshot);
     return { source: 'local' };
   }
 
-  setCachedSnapshot({ users: [], results: [], certificates: [] });
+  setCachedSnapshot({ users: [], results: [], certificates: [], trainings: [] });
+  backendBootstrapped = true;
   return { source: 'empty' };
 };
