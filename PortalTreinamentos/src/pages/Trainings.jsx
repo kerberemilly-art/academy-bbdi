@@ -12,16 +12,14 @@ const Trainings = ({ currentUser, onLogout }) => {
 
   return (
     <div className="dashboard-wrapper">
-      <header className="dashboard-header glass-panel">
+      <header className="dashboard-header">
         <div className="header-content container">
-          <div className="header-logo">
-            <button className="btn-back compact" onClick={() => navigate('/dashboard')}>
+          <div className="header-left" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <button className="btn-back" onClick={() => navigate('/dashboard')} title="Voltar ao Dashboard">
               <ArrowLeft size={20} />
-              <span>Voltar</span>
             </button>
             <div className="bbdi-logo-mark header-logo-mark">
               <span className="bbdi-logo-bb">BBDI</span>
-              <span className="bbdi-logo-divider">|</span>
               <span className="bbdi-logo-academy">ACADEMY</span>
             </div>
           </div>
@@ -38,12 +36,22 @@ const Trainings = ({ currentUser, onLogout }) => {
       </header>
 
       <main className="container dashboard-main animate-fade-in">
-        <div className="welcome-section">
-          <h1>Setores de treinamento</h1>
-          <p>Selecione um setor para abrir a trilha de estudo correspondente.</p>
+        <section className="hero-panel" style={{ padding: '32px 40px', gridTemplateColumns: '1fr' }}>
+           <div className="hero-copy">
+              <span className="section-kicker">Catálogo Técnico</span>
+              <h1 style={{ fontSize: '1.8rem' }}>Setores de Capacitação</h1>
+              <p style={{ marginBottom: 0 }}>
+                Explore os departamentos e inicie os treinamentos técnicos especializados do Grupo BBDI.
+              </p>
+           </div>
+        </section>
+
+        <div className="panel-heading">
+          <BookOpen size={20} color="var(--accent-color)" />
+          <h2>Departamentos Disponíveis</h2>
         </div>
 
-        <div className="modules-grid">
+        <div className="modules-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
           {sectors.map((sector) => (
             <SectorCard key={sector.id} sector={sector} currentUser={currentUser} />
           ))}

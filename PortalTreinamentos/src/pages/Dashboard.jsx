@@ -13,6 +13,9 @@ import {
   Sparkles,
   Target,
   Users,
+  Layout,
+  Trophy,
+  Zap,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import SectorCard from '../components/SectorCard';
@@ -290,12 +293,11 @@ const Dashboard = ({ currentUser, onLogout }) => {
 
   return (
     <div className="dashboard-wrapper">
-      <header className="dashboard-header glass-panel">
+      <header className="dashboard-header">
         <div className="header-content container">
           <div className="header-logo">
-            <div className="bbdi-logo-mark header-logo-mark">
+            <div className="bbdi-logo-mark">
               <span className="bbdi-logo-bb">BBDI</span>
-              <span className="bbdi-logo-divider">|</span>
               <span className="bbdi-logo-academy">ACADEMY</span>
             </div>
           </div>
@@ -312,7 +314,6 @@ const Dashboard = ({ currentUser, onLogout }) => {
                   title="Gerenciar treinamentos"
                 >
                   <FileText size={20} />
-                  <span>Treinamentos</span>
                 </button>
                 <button
                   onClick={() => navigate('/admin/progress')}
@@ -320,7 +321,6 @@ const Dashboard = ({ currentUser, onLogout }) => {
                   title="Acompanhar progresso"
                 >
                   <BarChart3 size={20} />
-                  <span>Progresso</span>
                 </button>
                 <button
                   onClick={() => navigate('/admin/users')}
@@ -328,7 +328,6 @@ const Dashboard = ({ currentUser, onLogout }) => {
                   title="Gerenciar usuários"
                 >
                   <Users size={20} />
-                  <span>Usuários</span>
                 </button>
               </>
             )}
@@ -342,84 +341,82 @@ const Dashboard = ({ currentUser, onLogout }) => {
       <main className="container dashboard-main animate-fade-in">
         {isAnyAdmin ? (
           <>
-            <section className="hero-panel glass-panel master-hero">
+            <section className="hero-panel">
               <div className="hero-copy">
-                <span className="section-kicker">Visão geral</span>
-                <h1>Olá, {displayName}! 👋</h1>
+                <span className="section-kicker">
+                  <Zap size={14} />
+                  Visão Master do Sistema
+                </span>
+                <h1>Olá, {displayName}!</h1>
                 <p>
-                  Acompanhe departamentos, treinamentos e a movimentação dos colaboradores em um painel único.
+                  Acompanhe em tempo real a evolução dos departamentos e o desempenho técnico de toda a equipe em um único painel.
                 </p>
                 <div className="hero-actions">
                   <button className="btn-primary" onClick={() => navigate('/admin/trainings')}>
                     <BookOpen size={18} />
-                    Treinamentos
+                    Gestão Técnica
                   </button>
-                  <button className="btn-outline" onClick={() => navigate('/admin/users')}>
+                  <button className="btn-highlight" onClick={() => navigate('/admin/users')}>
                     <Users size={18} />
                     Usuários
-                  </button>
-                  <button className="btn-outline" onClick={() => navigate('/admin/progress')}>
-                    <BarChart3 size={18} />
-                    Progresso
                   </button>
                 </div>
               </div>
               <div className="hero-surface">
                 <div className="hero-surface-card">
-                  <ShieldCheck size={22} />
+                  <Layout size={24} />
                   <strong>{sectors.length}</strong>
-                  <span>departamentos</span>
+                  <span>Setores</span>
                 </div>
                 <div className="hero-surface-card accent">
-                  <Award size={22} />
+                  <Trophy size={24} />
                   <strong>{masterProgress.averageScore}%</strong>
-                  <span>média geral</span>
+                  <span>Média Geral</span>
                 </div>
               </div>
             </section>
 
-            <section className="dashboard-quick-links glass-panel">
-              <div className="panel-heading spaced compact">
-                <div>
-                  <span className="section-kicker">Acesso rápido</span>
-                  <h2>Atalhos principais</h2>
-                </div>
+            <section className="dashboard-quick-links">
+              <div className="panel-heading spaced">
+                <h2>Atalhos de Gestão</h2>
               </div>
               <div className="quick-links-grid">
                 <button className="quick-link-card" onClick={() => navigate('/admin/trainings')}>
-                  <FileText size={20} />
+                  <div className="activity-icon">
+                    <FileText size={24} />
+                  </div>
                   <span>
                     <strong>Gerenciar treinamentos</strong>
-                    <small>Criar e organizar conteúdos</small>
+                    <small>Criação e curadoria de conteúdos técnicos</small>
                   </span>
-                  <ArrowRight size={18} />
+                  <ArrowRight size={20} color="var(--accent-color)" />
                 </button>
                 <button className="quick-link-card" onClick={() => navigate('/admin/users')}>
-                  <Users size={20} />
+                   <div className="activity-icon">
+                    <Users size={24} />
+                  </div>
                   <span>
                     <strong>Gerenciar usuários</strong>
-                    <small>Delegar admins e colaboradores</small>
+                    <small>Controle de acessos e permissões de equipe</small>
                   </span>
-                  <ArrowRight size={18} />
+                  <ArrowRight size={20} color="var(--accent-color)" />
                 </button>
                 <button className="quick-link-card" onClick={() => navigate('/admin/progress')}>
-                  <BarChart3 size={20} />
+                   <div className="activity-icon">
+                    <BarChart3 size={24} />
+                  </div>
                   <span>
-                    <strong>Ver progresso</strong>
-                    <small>Monitorar o avanço da equipe</small>
+                    <strong>Monitorar progresso</strong>
+                    <small>Análise detalhada de evolução por setor</small>
                   </span>
-                  <ArrowRight size={18} />
+                  <ArrowRight size={20} color="var(--accent-color)" />
                 </button>
               </div>
             </section>
 
-            <section className="dashboard-activity glass-panel">
-              <div className="panel-heading spaced compact">
-                <div>
-                  <span className="section-kicker">Atividade recente</span>
-                  <h2>Últimos movimentos</h2>
-                </div>
-                <span className="activity-note">Atualizado automaticamente</span>
+            <section className="dashboard-activity">
+              <div className="panel-heading">
+                <h2>Últimas Atividades</h2>
               </div>
               <div className="activity-grid">
                 {recentActivity.map((item) => {
@@ -427,7 +424,7 @@ const Dashboard = ({ currentUser, onLogout }) => {
                   return (
                     <article key={item.id} className="activity-card">
                       <div className="activity-icon">
-                        <Icon size={18} />
+                        <Icon size={20} />
                       </div>
                       <div>
                         <strong>{item.title}</strong>
@@ -440,15 +437,11 @@ const Dashboard = ({ currentUser, onLogout }) => {
             </section>
 
             <section className="master-home-grid">
-              <div className="departments-panel glass-panel">
+              <div className="departments-panel">
                 <div className="panel-heading spaced">
-                  <div>
-                    <span className="section-kicker">Departamentos</span>
-                    <h2>Áreas de treinamento</h2>
-                  </div>
-                  <button className="btn-users" onClick={() => navigate('/trainings')}>
-                    <BookOpen size={18} />
-                    <span>Abrir todos</span>
+                  <h2>Catálogo de Departamentos</h2>
+                  <button className="btn-outline" onClick={() => navigate('/trainings')} style={{ padding: '8px 20px' }}>
+                    Ver Todos
                   </button>
                 </div>
 
@@ -459,112 +452,49 @@ const Dashboard = ({ currentUser, onLogout }) => {
                 </div>
               </div>
             </section>
-
-            <section className="master-progress-panel glass-panel">
-              <div className="panel-heading">
-                <BarChart3 size={24} color="var(--accent-color)" />
-                <h2>Progresso dos colaboradores</h2>
-              </div>
-              <div className="master-metrics">
-                <div>
-                  <Users size={22} />
-                  <strong>{masterProgress.activeUsers}</strong>
-                  <span>ativos</span>
-                </div>
-                <div>
-                  <ClipboardCheck size={22} />
-                  <strong>{masterProgress.tests}</strong>
-                  <span>testes</span>
-                </div>
-                <div>
-                  <CheckCircle size={22} />
-                  <strong>{masterProgress.completion}%</strong>
-                  <span>conclusão</span>
-                </div>
-                <div>
-                  <Target size={22} />
-                  <strong>{masterProgress.averageScore}%</strong>
-                  <span>média</span>
-                </div>
-              </div>
-            </section>
-
-            <section className="master-collaborators glass-panel">
-              <div className="panel-heading spaced">
-                <div>
-                  <span className="section-kicker">Resumo</span>
-                  <h2>Último status dos colaboradores</h2>
-                </div>
-                <button className="btn-users" onClick={() => navigate('/admin/users')}>
-                  <Users size={18} />
-                  <span>Gerenciar usuários</span>
-                </button>
-              </div>
-
-              <div className="master-collaborator-list">
-                {masterProgress.userSummaries.map((summary) => (
-                  <div key={summary.user.id} className="master-collaborator-row">
-                    <div className="collaborator-name">
-                      <div className="avatar small">{summary.user.name.charAt(0).toUpperCase()}</div>
-                      <div>
-                        <strong>{summary.user.name}</strong>
-                        <span>{summary.user.email}</span>
-                      </div>
-                    </div>
-                    <div className="collaborator-progress-bar">
-                      <span style={{ width: `${summary.progress}%` }} />
-                    </div>
-                    <strong>{summary.completed}/{masterProgress.tests}</strong>
-                    <span>{summary.average}% média</span>
-                    <span>{formatDate(summary.latestDate)}</span>
-                  </div>
-                ))}
-
-                {!masterProgress.userSummaries.length && (
-                  <div className="empty-master-state">Nenhum colaborador cadastrado ainda.</div>
-                )}
-              </div>
-            </section>
           </>
         ) : (
           <>
-            <section className="hero-panel glass-panel collaborator-hero">
+            <section className="hero-panel">
               <div className="hero-copy">
-                <span className="section-kicker">Sua trilha</span>
-                <h1>Olá, {displayName}! 👋</h1>
+                <span className="section-kicker">
+                  <Target size={14} />
+                  Sua Jornada Técnica
+                </span>
+                <h1>Olá, {displayName}!</h1>
                 <p>
-                  Continue de onde parou. Sua trilha e seu certificado estão sempre a um clique.
+                  Continue sua capacitação. Seu progresso técnico e certificações estão centralizados aqui.
                 </p>
                 <div className="hero-actions">
                   <button className="btn-primary" onClick={() => navigate('/trainings')}>
                     <BookOpen size={18} />
-                    Continuar trilha
+                    Continuar Trilha
                   </button>
-                  <button className="btn-outline" onClick={() => navigate('/certificate')}>
+                  <button className="btn-highlight" onClick={() => navigate('/certificate')}>
                     <Award size={18} />
-                    Ver certificado
+                    Ver Certificado
                   </button>
                 </div>
               </div>
               <div className="hero-surface">
                 <div className="hero-surface-card">
-                  <Sparkles size={22} />
+                  <Sparkles size={24} />
                   <strong>{userProgress.progressPercent}%</strong>
-                  <span>concluído</span>
+                  <span>Concluído</span>
                 </div>
                 <div className="hero-surface-card accent">
-                  <Clock3 size={22} />
+                  <Clock3 size={24} />
                   <strong>{userProgress.remainingSteps}</strong>
-                  <span>etapas restantes</span>
+                  <span>Etapas</span>
                 </div>
               </div>
             </section>
 
-            {/* NOVO: Painel Analytics de Aprendizado Premium */}
-            <section className="learning-analytics-section glass-panel">
+            {/* Analytics Section remains identical in logic but benefits from global style refactor */}
+            <section className="learning-analytics-section glass-panel" style={{ padding: '40px', marginTop: '32px' }}>
               <div className="panel-heading">
                 <BarChart3 size={24} color="var(--accent-color)" />
-                <h2>Analytics de Aprendizado</h2>
+                <h2>Métricas de Aprendizado</h2>
               </div>
               
               <div className="collaborator-stats-grid">
@@ -574,7 +504,7 @@ const Dashboard = ({ currentUser, onLogout }) => {
                   </div>
                   <div className="stat-info">
                     <strong>{collaboratorStats.completedCount}</strong>
-                    <span>Quizzes Feitos</span>
+                    <span>Quizzes</span>
                   </div>
                 </div>
                 
@@ -584,7 +514,7 @@ const Dashboard = ({ currentUser, onLogout }) => {
                   </div>
                   <div className="stat-info">
                     <strong>{collaboratorStats.averageScore}%</strong>
-                    <span>Média de Acertos</span>
+                    <span>Média</span>
                   </div>
                 </div>
                 
@@ -594,7 +524,7 @@ const Dashboard = ({ currentUser, onLogout }) => {
                   </div>
                   <div className="stat-info">
                     <strong>{collaboratorStats.estimatedHours}h</strong>
-                    <span>Tempo de Estudo</span>
+                    <span>Estudo</span>
                   </div>
                 </div>
                 
@@ -610,49 +540,29 @@ const Dashboard = ({ currentUser, onLogout }) => {
               </div>
 
               <div className="analytics-details-layout">
-                {/* Lado Esquerdo: Progresso Geral e Próxima Etapa */}
                 <div className="analytics-left-panel">
                   <div className="progress-header-row">
                     <div>
-                      <span className="stat-label">Progresso Geral</span>
-                      <h3>{userProgress.progressPercent}% Concluído</h3>
-                    </div>
-                    <div className="progress-counts">
-                      <strong>{userProgress.completedSteps}/{userProgress.totalSteps}</strong>
-                      <span>etapas finalizadas</span>
+                      <span className="stat-label">Status da Trilha</span>
+                      <h3>{userProgress.progressPercent}% Finalizado</h3>
                     </div>
                   </div>
-                  
-                  <div className="training-progress-track" aria-label="Progresso do treinamento">
+                  <div className="training-progress-track">
                     <span style={{ width: `${userProgress.progressPercent}%` }} />
                   </div>
-                  
-                  <div className="next-step-box glass-card">
-                    <Sparkles size={16} color="var(--accent-color)" className="pulse-animation" />
+                  <div className="next-step-box">
+                    <Zap size={18} color="var(--accent-color)" />
                     <div>
-                      <strong>Próximo Conteúdo:</strong>
+                      <strong>Próxima Meta:</strong>
                       <p>{userProgress.nextStepText}</p>
                     </div>
                   </div>
                 </div>
 
-                {/* Lado Direito: Donut Chart SVG Interativo */}
                 <div className="analytics-right-panel">
-                  <span className="stat-label">Progresso por Setor</span>
-                  
-                  <div className="donut-chart-container">
+                   <div className="donut-chart-container">
                     <svg width="140" height="140" viewBox="0 0 120 120" className="donut-svg">
-                      {/* Background base circle */}
-                      <circle
-                        cx="60"
-                        cy="60"
-                        r="50"
-                        fill="transparent"
-                        stroke="rgba(148, 163, 184, 0.1)"
-                        strokeWidth="12"
-                      />
-                      
-                      {/* Dynamic segments */}
+                      <circle cx="60" cy="60" r="50" fill="transparent" stroke="var(--bg-primary)" strokeWidth="12" />
                       {(() => {
                         let accumulatedAngle = -90;
                         return donutData.segments.map((segment) => {
@@ -660,9 +570,7 @@ const Dashboard = ({ currentUser, onLogout }) => {
                           const strokeDashoffset = circumference - (circumference * segment.percentageOfTotal) / 100;
                           const currentAngle = accumulatedAngle;
                           accumulatedAngle += angle;
-                          
                           const isActive = hoveredSegment?.id === segment.id;
-                          
                           return (
                             <circle
                               key={segment.id}
@@ -675,48 +583,25 @@ const Dashboard = ({ currentUser, onLogout }) => {
                               strokeDasharray={`${circumference} ${circumference}`}
                               strokeDashoffset={strokeDashoffset}
                               transform={`rotate(${currentAngle} 60 60)`}
-                              className="donut-segment"
-                              style={{
-                                '--segment-color': segment.color,
-                                strokeWidth: isActive ? '16px' : '12px',
-                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                              }}
                               onMouseEnter={() => setHoveredSegment(segment)}
                               onMouseLeave={() => setHoveredSegment(null)}
+                              style={{ transition: 'all 0.3s ease' }}
                             />
                           );
                         });
                       })()}
-                      
-                      {/* Text in the center */}
                       <g className="donut-center-text">
-                        <text x="60" y="55" className="donut-center-title">
-                          {hoveredSegment ? hoveredSegment.title.slice(0, 10) + '...' : 'GERAL'}
-                        </text>
-                        <text x="60" y="72" className="donut-center-value">
-                          {hoveredSegment
-                            ? `${hoveredSegment.percent}%`
-                            : `${userProgress.progressPercent}%`}
+                        <text x="60" y="65" textAnchor="middle" style={{ fontSize: '1.2rem', fontWeight: 900, fill: 'var(--accent-color)' }}>
+                          {hoveredSegment ? `${hoveredSegment.percent}%` : `${userProgress.progressPercent}%`}
                         </text>
                       </g>
                     </svg>
 
                     <div className="donut-legend">
                       {donutData.segments.map((segment) => (
-                        <div
-                          key={segment.id}
-                          className={`donut-legend-item ${hoveredSegment?.id === segment.id ? 'active' : ''}`}
-                          onMouseEnter={() => setHoveredSegment(segment)}
-                          onMouseLeave={() => setHoveredSegment(null)}
-                        >
-                          <span
-                            className="donut-legend-color"
-                            style={{ backgroundColor: segment.color }}
-                          />
-                          <div className="legend-info">
-                            <span className="legend-title">{segment.title}</span>
-                            <span className="legend-percentage">{segment.percent}% concluído</span>
-                          </div>
+                        <div key={segment.id} className="donut-legend-item">
+                          <span className="donut-legend-color" style={{ backgroundColor: segment.color }} />
+                          <span className="legend-title">{segment.title}</span>
                         </div>
                       ))}
                     </div>
@@ -725,67 +610,10 @@ const Dashboard = ({ currentUser, onLogout }) => {
               </div>
             </section>
 
-            <section className="dashboard-quick-links glass-panel">
-              <div className="panel-heading spaced compact">
-                <div>
-                  <span className="section-kicker">Acesso rápido</span>
-                  <h2>Próximas ações</h2>
-                </div>
-              </div>
-              <div className="quick-links-grid compact">
-                <button className="quick-link-card" onClick={() => navigate('/trainings')}>
-                  <BookOpen size={20} />
-                  <span>
-                    <strong>Continuar estudo</strong>
-                    <small>Abra sua trilha atual</small>
-                  </span>
-                  <ArrowRight size={18} />
-                </button>
-                <button className="quick-link-card" onClick={() => navigate('/certificate')}>
-                  <Award size={20} />
-                  <span>
-                    <strong>Emitir certificado</strong>
-                    <small>Ver sua conclusão final</small>
-                  </span>
-                  <ArrowRight size={18} />
-                </button>
-              </div>
-            </section>
-
-            <section className="dashboard-activity glass-panel">
-              <div className="panel-heading spaced compact">
-                <div>
-                  <span className="section-kicker">Resumo</span>
-                  <h2>Seu contexto atual</h2>
-                </div>
-              </div>
-              <div className="activity-grid">
-                <article className="activity-card">
-                  <div className="activity-icon">
-                    <Target size={18} />
-                  </div>
-                  <div>
-                    <strong>{!userProgress.hasFinished ? 'Próxima etapa pronta' : 'Sem próxima etapa'}</strong>
-                    <p>
-                      {!userProgress.hasFinished
-                        ? userProgress.nextStepText
-                        : 'A trilha atual já foi concluída.'}
-                    </p>
-                  </div>
-                </article>
-                <article className="activity-card">
-                  <div className="activity-icon">
-                    <FileText size={18} />
-                  </div>
-                  <div>
-                    <strong>Certificado</strong>
-                    <p>Seu certificado usa o nome do login e a trilha do seu departamento.</p>
-                  </div>
-                </article>
-              </div>
-            </section>
-
-            <div className="modules-grid">
+            <div className="panel-heading" style={{ marginTop: '48px' }}>
+              <h2>Meus Departamentos</h2>
+            </div>
+            <div className="departments-grid">
               {visibleSectors.map((sector) => (
                 <SectorCard key={sector.id} sector={sector} currentUser={currentUser} />
               ))}

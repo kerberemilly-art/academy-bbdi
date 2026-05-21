@@ -106,7 +106,6 @@ function App() {
         title={isDarkTheme ? 'Modo claro' : 'Modo noturno'}
       >
         {isDarkTheme ? <Sun size={20} /> : <Moon size={20} />}
-        <span>{isDarkTheme ? 'Claro' : 'Noturno'}</span>
       </button>
       <Routes>
         <Route path="/" element={<CertificateShowcase />} />
