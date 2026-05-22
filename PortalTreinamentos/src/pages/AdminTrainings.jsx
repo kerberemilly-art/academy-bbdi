@@ -1244,7 +1244,7 @@ const AdminTrainings = ({ currentUser }) => {
                   <div className="training-row-actions">
                     <button type="button" className="btn-small btn-primary-ghost" onClick={() => handleStartEdit(training)}>
                       <Pencil size={15} />
-                      {training.builtinSource ? 'Editar cópia' : 'Editar'}
+                      Editar
                     </button>
                     {!training.builtinSource && (
                       <button type="button" className="btn-small btn-danger-ghost" onClick={() => handleDelete(training)}>
