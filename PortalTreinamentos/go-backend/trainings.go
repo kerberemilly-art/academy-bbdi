@@ -20,7 +20,7 @@ type TrainingPayload struct {
 }
 
 func GetTrainings() []TrainingPayload {
-	rows, err := db.Query("SELECT id, department_id, title, description, created_at, updated_at, status, module_id, content_json, quiz_questions_json, content_blocks_json FROM trainings ORDER BY created_at ASC")
+	rows, err := db.Query("SELECT id, department_id, title, description, created_at, updated_at, status, module_id, content, quiz_questions_json, content_blocks_json FROM trainings ORDER BY created_at ASC")
 	if err != nil {
 		log.Printf("Error getting trainings: %v\n", err)
 		return []TrainingPayload{}
@@ -47,7 +47,7 @@ func GetTrainings() []TrainingPayload {
 
 func SaveTraining(t TrainingPayload) error {
 	query := `
-		INSERT INTO trainings (id, department_id, title, description, created_at, updated_at, status, module_id, content_json, quiz_questions_json, content_blocks_json)
+		INSERT INTO trainings (id, department_id, title, description, created_at, updated_at, status, module_id, content, quiz_questions_json, content_blocks_json)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		ON CONFLICT(id) DO UPDATE SET
 			department_id = excluded.department_id,
@@ -56,7 +56,7 @@ func SaveTraining(t TrainingPayload) error {
 			updated_at = excluded.updated_at,
 			status = excluded.status,
 			module_id = excluded.module_id,
-			content_json = excluded.content_json,
+			content = excluded.content,
 			quiz_questions_json = excluded.quiz_questions_json,
 			content_blocks_json = excluded.content_blocks_json
 	`

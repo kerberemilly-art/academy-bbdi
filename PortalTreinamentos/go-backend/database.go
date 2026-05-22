@@ -44,7 +44,7 @@ func InitDB() {
 			created_at TEXT NOT NULL,
 			updated_at TEXT NOT NULL,
 			status TEXT NOT NULL DEFAULT 'draft',
-			content_json TEXT NOT NULL DEFAULT '[]'
+			content TEXT NOT NULL DEFAULT ''
 		);`,
 	}
 
