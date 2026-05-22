@@ -15,12 +15,18 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"github.com/joho/godotenv"
 )
 
 //go:embed dist/*
 var content embed.FS
 
 func main() {
+	// Attempt to load .env from parent directory
+	workDir, _ := os.Getwd()
+	envPath := filepath.Join(filepath.Dir(workDir), ".env")
+	godotenv.Load(envPath) // ignore error if it doesn't exist
+
 	InitDB()
 
 	r := chi.NewRouter()
@@ -92,7 +98,7 @@ func main() {
 	r.Post("/api/mentor", MentorHandler)
 	r.Post("/api/pdf/extract", PdfExtractHandler)
 
-	workDir, _ := os.Getwd()
+	workDir, _ = os.Getwd()
 	uploadsDir := filepath.Join(filepath.Dir(workDir), "uploads")
 	if err := os.MkdirAll(uploadsDir, 0755); err != nil {
 		log.Printf("Error creating uploads dir: %v", err)
