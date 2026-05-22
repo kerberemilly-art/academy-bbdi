@@ -28,6 +28,7 @@ COPY --from=frontend-builder /app/dist /app/go-backend/dist
 
 # Compila o binário otimizado para Linux (sem necessidade de CGO por conta do modernc.org/sqlite)
 WORKDIR /app/go-backend
+RUN go mod tidy
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o portal-treinamentos .
 
 # Stage 3: Imagem Final Leve (Produção)
