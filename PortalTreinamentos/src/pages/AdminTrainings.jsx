@@ -481,6 +481,26 @@ const AdminTrainings = ({ currentUser }) => {
     }
   };
 
+  const handleStartManualTraining = () => {
+    if (!canManageSector(currentUser, formData.departmentId)) {
+      setFeedback({ type: 'error', message: 'Você só pode gerenciar treinamentos no seu departamento.' });
+      return;
+    }
+    
+    setExtractionPreview({
+      title: '',
+      description: '',
+      content: '',
+      contentBlocks: [],
+      quizQuestions: [],
+      status: 'organized',
+    });
+    setFeedback({
+      type: 'success',
+      message: 'Modo manual ativado. Preencha os dados abaixo.',
+    });
+  };
+
   const resetForm = () => {
     setExtractionPreview(null);
     setSelectedPdf(null);
@@ -879,10 +899,10 @@ const AdminTrainings = ({ currentUser }) => {
 
                 <div className="pdf-upload-box">
                   <div>
-                    <span className="field-label">PDF do treinamento</span>
-                    <p className="field-hint">A IA vai extrair e organizar título, descrição e conteúdo.</p>
+                    <span className="field-label">Fonte do treinamento</span>
+                    <p className="field-hint">Extraia dados de um PDF usando IA ou crie o treinamento manualmente.</p>
                   </div>
-                  <div className="pdf-upload-actions">
+                  <div className="pdf-upload-actions" style={{ flexWrap: 'wrap', gap: '12px' }}>
                     <label className="pdf-file-button">
                       <Upload size={17} />
                       <span>{selectedPdf ? selectedPdf.name : 'Selecionar PDF'}</span>
@@ -895,7 +915,16 @@ const AdminTrainings = ({ currentUser }) => {
                       disabled={!selectedPdf || extractingPdf || !!editingTrainingId}
                     >
                       {extractingPdf ? <Loader2 size={17} className="spin-icon" /> : <FileText size={17} />}
-                      Extrair dados
+                      Extrair com IA
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-outline"
+                      onClick={handleStartManualTraining}
+                      disabled={extractingPdf || !!editingTrainingId}
+                    >
+                      <Pencil size={17} />
+                      Gerar Manualmente
                     </button>
                   </div>
                 </div>
