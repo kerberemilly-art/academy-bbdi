@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  portal-treinamentos:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: portal-treinamentos
+    ports:
+      - "8787:8787"
+    volumes:
+      - portal_data:/app/data
+      - portal_uploads:/app/uploads
+    restart: unless-stopped
+    environment:
+      - PORT=8787
+
+volumes:
+  portal_data:
+    name: portal-treinamentos-data
+  portal_uploads:
+    name: portal-treinamentos-uploads
