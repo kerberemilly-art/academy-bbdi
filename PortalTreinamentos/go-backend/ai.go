@@ -17,12 +17,139 @@ import (
 
 func MentorHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	// For now, return a placeholder response
+
+	var body struct {
+		Question      string                   `json:"question"`
+		LessonContent string                   `json:"lessonContent"`
+		History       []map[string]interface{} `json:"history"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		http.Error(w, `{"ok":false,"error":"Payload inválido"}`, http.StatusBadRequest)
+		return
+	}
+
+	question := strings.TrimSpace(body.Question)
+	lessonContent := strings.TrimSpace(body.LessonContent)
+
+	if question == "" {
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"ok":    false,
+			"error": "Informe uma pergunta para o mentor.",
+		})
+		return
+	}
+
+	apiKey := os.Getenv("GROQ_API_KEY")
+	if apiKey == "" {
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"ok":       true,
+			"response": "Olá! Sou o seu mentor de estudos da BBDI. Atualmente a chave de API do Groq não está configurada no servidor, então estou respondendo de forma simulada. Que excelente dúvida você tem! O conteúdo desta aula detalha processos fundamentais e de alto valor prático para o seu departamento. Lembre-se de revisar os pontos principais e realizar o quiz ao final!",
+		})
+		return
+	}
+
+	apiUrl := os.Getenv("GROQ_CHAT_URL")
+	if apiUrl == "" {
+		apiUrl = "https://api.groq.com/openai/v1/chat/completions"
+	}
+	model := os.Getenv("GROQ_TRAINING_MODEL")
+	if model == "" {
+		model = "llama-3.3-70b-versatile"
+	}
+
+	systemContent := fmt.Sprintf(`Você é um mentor e assistente de estudos altamente didático para um portal de treinamentos corporativos da BBDI.
+O aluno está lendo a seguinte aula:
+---
+%s
+---
+Responda de forma extremamente clara, amigável, incentivadora e profissional às dúvidas do aluno sobre esta aula ou tópicos técnicos relacionados. Responda em português de forma concisa e direta, usando formatação Markdown amigável.`, lessonContent)
+
+	if lessonContent == "" {
+		systemContent = strings.Replace(systemContent, "%s", "Sem conteúdo disponível no momento.", 1)
+	}
+
+	messages := []map[string]interface{}{
+		{"role": "system", "content": systemContent},
+	}
+
+	for _, msg := range body.History {
+		role, _ := msg["role"].(string)
+		content, _ := msg["content"].(string)
+		if role == "assistant" {
+			role = "assistant"
+		} else {
+			role = "user"
+		}
+		if content != "" {
+			messages = append(messages, map[string]interface{}{"role": role, "content": content})
+		}
+	}
+
+	messages = append(messages, map[string]interface{}{"role": "user", "content": question})
+
+	reqBody := map[string]interface{}{
+		"model":       model,
+		"messages":    messages,
+		"temperature": 0.7,
+		"max_tokens":  800,
+	}
+
+	jsonData, _ := json.Marshal(reqBody)
+	req, err := http.NewRequest("POST", apiUrl, bytes.NewBuffer(jsonData))
+	if err != nil {
+		http.Error(w, `{"ok":false,"error":"Erro interno ao preparar requisição"}`, http.StatusInternalServerError)
+		return
+	}
+	req.Header.Set("Authorization", "Bearer "+apiKey)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"ok":    false,
+			"error": "Falha na rede ao consultar a IA",
+		})
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"ok":    false,
+			"error": fmt.Sprintf("A Groq falhou: status %d - %s", resp.StatusCode, string(bodyBytes)),
+		})
+		return
+	}
+
+	var groqResp struct {
+		Choices []struct {
+			Message struct {
+				Content string `json:"content"`
+			} `json:"message"`
+		} `json:"choices"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&groqResp); err != nil {
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"ok":    false,
+			"error": "Erro ao interpretar resposta da IA",
+		})
+		return
+	}
+
+	if len(groqResp.Choices) == 0 {
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"ok":    false,
+			"error": "A Groq não retornou texto válido",
+		})
+		return
+	}
+
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"ok": true,
-		"mentor": map[string]interface{}{
-			"message": "Sou o seu mentor em Go! (A integração completa com Gemini/Groq foi stubada para garantir a compilação do binário).",
-		},
+		"ok":       true,
+		"response": groqResp.Choices[0].Message.Content,
 	})
 }
 
