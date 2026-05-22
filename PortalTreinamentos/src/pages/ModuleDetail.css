@@ -96,7 +96,7 @@
   position: relative;
   max-width: 860px;
   margin: 48px auto;
-  height: 540px; /* 3 rows * 180px */
+  height: 720px; /* 3 rows * 240px */
 }
 
 .roadmap-svg-line {
@@ -113,21 +113,23 @@
   position: absolute;
   left: 0;
   width: 100%;
-  height: 180px;
+  height: 240px;
   display: grid;
   grid-template-columns: 1fr 120px 1fr;
   align-items: center;
   z-index: 2;
+  pointer-events: none;
 }
 
 .roadmap-row-1 { top: 0; }
-.roadmap-row-2 { top: 180px; }
-.roadmap-row-3 { top: 360px; }
+.roadmap-row-2 { top: 240px; }
+.roadmap-row-3 { top: 480px; }
 
 .roadmap-col {
   display: flex;
   align-items: center;
   min-width: 0;
+  pointer-events: none;
 }
 
 .roadmap-left {
@@ -184,6 +186,7 @@
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
+  pointer-events: auto; /* Required since parent column has pointer-events: none */
 }
 
 .node-circle-wrapper.active .node-circle {
@@ -234,6 +237,7 @@
   background: rgba(255, 255, 255, 0.85) !important;
   border: 1.5px solid;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: auto; /* Ensure cards are clickable even if columns overlap */
 }
 
 .timeline-card:hover {

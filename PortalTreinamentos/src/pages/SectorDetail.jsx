@@ -10,7 +10,7 @@ import {
   canManageSector,
   getUserDepartmentSummary,
 } from '../data/sectorAccess';
-import { fetchTrainings, getCachedTrainings } from '../data/trainingAdminApi';
+import { fetchTrainings, getCachedTrainings } from '../api/trainingAdminApi';
 import './SectorDetail.css';
 
 const SectorDetail = ({ currentUser, onLogout }) => {

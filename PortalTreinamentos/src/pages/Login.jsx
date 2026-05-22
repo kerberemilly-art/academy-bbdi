@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Lock, Mail, ArrowRight, ShieldCheck } from 'lucide-react';
-import { MASTER_CREDENTIALS } from '../data/usersStorage';
+import { MASTER_CREDENTIALS } from '../api/usersStorage';
 import './Login.css';
 
 const Login = ({ onLogin }) => {

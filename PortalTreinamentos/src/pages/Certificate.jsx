@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Award, ArrowLeft, BadgeCheck, Download, LogOut, Printer, ShieldCheck } from 'lucide-react';
-import { getLatestCertificateByUser } from '../data/certificateStorage';
-import { getMarketingCertificateStatus } from '../data/certificateEligibility';
-import { issueMarketingCertificateIfEligible } from '../data/certificateActions';
+import { getLatestCertificateByUser, getCertificateById } from '../api/certificateStorage';
 import { getDepartmentLabel, getUserDepartmentId } from '../data/sectorAccess';
+import { capitalizeName } from '../data/certificateTemplates';
 import './Certificate.css';
 
 const formatDate = (date) => new Intl.DateTimeFormat('pt-BR', {
@@ -19,10 +18,11 @@ const DUMMY_CERTIFICATE = {
   id: 'PREVIEW-ONLY-DESIGN',
   userName: 'Nome do Colaborador',
   userEmail: 'colaborador@bbdi.com.br',
-  moduleTitle: 'Marketing de Produtos',
-  sectorTitle: 'Marketing de Produtos',
-  trainingTrailName: 'Marketing de Produtos',
-  quizTitle: 'Certificado de Marketing de Produtos',
+  moduleTitle: 'Baterias',
+  sectorTitle: 'Pós Vendas',
+  levelTitle: 'Básico',
+  trainingTrailName: 'Pós Vendas',
+  quizTitle: 'Certificado de Baterias',
   score: 10,
   totalQuestions: 10,
   percent: 100,
@@ -33,6 +33,7 @@ const Certificate = ({ currentUser, onLogout }) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const isPreview = searchParams.get('preview') === 'true';
+  const certId = searchParams.get('id');
 
   const cardRef = useRef(null);
   const shineRef = useRef(null);
@@ -75,9 +76,14 @@ const Certificate = ({ currentUser, onLogout }) => {
   };
 
   const [PDFDownloadLink, setPDFDownloadLink] = useState(null);
-  const [MarketingCertificateDocument, setMarketingCertificateDocument] = useState(null);
+  const [BlobProvider, setBlobProvider] = useState(null);
+  const [GenericCertificateDocument, setGenericCertificateDocument] = useState(null);
   const [certificate, setCertificate] = useState(() => {
     if (isPreview) return DUMMY_CERTIFICATE;
+    if (certId) {
+      const specificCert = getCertificateById(certId);
+      if (specificCert && specificCert.userId === currentUser.id) return specificCert;
+    }
     return getLatestCertificateByUser(currentUser.id);
   });
   const displayName = currentUser?.name ?? certificate?.userName ?? DUMMY_CERTIFICATE.userName;
@@ -98,8 +104,8 @@ const Certificate = ({ currentUser, onLogout }) => {
   }, [certificate, displayName, displayTrailName]);
 
   const certificateStatus = useMemo(
-    () => (isPreview ? { isEligible: true } : getMarketingCertificateStatus(currentUser.id)),
-    [currentUser.id, isPreview],
+    () => (isPreview ? { isEligible: true } : { isEligible: !!certificate }),
+    [certificate, isPreview]
   );
 
   useEffect(() => {
@@ -107,23 +113,24 @@ const Certificate = ({ currentUser, onLogout }) => {
 
     Promise.all([
       import('@react-pdf/renderer'),
-      import('../components/certificates/MarketingCertificateDocument'),
+      import('../components/certificates/GenericCertificateDocument'),
     ]).then(([rendererModule, documentModule]) => {
       if (!mounted) {
         return;
       }
 
       setPDFDownloadLink(() => rendererModule.PDFDownloadLink);
-      setMarketingCertificateDocument(() => documentModule.default);
+      setBlobProvider(() => rendererModule.BlobProvider);
+      setGenericCertificateDocument(() => documentModule.default);
     });
 
-    if (!isPreview) {
+    if (!isPreview && !certId) {
       Promise.resolve().then(() => {
         if (!mounted) {
           return;
         }
 
-        const issuedCertificate = issueMarketingCertificateIfEligible(currentUser);
+        const issuedCertificate = getLatestCertificateByUser(currentUser.id);
 
         if (issuedCertificate) {
           setCertificate(issuedCertificate);
@@ -134,7 +141,7 @@ const Certificate = ({ currentUser, onLogout }) => {
     return () => {
       mounted = false;
     };
-  }, [currentUser, isPreview]);
+  }, [currentUser, isPreview, certId]);
 
   if (!certificateStatus.isEligible) {
     return (
@@ -160,8 +167,7 @@ const Certificate = ({ currentUser, onLogout }) => {
             <BadgeCheck size={40} color="var(--accent-color)" />
             <h1>Certificado bloqueado</h1>
             <p>
-              O certificado da trilha só é liberado depois que o colaborador concluir a Avaliação Final e a
-              atividade de Compatibilidade do seu departamento.
+              O certificado é liberado assim que você conclui e é aprovado na avaliação de um treinamento. Continue estudando!
             </p>
             <button className="btn-primary" onClick={() => navigate('/trainings')}>
               Ir para treinamentos
@@ -223,13 +229,8 @@ const Certificate = ({ currentUser, onLogout }) => {
       <main className="container certificate-main animate-fade-in">
         <section 
           ref={cardRef}
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleMouseLeave}
           className="certificate-paper glass-panel"
         >
-          {/* Holographic dynamic metallic reflection overlay */}
-          <div ref={shineRef} className="certificate-shine" />
-          
           <div className="certificate-topbar">
             <span className="certificate-seal">
               <Award size={18} />
@@ -240,11 +241,9 @@ const Certificate = ({ currentUser, onLogout }) => {
 
           <div className="certificate-body">
             <p className="certificate-kicker">Certificamos que</p>
-            <h1>{resolvedCertificate.userName}</h1>
-            <p className="certificate-intro">
-              concluiu a trilha de {resolvedCertificate.trainingTrailName}, após finalizar a Avaliação Final Produtos e a
-              Compatibilidade, demonstrando domínio dos critérios de identificação, compatibilidade e atendimento
-              técnico.
+            <h1>{capitalizeName(resolvedCertificate.userName)}</h1>
+            <p className="certificate-intro" style={{ fontStyle: 'italic', maxWidth: '650px', margin: '0 auto 30px' }}>
+              Concluiu com êxito a seguinte etapa de treinamento, demonstrando dedicação e compromisso com seu desenvolvimento profissional.
             </p>
 
             <div className="certificate-highlight">
@@ -253,8 +252,12 @@ const Certificate = ({ currentUser, onLogout }) => {
                 <strong>{resolvedCertificate.moduleTitle}</strong>
               </div>
               <div>
-                <span>Aproveitamento</span>
-                <strong>{resolvedCertificate.percent}%</strong>
+                <span>Departamento</span>
+                <strong>{resolvedCertificate.sectorTitle}</strong>
+              </div>
+              <div>
+                <span>Nível</span>
+                <strong>{resolvedCertificate.levelTitle}</strong>
               </div>
               <div>
                 <span>Resultado</span>
@@ -271,10 +274,6 @@ const Certificate = ({ currentUser, onLogout }) => {
                 <span>Emitido em</span>
                 <strong>{formatDate(resolvedCertificate.issuedAt)}</strong>
               </div>
-              <div>
-                <span>E-mail</span>
-                <strong>{resolvedCertificate.userEmail}</strong>
-              </div>
             </div>
           </div>
 
@@ -285,29 +284,54 @@ const Certificate = ({ currentUser, onLogout }) => {
               <span>Portal Treinamentos BBDI</span>
             </div>
             <div className="certificate-actions no-print">
-              {PDFDownloadLink && MarketingCertificateDocument ? (
-                <PDFDownloadLink
-                  document={<MarketingCertificateDocument certificate={resolvedCertificate} />}
-                  fileName={`certificado-${resolvedCertificate.userName.toLowerCase().replace(/\s+/g, '-')}.pdf`}
-                  className="btn-outline"
-                >
-                  {({ loading }) => (
-                    <>
-                      <Download size={18} />
-                      {loading ? 'Gerando PDF...' : 'Baixar PDF'}
-                    </>
-                  )}
-                </PDFDownloadLink>
+              {BlobProvider && GenericCertificateDocument ? (
+                <BlobProvider document={<GenericCertificateDocument certificate={resolvedCertificate} />}>
+                  {({ url, loading, error }) => {
+                    const fileName = `certificado-${(resolvedCertificate?.userName || 'usuario').toLowerCase().replace(/\s+/g, '-')}.pdf`;
+                    return (
+                      <>
+                        <a
+                          href={url || '#'}
+                          download={fileName}
+                          className="btn-outline"
+                          style={{ pointerEvents: loading || error ? 'none' : 'auto', opacity: loading || error ? 0.6 : 1 }}
+                        >
+                          <Download size={18} />
+                          {loading ? 'Gerando...' : 'Baixar PDF'}
+                        </a>
+                        <button 
+                          className="btn-primary" 
+                          onClick={() => {
+                            if (url) {
+                              const newWindow = window.open(url, '_blank');
+                              if (newWindow) {
+                                newWindow.onload = () => {
+                                  newWindow.print();
+                                };
+                              }
+                            }
+                          }}
+                          disabled={loading || error}
+                        >
+                          <Printer size={18} />
+                          Imprimir PDF
+                        </button>
+                      </>
+                    );
+                  }}
+                </BlobProvider>
               ) : (
-                <button className="btn-outline" type="button" disabled>
-                  <Download size={18} />
-                  Carregando PDF...
-                </button>
+                <>
+                  <button className="btn-outline" type="button" disabled>
+                    <Download size={18} />
+                    Carregando...
+                  </button>
+                  <button className="btn-primary" type="button" disabled>
+                    <Printer size={18} />
+                    Carregando...
+                  </button>
+                </>
               )}
-              <button className="btn-outline" onClick={() => window.print()}>
-                <Printer size={18} />
-                Imprimir
-              </button>
               <button className="btn-outline" onClick={() => navigate('/dashboard')}>
                 <ArrowLeft size={18} />
                 Dashboard

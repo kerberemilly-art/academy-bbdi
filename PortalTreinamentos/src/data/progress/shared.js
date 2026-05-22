@@ -1,4 +1,4 @@
-import { readBackendSlice, writeBackendSlice } from '../backendSync';
+import { readBackendSlice, writeBackendSlice } from '../../api/backendSync';
 
 export const readResults = () => {
   const storedResults = readBackendSlice('results', []);

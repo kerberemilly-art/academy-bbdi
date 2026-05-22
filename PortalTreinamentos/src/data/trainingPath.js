@@ -1,7 +1,7 @@
 import { modulesData } from './modulesData';
-import { getLatestResultsByUser, getQuizResults } from './progressStorage';
+import { getLatestResultsByUser, getQuizResults } from '../api/progressStorage';
 import { sectorsData } from './sectorsData';
-import { getCachedTrainings } from './trainingAdminApi';
+import { getCachedTrainings } from '../api/trainingAdminApi';
 
 export const getSectorForModule = (moduleId) => {
   const idNum = Number(moduleId);

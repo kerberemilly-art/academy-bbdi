@@ -14,10 +14,10 @@ import Preview from './pages/Preview';
 import CertificateShowcase from './pages/CertificateShowcase';
 import SectorDetail from './pages/SectorDetail';
 import TrainingDetail from './pages/TrainingDetail';
-import { authenticateUser, clearCurrentUser, getCurrentUser } from './data/usersStorage';
+import { authenticateUser, clearCurrentUser, getCurrentUser } from "./api/usersStorage";
 import { canAccessAdminArea } from './data/sectorAccess';
 import { readStorageValue, writeStorageValue } from './data/runtime';
-import { bootstrapBackendSnapshot } from './data/backendSync';
+import { bootstrapBackendSnapshot } from "./api/backendSync";
 
 const THEME_STORAGE_KEY = 'portalTreinamentos.theme';
 

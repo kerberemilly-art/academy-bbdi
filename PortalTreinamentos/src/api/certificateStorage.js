@@ -1,4 +1,4 @@
-import { createId } from './runtime';
+import { createId } from "../data/runtime";
 import { readBackendSlice, writeBackendSlice } from './backendSync';
 
 const readCertificates = () => {
@@ -63,5 +63,16 @@ export const recordCertificate = ({
 export const getLatestCertificateByUser = (userId) => {
   const certificates = readCertificates().filter((certificate) => certificate.userId === userId);
 
+  return certificates.sort((a, b) => new Date(b.issuedAt) - new Date(a.issuedAt))[0] ?? null;
+};
+
+export const getCertificateById = (certId) => {
+  return readCertificates().find((c) => c.id === certId) ?? null;
+};
+
+export const getCertificateByLevel = (userId, moduleId, levelId) => {
+  const certificates = readCertificates().filter(
+    (c) => c.userId === userId && String(c.moduleId) === String(moduleId) && c.levelId === levelId
+  );
   return certificates.sort((a, b) => new Date(b.issuedAt) - new Date(a.issuedAt))[0] ?? null;
 };

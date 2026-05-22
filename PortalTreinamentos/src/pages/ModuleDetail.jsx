@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, BookOpen, CheckCircle, Lock, PlayCircle } from 'lucide-react';
+import { ArrowLeft, BookOpen, CheckCircle, Lock, PlayCircle, Award } from 'lucide-react';
 import { modulesData } from '../data/modulesData';
 import { sectorsData } from '../data/sectorsData';
 import { getMarketingLevelStatus, getMarketingModuleProgress, getMarketingModuleStatus } from '../data/trainingPath';
-import { fetchTrainings, getCachedTrainings } from '../data/trainingAdminApi';
+import { fetchTrainings, getCachedTrainings } from '../api/trainingAdminApi';
+import { getCertificateByLevel } from '../api/certificateStorage';
 import './ModuleDetail.css';
 
 const ModuleDetail = ({ currentUser }) => {
@@ -124,7 +125,7 @@ const ModuleDetail = ({ currentUser }) => {
 
         <div className="roadmap-container">
           {/* Neon SVG Path Background */}
-          <svg className="roadmap-svg-line" viewBox="0 0 800 540" preserveAspectRatio="none">
+          <svg className="roadmap-svg-line" viewBox="0 0 800 720" preserveAspectRatio="none">
             <defs>
               <filter id="neon-glow" x="-20%" y="-20%" width="140%" height="140%">
                 <feGaussianBlur stdDeviation="5" result="blur" />
@@ -135,9 +136,9 @@ const ModuleDetail = ({ currentUser }) => {
               </filter>
             </defs>
             
-            {/* Curved connections centered at Node 1 (360, 90) -> Node 2 (400, 270) -> Node 3 (440, 450) */}
+            {/* Curved connections centered at Node 1 (360, 120) -> Node 2 (400, 360) -> Node 3 (440, 600) */}
             <path
-              d="M 360 90 Q 420 180 400 270"
+              d="M 360 120 Q 420 240 400 360"
               fill="none"
               stroke={
                 moduleInfo.levels[1] && getMarketingLevelStatus(currentUser, id, moduleInfo.levels[1].id).isLocked
@@ -154,7 +155,7 @@ const ModuleDetail = ({ currentUser }) => {
             />
             
             <path
-              d="M 400 270 Q 380 360 440 450"
+              d="M 400 360 Q 380 480 440 600"
               fill="none"
               stroke={
                 moduleInfo.levels[2] && getMarketingLevelStatus(currentUser, id, moduleInfo.levels[2].id).isLocked
@@ -209,26 +210,46 @@ const ModuleDetail = ({ currentUser }) => {
                   <h3>Nível {level.title}</h3>
                   <p>{level.description}</p>
                 </div>
-                <button 
-                  className="btn-start"
-                  style={{ backgroundColor: moduleInfo.color }}
-                  onClick={() => {
-                    if (customTraining) {
-                      navigate(`/training/${customTraining.id}`, { state: { backPath: `/module/${id}` } });
-                    } else {
-                      navigate(`/lesson/${id}/${level.id}`, { state: { backPath } });
-                    }
-                  }}
-                  disabled={!hasLesson || (currentUser?.role !== 'master' && currentUser?.role !== 'admin' && levelStatus.isLocked)}
-                >
-                  {hasLesson
-                    ? currentUser?.role !== 'master' && currentUser?.role !== 'admin' && levelStatus.isLocked
-                      ? `Bloqueado`
-                      : levelStatus.isCompleted
-                        ? 'Revisar conteúdo'
-                        : 'Iniciar Aprendizado'
-                    : 'Em breve'}
-                </button>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+                  <button 
+                    className="btn-start"
+                    style={{ backgroundColor: moduleInfo.color, width: '100%' }}
+                    onClick={() => {
+                      if (customTraining) {
+                        navigate(`/training/${customTraining.id}`, { state: { backPath: `/module/${id}` } });
+                      } else {
+                        navigate(`/lesson/${id}/${level.id}`, { state: { backPath } });
+                      }
+                    }}
+                    disabled={!hasLesson || (currentUser?.role !== 'master' && currentUser?.role !== 'admin' && levelStatus.isLocked)}
+                  >
+                    {hasLesson
+                      ? currentUser?.role !== 'master' && currentUser?.role !== 'admin' && levelStatus.isLocked
+                        ? `Bloqueado`
+                        : levelStatus.isCompleted
+                          ? 'Revisar conteúdo'
+                          : 'Iniciar Aprendizado'
+                      : 'Em breve'}
+                  </button>
+                  {levelStatus.isCompleted && (
+                    <button 
+                      className="btn-outline" 
+                      style={{ width: '100%', pointerEvents: 'auto', zIndex: 100, position: 'relative' }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const cert = getCertificateByLevel(currentUser?.id, id, level.id);
+                        if (cert) {
+                          navigate(`/certificate?id=${cert.id}`);
+                        } else {
+                          navigate('/certificate');
+                        }
+                      }}
+                    >
+                      <Award size={18} />
+                      Ver Certificado
+                    </button>
+                  )}
+                </div>
               </div>
             );
 

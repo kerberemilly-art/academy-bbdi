@@ -1,115 +1,144 @@
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
-import { certificateTemplates, fillTemplate } from '../../data/certificateTemplates';
+import { certificateTemplates, fillTemplate, capitalizeName } from '../../data/certificateTemplates';
 
 const styles = StyleSheet.create({
   page: {
-    padding: 40,
+    padding: 30,
     backgroundColor: '#ffffff',
     color: '#1a1a1a',
     fontFamily: 'Helvetica',
   },
   border: {
     flex: 1,
-    borderWidth: 10,
-    borderColor: '#1e3a8a', // Navy blue
-    padding: 2,
+    borderWidth: 8,
+    borderColor: '#004A99', // BBDI Deep Blue
+    padding: 3,
   },
   innerBorder: {
     flex: 1,
     borderWidth: 2,
-    borderColor: '#3b82f6', // Brighter blue
+    borderColor: '#94a3b8', // Subtle slate/gray
     padding: 30,
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#ffffff', 
     alignItems: 'center',
     justifyContent: 'center',
     textAlign: 'center',
   },
   header: {
-    marginBottom: 40,
+    marginBottom: 20,
     alignItems: 'center',
   },
   logoPlaceholder: {
-    marginBottom: 10,
+    marginBottom: 5,
+    flexDirection: 'row',
+    alignItems: 'baseline',
   },
   logoTextGrupo: {
-    fontSize: 24,
-    color: '#1e3a8a',
+    fontSize: 20,
+    color: '#004A99', // BBDI Deep Blue
     fontWeight: 'bold',
+    marginRight: 4,
   },
   logoTextBBDI: {
-    fontSize: 32,
-    color: '#94a3b8',
+    fontSize: 28,
+    color: '#475569', // Slate
     fontWeight: 'bold',
     letterSpacing: 2,
   },
   institution: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#64748b',
     textTransform: 'uppercase',
-    letterSpacing: 2,
+    letterSpacing: 3,
     marginTop: 5,
   },
   headline: {
-    fontSize: 42,
-    color: '#1e3a8a',
-    marginVertical: 20,
+    fontSize: 34,
+    color: '#004A99', // BBDI Deep Blue
+    marginVertical: 15,
     fontWeight: 'bold',
+    letterSpacing: 4,
   },
   kicker: {
-    fontSize: 18,
+    fontSize: 14,
     color: '#475569',
-    marginBottom: 10,
+    marginBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   name: {
-    fontSize: 48,
-    color: '#2563eb',
+    fontSize: 42,
+    color: '#004A99', // BBDI Deep Blue
     marginBottom: 20,
     fontWeight: 'bold',
-    textDecoration: 'underline',
   },
   statement: {
-    fontSize: 16,
+    fontSize: 13,
     lineHeight: 1.6,
     color: '#334155',
-    maxWidth: 600,
-    marginBottom: 40,
+    maxWidth: 650,
+    marginBottom: 20,
     fontStyle: 'italic',
+  },
+  programBox: {
+    backgroundColor: '#f8fafc',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderLeftWidth: 4,
+    borderLeftColor: '#004A99', // BBDI Deep Blue
+    borderLeftStyle: 'solid',
+    marginBottom: 30,
+    minWidth: 400,
+  },
+  programTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#004A99',
+    marginBottom: 4,
+  },
+  programSub: {
+    fontSize: 12,
+    color: '#475569',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   footer: {
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
-    marginTop: 20,
+    marginTop: 10,
+    paddingHorizontal: 20,
   },
   signatureContainer: {
     alignItems: 'center',
-    width: 250,
+    width: 200,
   },
   signatureLine: {
     width: '100%',
     height: 1,
-    backgroundColor: '#1e3a8a',
+    backgroundColor: '#475569',
     marginBottom: 8,
   },
   signatureName: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: 'bold',
-    color: '#1e3a8a',
+    color: '#004A99',
   },
   signatureTitle: {
-    fontSize: 12,
+    fontSize: 10,
     color: '#64748b',
+    textTransform: 'uppercase',
   },
   meta: {
     alignItems: 'flex-end',
   },
   date: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#64748b',
   },
   id: {
-    fontSize: 10,
+    fontSize: 9,
     color: '#94a3b8',
     marginTop: 4,
   },
@@ -123,8 +152,10 @@ const formatDate = (date) => new Intl.DateTimeFormat('pt-BR', {
 
 const GenericCertificateDocument = ({ certificate }) => {
   const template = certificateTemplates.generic;
-  const fullName = certificate?.userName?.trim() || template.placeholderName;
-  const programName = certificate?.moduleTitle || template.programTitle;
+  const fullName = capitalizeName(certificate?.userName) || template.placeholderName;
+  const moduleName = certificate?.moduleTitle || 'Módulo';
+  const departmentName = certificate?.sectorTitle || 'Departamento';
+  const levelName = certificate?.levelTitle || 'Básico';
   const issuedAt = certificate?.issuedAt ? formatDate(certificate.issuedAt) : formatDate(new Date());
 
   return (
@@ -134,7 +165,7 @@ const GenericCertificateDocument = ({ certificate }) => {
           <View style={styles.innerBorder}>
             <View style={styles.header}>
               <View style={styles.logoPlaceholder}>
-                <Text style={styles.logoTextGrupo}>Grupo</Text>
+                <Text style={styles.logoTextGrupo}>GRUPO</Text>
                 <Text style={styles.logoTextBBDI}>BBDI</Text>
               </View>
               <Text style={styles.institution}>{template.institution}</Text>
@@ -142,20 +173,23 @@ const GenericCertificateDocument = ({ certificate }) => {
 
             <Text style={styles.headline}>{template.headline}</Text>
             
-            <Text style={styles.kicker}>Certificamos com orgulho que</Text>
             <Text style={styles.name}>{fullName}</Text>
             
             <Text style={styles.statement}>
               {fillTemplate(template.statement, {
                 nome: fullName,
-                programa: programName,
               })}
             </Text>
+
+            <View style={styles.programBox}>
+              <Text style={styles.programTitle}>{moduleName}</Text>
+              <Text style={styles.programSub}>{departmentName} • Nível {levelName}</Text>
+            </View>
 
             <View style={styles.footer}>
               <View style={styles.signatureContainer}>
                 <View style={styles.signatureLine} />
-                <Text style={styles.signatureName}>Diretoria Executiva</Text>
+                <Text style={styles.signatureName}>Diretoria de Treinamento</Text>
                 <Text style={styles.signatureTitle}>{template.institution}</Text>
               </View>
 

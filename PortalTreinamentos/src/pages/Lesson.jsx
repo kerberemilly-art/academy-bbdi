@@ -3,9 +3,9 @@ import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { CheckCircle, ChevronRight, ChevronLeft, Award, RefreshCcw } from 'lucide-react';
 import { modulesData } from '../data/modulesData';
 import { getMarketingLevelStatus } from '../data/trainingPath';
-import { getMarketingCertificateStatus } from '../data/certificateEligibility';
-import { recordQuizResult } from '../data/progressStorage';
-import { issueMarketingCertificateIfEligible } from '../data/certificateActions';
+
+import { recordQuizResult } from '../api/progressStorage';
+import { issueQuizCertificate } from '../data/certificateActions';
 import './Lesson.css';
 import Confetti from '../components/Confetti';
 import StudyMentor from '../components/StudyMentor';
@@ -84,11 +84,7 @@ const Lesson = ({ currentUser }) => {
     });
 
     if (result) {
-      const certificate = issueMarketingCertificateIfEligible(currentUser, {
-        score: result.score,
-        totalQuestions: result.totalQuestions,
-        percent: result.percent,
-      });
+      const certificate = issueQuizCertificate(currentUser, result);
 
       if (certificate) {
         navigate('/certificate');
@@ -117,7 +113,6 @@ const Lesson = ({ currentUser }) => {
   const score = calculateScore();
   const scorePercent = Math.round((score / totalQuestions) * 100);
   const currentLessonStep = lesson.steps[currentStep];
-  const certificateStatus = getMarketingCertificateStatus(currentUser.id);
 
   const renderStepImages = () => {
     if (!currentLessonStep.image) return null;
@@ -258,12 +253,11 @@ const Lesson = ({ currentUser }) => {
                 <span className="score-percent">{scorePercent}% de aproveitamento</span>
                 <h3>Quiz Concluído!</h3>
                 <p>Ótimo trabalho! Você finalizou este nível de treinamento.</p>
-                {(moduleId === '7' || moduleId === '8') && !certificateStatus.isEligible && (
-                  <p className="certificate-lock-note">
-                    O certificado de Marketing de Produtos será liberado quando a Avaliação Final Produtos e a
-                    Compatibilidade estiverem concluídas.
-                  </p>
-                )}
+                <div className="lesson-actions" style={{ marginBottom: '16px' }}>
+                  <button type="button" className="btn-secondary" onClick={() => navigate('/certificate')}>
+                    Ver Meu Certificado
+                  </button>
+                </div>
                 <div className="quiz-result-actions">
                   <button 
                     className="btn-outline"

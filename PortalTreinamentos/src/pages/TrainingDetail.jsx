@@ -11,10 +11,11 @@ import {
   LogOut,
   RefreshCcw,
 } from 'lucide-react';
+import ContentBlockRenderer from '../components/ContentBlockRenderer';
 import { canAccessSector, canManageSector } from '../data/sectorAccess';
 import { sectorsData } from '../data/sectorsData';
-import { fetchTrainings, getCachedTrainings } from '../data/trainingAdminApi';
-import { recordQuizResult } from '../data/progressStorage';
+import { fetchTrainings, getCachedTrainings } from '../api/trainingAdminApi';
+import { recordQuizResult } from '../api/progressStorage';
 import { modulesData } from '../data/modulesData';
 import './Lesson.css';
 import './TrainingDetail.css';
@@ -58,6 +59,7 @@ const TrainingDetail = ({ currentUser, onLogout }) => {
     && (training.status === 'published' || canManageSector(currentUser, training.departmentId));
 
   const quizQuestions = Array.isArray(training?.quizQuestions) ? training.quizQuestions : [];
+  const contentBlocks = Array.isArray(training?.contentBlocks) ? training.contentBlocks : [];
   const totalQuestions = quizQuestions.length;
   const answeredCount = Object.keys(quizAnswers).length;
 
@@ -191,11 +193,7 @@ const TrainingDetail = ({ currentUser, onLogout }) => {
                 </div>
               </div>
 
-              <div className="training-markdown">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {training.content ? training.content.replace(/\\n/g, '\n') : 'Conteúdo ainda não informado.'}
-                </ReactMarkdown>
-              </div>
+              <ContentBlockRenderer blocks={contentBlocks} fallbackContent={training.content} />
 
               {totalQuestions > 0 && (
                 <div className="lesson-actions" style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '32px', paddingTop: '24px', borderTop: '1px solid var(--panel-border)' }}>

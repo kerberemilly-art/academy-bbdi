@@ -15,7 +15,7 @@ import {
   FileText,
   X,
 } from 'lucide-react';
-import { createUser, deleteUser, getUsers, setUserActive, updateUser, updateUserDepartments } from '../data/usersStorage';
+import { createUser, deleteUser, getUsers, setUserActive, updateUser, updateUserDepartments } from '../api/usersStorage';
 import { sectorsData } from '../data/sectorsData';
 import { getUserDepartmentIds, getUserDepartmentLabels, isSuperAdmin } from '../data/sectorAccess';
 import './AdminUsers.css';

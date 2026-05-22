@@ -83,3 +83,21 @@ export const extractTrainingPdf = async ({ file, departmentId }) => {
 
   return payload;
 };
+
+export const uploadTrainingImage = async (file) => {
+  const response = await fetch(`${API_BASE_URL}/assets/upload`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': file.type || 'image/jpeg',
+      'x-file-name': file.name,
+    },
+    body: file,
+  });
+  const payload = await response.json().catch(() => ({}));
+
+  if (!response.ok || payload.ok === false) {
+    throw new Error(payload.error ?? 'Não foi possível enviar a imagem.');
+  }
+
+  return payload.asset;
+};

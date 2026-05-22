@@ -7,7 +7,7 @@ import {
   normalizeEmail,
   safeTrim,
 } from '../runtime';
-import { readBackendSlice, writeBackendSlice } from '../backendSync';
+import { readBackendSlice, writeBackendSlice } from '../../api/backendSync';
 
 const SESSION_STORAGE_KEY = 'portalTreinamentos.currentUserId';
 

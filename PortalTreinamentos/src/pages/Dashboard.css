@@ -313,6 +313,185 @@
   color: var(--text-secondary);
 }
 
+/* ── Collaborator Learning Metrics ── */
+.learning-analytics-section {
+  margin-top: 32px;
+  padding: 36px;
+  display: grid;
+  gap: 28px;
+}
+
+.learning-analytics-section .panel-heading {
+  margin-bottom: 0;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.collaborator-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 112px;
+  padding: 20px;
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  background: var(--bg-secondary);
+}
+
+.stat-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.stat-icon-wrapper.blue { color: #2563eb; background: #dbeafe; }
+.stat-icon-wrapper.green { color: #059669; background: #d1fae5; }
+.stat-icon-wrapper.purple { color: #7c3aed; background: #ede9fe; }
+.stat-icon-wrapper.orange { color: #ea580c; background: #ffedd5; }
+
+.stat-info {
+  min-width: 0;
+}
+
+.stat-info strong {
+  display: block;
+  font-size: 1.75rem;
+  line-height: 1;
+  color: var(--text-primary);
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+
+.stat-info span,
+.stat-label {
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.analytics-details-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.65fr);
+  gap: 24px;
+  align-items: stretch;
+}
+
+.analytics-left-panel,
+.analytics-right-panel {
+  min-height: 260px;
+  padding: 28px;
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  background: var(--bg-secondary);
+}
+
+.progress-header-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.progress-header-row h3 {
+  margin-top: 8px;
+  color: var(--accent-color);
+  font-size: 1.55rem;
+  font-weight: 900;
+}
+
+.training-progress-track {
+  height: 14px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--bg-primary);
+  border: 1px solid var(--panel-border);
+}
+
+.training-progress-track span {
+  display: block;
+  height: 100%;
+  min-width: 8px;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent-color), #22c55e);
+  transition: width 0.4s ease;
+}
+
+.next-step-box {
+  margin-top: 24px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 18px;
+  border-radius: 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--panel-border);
+}
+
+.next-step-box strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--text-primary);
+}
+
+.next-step-box p {
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.donut-chart-container {
+  height: 100%;
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  gap: 20px;
+  align-items: center;
+}
+
+.donut-svg {
+  width: 150px;
+  height: 150px;
+}
+
+.donut-legend {
+  display: grid;
+  gap: 10px;
+  align-content: center;
+  min-width: 0;
+}
+
+.donut-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.donut-legend-color {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.legend-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* ── Departments ── */
 .departments-grid {
   display: grid;
@@ -341,6 +520,14 @@
     grid-template-columns: repeat(2, 1fr);
     width: 100%;
   }
+
+  .collaborator-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .analytics-details-layout {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 600px) {
@@ -350,5 +537,27 @@
   
   .hero-surface {
     grid-template-columns: 1fr;
+  }
+
+  .learning-analytics-section {
+    padding: 24px;
+  }
+
+  .collaborator-stats-grid,
+  .donut-chart-container {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-card {
+    min-height: 96px;
+  }
+
+  .analytics-left-panel,
+  .analytics-right-panel {
+    padding: 22px;
+  }
+
+  .donut-svg {
+    margin: 0 auto;
   }
 }

@@ -72,4 +72,13 @@ export const sectorsData = [
     status: 'active',
     moduleIds: [29, 30, 31, 32],
   },
+  {
+    id: 'rh',
+    title: 'RH',
+    description: 'Espaço reservado para treinamentos de gestão de pessoas, recrutamento, seleção e integração.',
+    icon: BookOpen,
+    color: '#9333ea',
+    status: 'active',
+    moduleIds: [33, 34, 35, 36],
+  },
 ];

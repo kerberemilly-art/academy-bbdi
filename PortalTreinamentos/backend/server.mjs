@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { handleMentorRequest } from './mentorHandler.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const projectDir = dirname(__dirname);
@@ -90,6 +91,12 @@ try {
   // Column already exists.
 }
 
+try {
+  db.exec("ALTER TABLE trainings ADD COLUMN content_blocks_json TEXT NOT NULL DEFAULT '[]'");
+} catch {
+  // Column already exists.
+}
+
 db.exec(`
   INSERT OR IGNORE INTO app_state (id, users_json, results_json, certificates_json, trainings_json, updated_at)
   VALUES (1, '[]', '[]', '[]', '[]', datetime('now'));
@@ -101,6 +108,7 @@ db.exec(`
     title TEXT NOT NULL,
     description TEXT NOT NULL DEFAULT '',
     content TEXT NOT NULL DEFAULT '',
+    content_blocks_json TEXT NOT NULL DEFAULT '[]',
     quiz_questions_json TEXT NOT NULL DEFAULT '[]',
     level TEXT NOT NULL DEFAULT 'basico',
     status TEXT NOT NULL DEFAULT 'draft',
@@ -127,6 +135,7 @@ const mapTrainingRow = (row) => ({
   title: row.title,
   description: row.description,
   content: row.content,
+  contentBlocks: JSON.parse(row.content_blocks_json ?? '[]'),
   quizQuestions: JSON.parse(row.quiz_questions_json ?? '[]'),
   level: row.level,
   status: row.status,
@@ -136,7 +145,7 @@ const mapTrainingRow = (row) => ({
 
 const getTrainingsFromTable = () => (
   db.prepare(`
-    SELECT id, department_id, module_id, title, description, content, quiz_questions_json, level, status, created_at, updated_at
+    SELECT id, department_id, module_id, title, description, content, content_blocks_json, quiz_questions_json, level, status, created_at, updated_at
     FROM trainings
     ORDER BY datetime(created_at) DESC
   `).all().map(mapTrainingRow)
@@ -146,8 +155,8 @@ const replaceTrainingsInTable = (trainings) => {
   const safeTrainings = Array.isArray(trainings) ? trainings : [];
   const insertTraining = db.prepare(`
     INSERT INTO trainings (
-      id, department_id, module_id, title, description, content, quiz_questions_json, level, status, created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      id, department_id, module_id, title, description, content, content_blocks_json, quiz_questions_json, level, status, created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
   db.exec('BEGIN');
@@ -164,6 +173,7 @@ const replaceTrainingsInTable = (trainings) => {
         String(training.title),
         String(training.description ?? ''),
         String(training.content ?? ''),
+        JSON.stringify(Array.isArray(training.contentBlocks) ? training.contentBlocks : []),
         JSON.stringify(Array.isArray(training.quizQuestions) ? training.quizQuestions : []),
         String(training.level ?? 'basico'),
         training.status === 'published' ? 'published' : 'draft',
@@ -242,12 +252,122 @@ const saveTrainings = (trainings) => {
   return getTrainingsFromTable();
 };
 
+const sanitizeBlockHtml = (value = '') => String(value ?? '')
+  .slice(0, 12000)
+  .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
+  .replace(/\son\w+="[^"]*"/gi, '')
+  .replace(/\son\w+='[^']*'/gi, '')
+  .replace(/\shref=(["'])javascript:[\s\S]*?\1/gi, ' href="#"')
+  .replace(/\ssrc=(["'])javascript:[\s\S]*?\1/gi, ' src="#"');
+
+const getSafeEmbedUrl = (value = '') => {
+  const rawUrl = String(value ?? '').slice(0, 800).trim();
+  if (!rawUrl) return '';
+
+  try {
+    const url = new URL(rawUrl);
+    const host = url.hostname.replace(/^www\./, '').toLowerCase();
+
+    if ((host === 'youtube.com' || host === 'm.youtube.com') && url.pathname === '/watch' && url.searchParams.get('v')) {
+      return `https://www.youtube.com/embed/${encodeURIComponent(url.searchParams.get('v'))}`;
+    }
+    if ((host === 'youtube.com' || host === 'm.youtube.com') && url.pathname.startsWith('/embed/')) {
+      return `https://www.youtube.com${url.pathname}`;
+    }
+    if (host === 'youtu.be' && url.pathname.length > 1) {
+      return `https://www.youtube.com/embed/${encodeURIComponent(url.pathname.slice(1))}`;
+    }
+    if (host === 'vimeo.com' && /^\/\d+/.test(url.pathname)) {
+      return `https://player.vimeo.com/video/${url.pathname.match(/\d+/)[0]}`;
+    }
+    if (host === 'player.vimeo.com' && url.pathname.startsWith('/video/')) {
+      return `https://player.vimeo.com${url.pathname}`;
+    }
+  } catch {
+    return '';
+  }
+
+  return '';
+};
+
+const normalizeTypedContentBlock = (block, index) => {
+  const id = String(block?.id ?? `block-${index + 1}`);
+  const props = block?.props ?? {};
+
+  if (block?.type === 'title') {
+    const titleText = String(props.text ?? '').slice(0, 240).trim();
+    return titleText ? { id, type: 'title', props: { text: titleText, level: Math.min(Math.max(Number(props.level) || 2, 1), 3) } } : null;
+  }
+
+  if (block?.type === 'image') {
+    const imageUrl = String(props.imageUrl ?? '').slice(0, 1200).trim();
+    return imageUrl ? { id, type: 'image', props: { imageUrl, imageAlt: String(props.imageAlt ?? '').slice(0, 240).trim() } } : null;
+  }
+
+  if (block?.type === 'link') {
+    const label = String(props.label ?? '').slice(0, 240).trim();
+    const url = String(props.url ?? '').slice(0, 1200).trim();
+    return label && url ? { id, type: 'link', props: { label, url } } : null;
+  }
+
+  if (block?.type === 'table') {
+    const columns = Array.isArray(props.columns) ? props.columns.map((cell) => String(cell ?? '').slice(0, 160).trim()).slice(0, 8) : [];
+    const rows = Array.isArray(props.rows)
+      ? props.rows.map((row) => columns.map((_, columnIndex) => String(row?.[columnIndex] ?? '').slice(0, 300).trim())).slice(0, 30)
+      : [];
+    const hasContent = columns.some(Boolean) || rows.flat().some(Boolean);
+    return hasContent ? { id, type: 'table', props: { columns, rows } } : null;
+  }
+
+  if (block?.type === 'videoEmbed') {
+    const url = String(props.url ?? '').slice(0, 800).trim();
+    return url && getSafeEmbedUrl(url) ? { id, type: 'videoEmbed', props: { url, title: String(props.title ?? '').slice(0, 240).trim() } } : null;
+  }
+
+  if (block?.type === 'richText') {
+    const content = sanitizeBlockHtml(props.content ?? '').trim();
+    return content ? { id, type: 'richText', props: { content } } : null;
+  }
+
+  return null;
+};
+
+const normalizeContentBlocks = (blocks, fallbackBlocks = []) => {
+  const source = Array.isArray(blocks) ? blocks : fallbackBlocks;
+
+  return source
+    .flatMap((block, index) => {
+      const typedBlock = normalizeTypedContentBlock(block, index);
+      if (typedBlock) {
+        return [typedBlock];
+      }
+
+      const title = String(block?.title ?? '').trim();
+      const text = String(block?.text ?? '').trim();
+      const imageUrl = String(block?.imageUrl ?? '').trim();
+      const imageAlt = String(block?.imageAlt ?? title ?? '').trim();
+
+      if (!title && !text && !imageUrl) {
+        return [];
+      }
+
+      return [
+        title ? { id: `${String(block?.id ?? `block-${index + 1}`)}-title`, type: 'title', props: { text: title, level: 2 } } : null,
+        text ? { id: `${String(block?.id ?? `block-${index + 1}`)}-text`, type: 'richText', props: { content: sanitizeBlockHtml(text.split(/\n{2,}/).map((part) => `<p>${part.replace(/\n/g, '<br />')}</p>`).join('')) } } : null,
+        imageUrl ? { id: `${String(block?.id ?? `block-${index + 1}`)}-image`, type: 'image', props: { imageUrl, imageAlt } } : null,
+      ].filter(Boolean);
+    })
+    .filter(Boolean)
+    .slice(0, 60);
+};
 const normalizeTrainingPayload = (payload, existingTraining = {}) => ({
   ...existingTraining,
   title: String(payload?.title ?? existingTraining.title ?? '').trim(),
   description: String(payload?.description ?? existingTraining.description ?? '').trim(),
   content: String(payload?.content ?? existingTraining.content ?? '').trim(),
+  contentBlocks: normalizeContentBlocks(payload?.contentBlocks, existingTraining.contentBlocks),
   quizQuestions: normalizeQuizQuestions(payload?.quizQuestions, existingTraining.quizQuestions),
+  catalogImport: Boolean(payload?.catalogImport),
   level: String(payload?.level ?? existingTraining.level ?? 'basico'),
   status: payload?.status === 'published' ? 'published' : 'draft',
   departmentId: String(payload?.departmentId ?? existingTraining.departmentId ?? '').trim(),
@@ -257,8 +377,11 @@ const normalizeTrainingPayload = (payload, existingTraining = {}) => ({
 const validateTraining = (training) => {
   if (!training.title) return 'Informe o título do treinamento.';
   if (!training.departmentId) return 'Informe o departamento.';
-  if (!Array.isArray(training.quizQuestions) || training.quizQuestions.length < 10) {
-    return 'O quiz do treinamento precisa ter pelo menos dez perguntas.';
+  const minimumQuizQuestions = training.catalogImport ? 8 : 10;
+  if (!Array.isArray(training.quizQuestions) || training.quizQuestions.length < minimumQuizQuestions) {
+    return training.catalogImport
+      ? 'O quiz do treinamento nativo precisa manter pelo menos oito perguntas.'
+      : 'O quiz do treinamento precisa ter pelo menos dez perguntas.';
   }
   return null;
 };
@@ -301,6 +424,32 @@ const sanitizeFileName = (fileName) => (
     .slice(0, 140) || 'treinamento.pdf'
 );
 
+
+const sanitizeImageFileName = (fileName) => (
+  String(fileName || 'imagem-treinamento')
+    .replace(/[/\\?%*:|"<>]/g, '-')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 120) || 'imagem-treinamento'
+);
+
+const getImageExtension = (contentType, fileName) => {
+  const extension = String(fileName ?? '').match(/\.(png|jpe?g|webp|gif)$/i)?.[1]?.toLowerCase();
+  if (extension) return extension === 'jpeg' ? 'jpg' : extension;
+  if (contentType.includes('png')) return 'png';
+  if (contentType.includes('webp')) return 'webp';
+  if (contentType.includes('gif')) return 'gif';
+  return 'jpg';
+};
+
+const getAssetContentType = (fileName) => {
+  const lower = String(fileName).toLowerCase();
+  if (lower.endsWith('.png')) return 'image/png';
+  if (lower.endsWith('.webp')) return 'image/webp';
+  if (lower.endsWith('.gif')) return 'image/gif';
+  if (lower.endsWith('.svg')) return 'image/svg+xml';
+  return 'image/jpeg';
+};
 const normalizeExtractionSuggestion = (payload, fileName) => {
   const pageMarkdown = Array.isArray(payload?.pages)
     ? payload.pages.map((page) => page?.markdown).filter(Boolean).join('\n\n')
@@ -682,8 +831,8 @@ const sendJson = (res, statusCode, payload) => {
   res.writeHead(statusCode, {
     'Content-Type': 'application/json; charset=utf-8',
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET,PUT,OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type,x-file-name',
   });
   res.end(JSON.stringify(payload));
 };
@@ -722,13 +871,63 @@ const server = createServer(async (req, res) => {
   if (req.method === 'OPTIONS') {
     res.writeHead(204, {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET,PUT,OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type,x-file-name',
     });
     res.end();
     return;
   }
 
+  if (req.url?.startsWith('/uploads/') && req.method === 'GET') {
+    const requestedName = decodeURIComponent(req.url.replace(/^\/uploads\//, '').split('?')[0] ?? '');
+    const safeName = sanitizeImageFileName(requestedName);
+    const filePath = join(uploadsDir, safeName);
+
+    if (!safeName || !existsSync(filePath)) {
+      sendJson(res, 404, { ok: false, error: 'Imagem não encontrada.' });
+      return;
+    }
+
+    res.writeHead(200, {
+      'Content-Type': getAssetContentType(safeName),
+      'Cache-Control': 'public, max-age=31536000, immutable',
+    });
+    res.end(readFileSync(filePath));
+    return;
+  }
+
+  if (req.url === '/api/assets/upload' && req.method === 'POST') {
+    const contentType = String(req.headers['content-type'] ?? '');
+    const originalName = sanitizeImageFileName(req.headers['x-file-name']);
+
+    if (!contentType.startsWith('image/')) {
+      sendJson(res, 400, { ok: false, error: 'Envie uma imagem válida.' });
+      return;
+    }
+
+    const imageBuffer = await readBodyBuffer(req);
+    const maxSize = 5 * 1024 * 1024;
+
+    if (!imageBuffer.length || imageBuffer.length > maxSize) {
+      sendJson(res, 400, { ok: false, error: 'A imagem precisa ter até 5 MB.' });
+      return;
+    }
+
+    const extension = getImageExtension(contentType, originalName);
+    const baseName = originalName.replace(/\.(png|jpe?g|webp|gif)$/i, '') || 'imagem-treinamento';
+    const storedFileName = `${createId('asset')}-${baseName}.${extension}`;
+    const filePath = join(uploadsDir, storedFileName);
+
+    writeFileSync(filePath, imageBuffer);
+    sendJson(res, 201, {
+      ok: true,
+      asset: {
+        fileName: storedFileName,
+        url: `/uploads/${encodeURIComponent(storedFileName)}`,
+      },
+    });
+    return;
+  }
   if (req.url === '/api/health' && req.method === 'GET') {
     sendJson(res, 200, { ok: true, port });
     return;
@@ -929,59 +1128,7 @@ const server = createServer(async (req, res) => {
   }
 
   if (req.url === '/api/mentor' && req.method === 'POST') {
-    try {
-      const body = await parseBody(req) ?? {};
-      const { question, lessonContent, history } = body;
-      const apiKey = process.env.GROQ_API_KEY;
-
-      if (!apiKey) {
-        sendJson(res, 200, {
-          ok: true,
-          response: "Olá! Sou o seu mentor de estudos da BBDI. Atualmente a chave de API do Groq não está configurada no servidor, então estou respondendo de forma simulada. Que excelente dúvida você tem! O conteúdo desta aula detalha processos fundamentais e de alto valor prático para o seu departamento. Lembre-se de revisar os pontos principais e realizar o quiz ao final!"
-        });
-        return;
-      }
-
-      const apiUrl = process.env.GROQ_CHAT_URL ?? 'https://api.groq.com/openai/v1/chat/completions';
-      const model = process.env.GROQ_TRAINING_MODEL ?? 'llama-3.3-70b-versatile';
-
-      const messages = [
-        {
-          role: 'system',
-          content: `Você é um mentor e assistente de estudos altamente didático para um portal de treinamentos corporativos da BBDI.
-O aluno está lendo a seguinte aula:
----
-${lessonContent || 'Sem conteúdo disponível no momento.'}
----
-Responda de forma extremamente clara, amigável, incentivadora e profissional às dúvidas do aluno sobre esta aula ou tópicos técnicos relacionados. Responda em português de forma concisa e direta, usando formatação Markdown amigável.`
-        }
-      ];
-
-      if (Array.isArray(history)) {
-        messages.push(...history.slice(-6));
-      }
-      messages.push({ role: 'user', content: question });
-
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          model,
-          messages,
-          temperature: 0.7,
-          max_tokens: 800
-        })
-      });
-
-      const payload = await response.json();
-      const text = payload?.choices?.[0]?.message?.content || 'Desculpe, não consegui processar sua dúvida agora.';
-      sendJson(res, 200, { ok: true, response: text });
-    } catch (err) {
-      sendJson(res, 500, { ok: false, error: err.message });
-    }
+    await handleMentorRequest({ req, res, parseBody, sendJson });
     return;
   }
 

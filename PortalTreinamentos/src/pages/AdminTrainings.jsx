@@ -3,16 +3,39 @@ import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
   BookOpen,
+  Bold,
   CheckCircle,
+  Copy,
   FileText,
+  GripVertical,
+  Image,
+  Italic,
+  Link,
+  List,
   Loader2,
   Pencil,
   Plus,
+  Table,
   Trash2,
+  Type,
   Upload,
+  Video,
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import ContentBlockRenderer from '../components/ContentBlockRenderer';
+import {
+  contentBlocksToMarkdown,
+  createContentBlock,
+  getSafeEmbedUrl,
+  normalizeContentBlocks,
+  sanitizeHtml,
+} from '../data/contentBlocks';
+import {
+  getBuiltinTrainings,
+  getEditableContentBlocks,
+  markdownToContentBlocks,
+} from '../data/adminTrainingCatalog';
 import { sectorsData } from '../data/sectorsData';
 import { getModulesForSector } from '../data/trainingCatalog';
 import { canManageSector, getUserDepartmentIds, isSuperAdmin } from '../data/sectorAccess';
@@ -23,7 +46,8 @@ import {
   fetchTrainings,
   getCachedTrainings,
   updateTraining,
-} from '../data/trainingAdminApi';
+  uploadTrainingImage,
+} from '../api/trainingAdminApi';
 import './AdminTrainings.css';
 
 const resolveModuleId = (titleOrId, departmentId) => {
@@ -54,6 +78,7 @@ const emptyForm = (departmentId) => {
   const defaultModuleTitle = modules.length > 0 ? String(modules[0].title) : '';
   return {
     level: 'basico',
+    customLevel: '',
     status: 'published',
     departmentId,
     moduleId: defaultModuleTitle,
@@ -74,14 +99,12 @@ const normalizeQuizQuestions = (questions = []) => (
   Array.isArray(questions)
     ? questions
         .map((question, index) => {
-          const questionText = safeText(question?.question, 240).trim();
+          const questionText = safeText(question?.question, 400).trim();
           const options = Array.isArray(question?.options)
-            ? question.options.map((option) => safeText(option, 140).trim()).filter(Boolean).slice(0, 4)
+            ? question.options.map((opt) => safeText(opt, 200).trim()).filter(Boolean)
             : [];
-          const answerIndex = Number.isInteger(question?.answerIndex)
-            ? question.answerIndex
-            : Number.parseInt(question?.answerIndex, 10);
-          const explanation = safeText(question?.explanation, 500).trim();
+          const answerIndex = Number(question?.answerIndex);
+          const explanation = safeText(question?.explanation, 600).trim();
 
           if (!questionText || options.length < 2 || !Number.isInteger(answerIndex) || answerIndex < 0 || answerIndex >= options.length) {
             return null;
@@ -99,6 +122,19 @@ const normalizeQuizQuestions = (questions = []) => (
         .slice(0, 20)
     : []
 );
+
+const blockMenu = [
+  { type: 'title', label: 'Titulo', icon: Type },
+  { type: 'richText', label: 'Rich text', icon: FileText },
+  { type: 'image', label: 'Imagem', icon: Image },
+  { type: 'link', label: 'Link', icon: Link },
+  { type: 'table', label: 'Tabela', icon: Table },
+  { type: 'videoEmbed', label: 'Video', icon: Video },
+];
+
+const richTextCommand = (command, value = null) => {
+  document.execCommand(command, false, value);
+};
 
 const AdminTrainings = ({ currentUser }) => {
   const navigate = useNavigate();
@@ -121,14 +157,23 @@ const AdminTrainings = ({ currentUser }) => {
   const [feedback, setFeedback] = useState({ type: '', message: '' });
   const [loading, setLoading] = useState(true);
   const [editingTrainingId, setEditingTrainingId] = useState(null);
+  const [editingCatalogTraining, setEditingCatalogTraining] = useState(null);
   const [descMode, setDescMode] = useState('preview'); // 'edit' or 'preview'
   const [contentMode, setContentMode] = useState('preview'); // 'edit' or 'preview'
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [selectedBlockId, setSelectedBlockId] = useState(null);
+  const [dragState, setDragState] = useState(null);
 
   const handleStartEdit = (training) => {
-    setEditingTrainingId(training.id);
+    setEditingTrainingId(training.builtinSource ? null : training.id);
+    setEditingCatalogTraining(training.builtinSource ? training : null);
     const displayModule = getModuleDisplayValue(training.moduleId, training.departmentId);
+    
+    const isCustomLevel = !['basico', 'intermediario', 'avancado'].includes(training.level);
+    
     setFormData({
-      level: training.level,
+      level: isCustomLevel ? 'outro' : training.level,
+      customLevel: isCustomLevel ? training.level : '',
       status: training.status,
       departmentId: training.departmentId,
       moduleId: displayModule,
@@ -137,6 +182,7 @@ const AdminTrainings = ({ currentUser }) => {
       title: training.title,
       description: training.description,
       content: training.content,
+      contentBlocks: getEditableContentBlocks(training),
       quizQuestions: training.quizQuestions || [],
       status: 'organized',
     });
@@ -194,6 +240,116 @@ const AdminTrainings = ({ currentUser }) => {
     });
   };
 
+
+  const getPreviewBlocks = (preview) => getEditableContentBlocks(preview);
+
+  const setPreviewBlocks = (updater) => {
+    setExtractionPreview((prev) => {
+      if (!prev) return prev;
+      const currentBlocks = getPreviewBlocks(prev);
+      const nextBlocks = updater(currentBlocks);
+      return {
+        ...prev,
+        contentBlocks: nextBlocks,
+        content: contentBlocksToMarkdown(nextBlocks, prev.content),
+      };
+    });
+  };
+
+  const handleUpdateContentBlock = (blockId, propsUpdates) => {
+    setPreviewBlocks((blocks) => blocks.map((block) => (
+      block.id === blockId
+        ? { ...block, props: { ...block.props, ...propsUpdates } }
+        : block
+    )));
+  };
+
+  const handleAddContentBlock = (type = 'richText', insertIndex) => {
+    const nextBlock = createContentBlock(type);
+    setPreviewBlocks((blocks) => {
+      const nextBlocks = [...blocks];
+      const targetIndex = Number.isInteger(insertIndex) ? insertIndex : nextBlocks.length;
+      nextBlocks.splice(targetIndex, 0, nextBlock);
+      return nextBlocks;
+    });
+    setSelectedBlockId(nextBlock.id);
+    setContentMode('edit');
+  };
+
+  const handleDuplicateContentBlock = (blockId) => {
+    setPreviewBlocks((blocks) => {
+      const sourceIndex = blocks.findIndex((block) => block.id === blockId);
+      if (sourceIndex < 0) return blocks;
+      const copy = createContentBlock(blocks[sourceIndex].type, blocks[sourceIndex].props);
+      const nextBlocks = [...blocks];
+      nextBlocks.splice(sourceIndex + 1, 0, copy);
+      setSelectedBlockId(copy.id);
+      return nextBlocks;
+    });
+  };
+
+  const handleMoveContentBlock = (fromIndex, toIndex) => {
+    setPreviewBlocks((blocks) => {
+      if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0 || fromIndex >= blocks.length || toIndex >= blocks.length) {
+        return blocks;
+      }
+      const nextBlocks = [...blocks];
+      const [movedBlock] = nextBlocks.splice(fromIndex, 1);
+      nextBlocks.splice(toIndex, 0, movedBlock);
+      return nextBlocks;
+    });
+  };
+
+  const handleRemoveContentBlock = (blockId) => {
+    setPreviewBlocks((blocks) => blocks.filter((block) => block.id !== blockId));
+    setSelectedBlockId((current) => (current === blockId ? null : current));
+  };
+
+  const handleDropOnCanvas = (event, dropIndex) => {
+    event.preventDefault();
+    const payload = dragState ?? JSON.parse(event.dataTransfer.getData('application/json') || 'null');
+    setDragState(null);
+
+    if (!payload) return;
+
+    if (payload.kind === 'new-block') {
+      handleAddContentBlock(payload.type, dropIndex);
+      return;
+    }
+
+    if (payload.kind === 'existing-block') {
+      handleMoveContentBlock(payload.index, dropIndex);
+    }
+  };
+
+  const handleTrainingImageUpload = async (event, blockId) => {
+    const file = event.target.files?.[0] ?? null;
+    event.target.value = '';
+
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setFeedback({ type: 'error', message: 'Selecione uma imagem válida.' });
+      return;
+    }
+
+    setUploadingImage(true);
+    setFeedback({ type: '', message: '' });
+
+    try {
+      const asset = await uploadTrainingImage(file);
+      handleUpdateContentBlock(blockId, {
+        imageUrl: asset.url,
+        imageAlt: file.name.replace(/\.[^.]+$/, ''),
+      });
+      setContentMode('preview');
+      setFeedback({ type: 'success', message: 'Imagem inserida no bloco do treinamento.' });
+    } catch (error) {
+      setFeedback({ type: 'error', message: error.message });
+    } finally {
+      setUploadingImage(false);
+    }
+  };
   const handleAddQuestion = () => {
     setExtractionPreview((prev) => {
       if (!prev) return prev;
@@ -233,11 +389,23 @@ const AdminTrainings = ({ currentUser }) => {
     };
   }, []);
 
+  const builtinTrainings = useMemo(() => getBuiltinTrainings(accessibleDepartments), [accessibleDepartments]);
+  const editableTrainings = useMemo(() => {
+    const customSourceKeys = new Set(
+      trainings.map((training) => `${training.departmentId}:${String(training.moduleId)}:${training.level}`)
+    );
+    const pendingBuiltinTrainings = builtinTrainings.filter(
+      (training) => !customSourceKeys.has(`${training.departmentId}:${String(training.moduleId)}:${training.level}`)
+    );
+
+    return [...trainings, ...pendingBuiltinTrainings];
+  }, [builtinTrainings, trainings]);
+
   const visibleTrainings = useMemo(() => (
-    trainings
+    editableTrainings
       .filter((training) => canManageSector(currentUser, training.departmentId))
       .filter((training) => catalogDepartmentId === 'all' || training.departmentId === catalogDepartmentId)
-  ), [catalogDepartmentId, currentUser, trainings]);
+  ), [catalogDepartmentId, currentUser, editableTrainings]);
 
   const handleFieldChange = (event) => {
     const { name, value } = event.target;
@@ -294,6 +462,7 @@ const AdminTrainings = ({ currentUser }) => {
 
       setExtractionPreview({
         ...suggestion,
+        contentBlocks: markdownToContentBlocks(suggestion.content),
         status: payload.status,
         organizationStatus: payload.organizationStatus,
       });
@@ -318,6 +487,8 @@ const AdminTrainings = ({ currentUser }) => {
     setFileInputKey((current) => current + 1);
     setFormData(emptyForm(defaultDepartmentId));
     setEditingTrainingId(null);
+    setEditingCatalogTraining(null);
+    setSelectedBlockId(null);
   };
 
   const handleCatalogDepartmentFilterChange = (event) => {
@@ -339,27 +510,46 @@ const AdminTrainings = ({ currentUser }) => {
     }
 
     const resolvedModuleId = resolveModuleId(formData.moduleId, formData.departmentId);
+    const hasInvalidVideo = normalizeContentBlocks(extractionPreview.contentBlocks, extractionPreview.content)
+      .some((block) => block.type === 'videoEmbed' && block.props.url && !getSafeEmbedUrl(block.props.url));
+    if (hasInvalidVideo) {
+      setFeedback({ type: 'error', message: 'Revise a URL do vídeo. Use YouTube, Vimeo ou embed aceito.' });
+      return;
+    }
+    const normalizedContentBlocks = normalizeContentBlocks(extractionPreview.contentBlocks, extractionPreview.content);
     const trainingPayload = {
       ...formData,
+      level: formData.level === 'outro' ? formData.customLevel : formData.level,
       moduleId: resolvedModuleId,
       title: extractionPreview.title,
       description: extractionPreview.description,
-      content: extractionPreview.content,
+      content: contentBlocksToMarkdown(normalizedContentBlocks, extractionPreview.content),
+      contentBlocks: normalizedContentBlocks,
       quizQuestions: extractionPreview.quizQuestions,
+      catalogImport: Boolean(editingCatalogTraining),
     };
+    
+    // Remover property temporária do customLevel
+    delete trainingPayload.customLevel;
 
     if (!trainingPayload.title?.trim()) {
       setFeedback({ type: 'error', message: 'Por favor, insira o título do treinamento.' });
       return;
     }
 
-    if (!trainingPayload.content?.trim()) {
+    if (!trainingPayload.content?.trim() && !trainingPayload.contentBlocks?.length) {
       setFeedback({ type: 'error', message: 'Por favor, insira o conteúdo do treinamento.' });
       return;
     }
 
-    if (!Array.isArray(trainingPayload.quizQuestions) || trainingPayload.quizQuestions.length < 10) {
-      setFeedback({ type: 'error', message: 'O quiz do treinamento precisa ter pelo menos dez perguntas.' });
+    const minimumQuizQuestions = editingCatalogTraining ? 8 : 10;
+    if (!Array.isArray(trainingPayload.quizQuestions) || trainingPayload.quizQuestions.length < minimumQuizQuestions) {
+      setFeedback({
+        type: 'error',
+        message: editingCatalogTraining
+          ? 'O quiz do treinamento nativo precisa manter pelo menos oito perguntas.'
+          : 'O quiz do treinamento precisa ter pelo menos dez perguntas.',
+      });
       return;
     }
 
@@ -388,6 +578,7 @@ const AdminTrainings = ({ currentUser }) => {
       setExtractionPreview(null);
       setFormData(emptyForm(savedTraining.departmentId));
       setEditingTrainingId(null);
+      setEditingCatalogTraining(null);
     } catch (error) {
       setFeedback({ type: 'error', message: error.message });
     }
@@ -407,6 +598,165 @@ const AdminTrainings = ({ currentUser }) => {
       setFeedback({ type: 'error', message: error.message });
     }
   };
+
+  const builderBlocks = getEditableContentBlocks(extractionPreview);
+
+  const handleRichTextInput = (blockId, event) => {
+    handleUpdateContentBlock(blockId, { content: sanitizeHtml(event.currentTarget.innerHTML) });
+  };
+
+  const handleTableCellChange = (block, rowIndex, columnIndex, value) => {
+    const columns = block.props.columns ?? [];
+    const rows = block.props.rows ?? [];
+    const nextRows = rows.map((row, currentRow) => (
+      currentRow === rowIndex
+        ? columns.map((_, currentColumn) => (currentColumn === columnIndex ? value : row?.[currentColumn] ?? ''))
+        : row
+    ));
+    handleUpdateContentBlock(block.id, { rows: nextRows });
+  };
+
+  const handleTableColumnChange = (block, columnIndex, value) => {
+    const nextColumns = (block.props.columns ?? []).map((column, currentColumn) => (
+      currentColumn === columnIndex ? value : column
+    ));
+    handleUpdateContentBlock(block.id, { columns: nextColumns });
+  };
+
+  const handleAddTableRow = (block) => {
+    const columns = block.props.columns ?? [];
+    handleUpdateContentBlock(block.id, { rows: [...(block.props.rows ?? []), columns.map(() => '')] });
+  };
+
+  const handleAddTableColumn = (block) => {
+    const columns = [...(block.props.columns ?? []), `Coluna ${(block.props.columns?.length ?? 0) + 1}`];
+    const rows = (block.props.rows ?? []).map((row) => [...row, '']);
+    handleUpdateContentBlock(block.id, { columns, rows });
+  };
+
+  const handleRemoveTableRow = (block, rowIndex) => {
+    const rows = (block.props.rows ?? []).filter((_, currentRow) => currentRow !== rowIndex);
+    handleUpdateContentBlock(block.id, { rows: rows.length ? rows : [(block.props.columns ?? []).map(() => '')] });
+  };
+
+  const handleRemoveTableColumn = (block, columnIndex) => {
+    const currentColumns = block.props.columns ?? [];
+    if (currentColumns.length <= 1) return;
+    const columns = currentColumns.filter((_, currentColumn) => currentColumn !== columnIndex);
+    const rows = (block.props.rows ?? []).map((row) => row.filter((_, currentColumn) => currentColumn !== columnIndex));
+    handleUpdateContentBlock(block.id, { columns, rows });
+  };
+
+  const renderBuilderPreview = (block) => {
+    if (block.type === 'image' && !block.props.imageUrl) return <div className="builder-draft-placeholder"><Image size={18} /> Configure a imagem</div>;
+    if (block.type === 'link' && !block.props.url) return <div className="builder-draft-placeholder"><Link size={18} /> Configure o link</div>;
+    if (block.type === 'videoEmbed' && !block.props.url) return <div className="builder-draft-placeholder"><Video size={18} /> Configure o video</div>;
+    return <ContentBlockRenderer blocks={[block]} fallbackContent="" className="builder-block-render" />;
+  };
+
+  const renderInlineBlockEditor = (block) => (
+    <div className="builder-inline-editor" onClick={(event) => event.stopPropagation()}>
+      <strong>Editar {blockMenu.find((item) => item.type === block.type)?.label}</strong>
+
+      {block.type === 'title' && (
+        <>
+          <label className="quiz-input-label">Texto
+            <input className="input-field quiz-edit-input" value={block.props.text ?? ''} onChange={(event) => handleUpdateContentBlock(block.id, { text: event.target.value })} />
+          </label>
+          <label className="quiz-input-label">Nivel
+            <select className="input-field" value={block.props.level ?? 2} onChange={(event) => handleUpdateContentBlock(block.id, { level: Number(event.target.value) })}>
+              <option value={1}>H1</option>
+              <option value={2}>H2</option>
+              <option value={3}>H3</option>
+            </select>
+          </label>
+        </>
+      )}
+
+      {block.type === 'richText' && (
+        <>
+          <div className="rich-text-toolbar">
+            <button type="button" title="Negrito" onMouseDown={(event) => { event.preventDefault(); richTextCommand('bold'); }}><Bold size={14} /></button>
+            <button type="button" title="Italico" onMouseDown={(event) => { event.preventDefault(); richTextCommand('italic'); }}><Italic size={14} /></button>
+            <button type="button" title="Lista" onMouseDown={(event) => { event.preventDefault(); richTextCommand('insertUnorderedList'); }}><List size={14} /></button>
+            <button type="button" title="Alinhar" onMouseDown={(event) => { event.preventDefault(); richTextCommand('justifyLeft'); }}>≡</button>
+            <button type="button" title="Link" onMouseDown={(event) => { event.preventDefault(); const url = window.prompt('URL do link'); if (url) richTextCommand('createLink', url); }}><Link size={14} /></button>
+          </div>
+          <div
+            className="rich-text-editor"
+            contentEditable
+            suppressContentEditableWarning
+            onInput={(event) => handleRichTextInput(block.id, event)}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(block.props.content ?? '') }}
+          />
+        </>
+      )}
+
+      {block.type === 'image' && (
+        <>
+          <label className={`btn-outline btn-image-upload ${uploadingImage ? 'is-loading' : ''}`}>
+            {uploadingImage ? <Loader2 size={15} className="spin-icon" /> : <Image size={15} />}
+            <span>{block.props.imageUrl ? 'Trocar imagem' : 'Inserir imagem'}</span>
+            <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={(event) => handleTrainingImageUpload(event, block.id)} disabled={uploadingImage} />
+          </label>
+          <label className="quiz-input-label">URL da imagem
+            <input className="input-field quiz-edit-input" value={block.props.imageUrl ?? ''} onChange={(event) => handleUpdateContentBlock(block.id, { imageUrl: event.target.value })} />
+          </label>
+          <label className="quiz-input-label">Texto alternativo
+            <input className="input-field quiz-edit-input" value={block.props.imageAlt ?? ''} onChange={(event) => handleUpdateContentBlock(block.id, { imageAlt: event.target.value })} />
+          </label>
+        </>
+      )}
+
+      {block.type === 'link' && (
+        <>
+          <label className="quiz-input-label">Rotulo
+            <input className="input-field quiz-edit-input" value={block.props.label ?? ''} onChange={(event) => handleUpdateContentBlock(block.id, { label: event.target.value })} />
+          </label>
+          <label className="quiz-input-label">URL
+            <input className="input-field quiz-edit-input" value={block.props.url ?? ''} onChange={(event) => handleUpdateContentBlock(block.id, { url: event.target.value })} />
+          </label>
+        </>
+      )}
+
+      {block.type === 'table' && (
+        <div className="table-editor">
+          <div className="table-editor-actions">
+            <button type="button" className="btn-outline" onClick={() => handleAddTableRow(block)}>Adicionar linha</button>
+            <button type="button" className="btn-outline" onClick={() => handleAddTableColumn(block)}>Adicionar coluna</button>
+          </div>
+          {(block.props.columns ?? []).map((column, columnIndex) => (
+            <div key={`col-${columnIndex}`} className="table-editor-row">
+              <input className="input-field quiz-edit-input" value={column} onChange={(event) => handleTableColumnChange(block, columnIndex, event.target.value)} />
+              <button type="button" className="btn-outline" onClick={() => handleRemoveTableColumn(block, columnIndex)}>Remover coluna</button>
+            </div>
+          ))}
+          {(block.props.rows ?? []).map((row, rowIndex) => (
+            <div key={`row-${rowIndex}`} className="table-editor-row">
+              {(block.props.columns ?? []).map((_, columnIndex) => (
+                <input key={`cell-${rowIndex}-${columnIndex}`} className="input-field quiz-edit-input" value={row?.[columnIndex] ?? ''} onChange={(event) => handleTableCellChange(block, rowIndex, columnIndex, event.target.value)} />
+              ))}
+              <button type="button" className="btn-outline" onClick={() => handleRemoveTableRow(block, rowIndex)}>Remover linha</button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {block.type === 'videoEmbed' && (
+        <>
+          <label className="quiz-input-label">Titulo
+            <input className="input-field quiz-edit-input" value={block.props.title ?? ''} onChange={(event) => handleUpdateContentBlock(block.id, { title: event.target.value })} />
+          </label>
+          <label className="quiz-input-label">URL YouTube, Vimeo ou embed
+            <input className="input-field quiz-edit-input" value={block.props.url ?? ''} onChange={(event) => handleUpdateContentBlock(block.id, { url: event.target.value })} />
+          </label>
+          {block.props.url && !getSafeEmbedUrl(block.props.url) && (
+            <p className="field-error">Informe uma URL valida do YouTube, Vimeo ou embed aceito.</p>
+          )}
+        </>
+      )}
+    </div>
+  );
 
   return (
     <div className="admin-trainings-wrapper animate-fade-in">
@@ -459,7 +809,7 @@ const AdminTrainings = ({ currentUser }) => {
 
             <form className="training-form" onSubmit={handleSubmit}>
               <div className="training-ai-controls">
-                <div className="training-selectors-column" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div className="training-selectors-column">
                   <label className="training-department-card">
                     <span className="field-label">Área / Departamento do Treinamento</span>
                     <p className="field-hint">Escolha qual área e departamento deseja inserir o treinamento.</p>
@@ -510,7 +860,20 @@ const AdminTrainings = ({ currentUser }) => {
                       <option value="basico">Básico</option>
                       <option value="intermediario">Intermediário</option>
                       <option value="avancado">Avançado</option>
+                      <option value="outro">Outro (Novo Nível)...</option>
                     </select>
+                    {formData.level === 'outro' && (
+                      <input
+                        type="text"
+                        name="customLevel"
+                        className="input-field"
+                        placeholder="Digite o novo nível..."
+                        value={formData.customLevel}
+                        onChange={handleFieldChange}
+                        style={{ marginTop: '8px' }}
+                        required
+                      />
+                    )}
                   </label>
                 </div>
 
@@ -597,40 +960,96 @@ const AdminTrainings = ({ currentUser }) => {
                     )}
                   </div>
 
-                  <div className="ai-preview-block content">
+                  <div className="ai-preview-block content page-builder-shell">
                     <div className="ai-preview-block-header">
-                      <span>Conteúdo Organizado</span>
-                      <div className="toggle-preview-buttons">
-                        <button
-                          type="button"
-                          className={`btn-toggle-small ${contentMode === 'edit' ? 'active' : ''}`}
-                          onClick={() => setContentMode('edit')}
-                        >
-                          Editar
-                        </button>
-                        <button
-                          type="button"
-                          className={`btn-toggle-small ${contentMode === 'preview' ? 'active' : ''}`}
-                          onClick={() => setContentMode('preview')}
-                        >
-                          Visualizar
-                        </button>
+                      <span>Page builder do treinamento</span>
+                      <div className="content-tools">
+                        <div className="toggle-preview-buttons">
+                          <button
+                            type="button"
+                            className={`btn-toggle-small ${contentMode === 'edit' ? 'active' : ''}`}
+                            onClick={() => setContentMode('edit')}
+                          >
+                            Editar
+                          </button>
+                          <button
+                            type="button"
+                            className={`btn-toggle-small ${contentMode === 'preview' ? 'active' : ''}`}
+                            onClick={() => setContentMode('preview')}
+                          >
+                            Visualizar
+                          </button>
+                        </div>
                       </div>
                     </div>
+
                     {contentMode === 'edit' ? (
-                      <textarea
-                        className="input-field"
-                        name="content"
-                        placeholder="Digite o conteúdo do treinamento (suporta Markdown)..."
-                        value={extractionPreview.content || ''}
-                        onChange={(e) => setExtractionPreview(prev => ({ ...prev, content: e.target.value }))}
-                      />
-                    ) : (
-                      <div className="markdown-preview">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                          {extractionPreview.content ? extractionPreview.content.replace(/\\n/g, '\n') : 'Sem conteúdo cadastrado.'}
-                        </ReactMarkdown>
+                      <div className="page-builder-layout">
+                        <div
+                          className={`page-builder-canvas ${builderBlocks.length ? '' : 'is-empty'} ${dragState ? 'is-dragging' : ''}`}
+                          onDragOver={(event) => event.preventDefault()}
+                          onDrop={(event) => handleDropOnCanvas(event, builderBlocks.length)}
+                        >
+                          {builderBlocks.length === 0 && (
+                            <button type="button" className="page-builder-empty" onClick={() => handleAddContentBlock('title')}>
+                              <Plus size={18} />
+                              <span>Adicionar o primeiro bloco</span>
+                            </button>
+                          )}
+
+                          {builderBlocks.map((block, blockIndex) => (
+                            <article
+                              key={block.id}
+                              className={`builder-block-card ${selectedBlockId === block.id ? 'is-selected' : ''}`}
+                              draggable={selectedBlockId !== block.id}
+                              onDragStart={(event) => {
+                                const payload = { kind: 'existing-block', index: blockIndex };
+                                setDragState(payload);
+                                event.dataTransfer.setData('application/json', JSON.stringify(payload));
+                              }}
+                              onDragOver={(event) => event.preventDefault()}
+                              onDrop={(event) => handleDropOnCanvas(event, blockIndex)}
+                              onClick={() => setSelectedBlockId(block.id)}
+                            >
+                              <div className="builder-block-actions">
+                                <GripVertical size={16} />
+                                <strong>{blockMenu.find((item) => item.type === block.type)?.label ?? block.type}</strong>
+                                <button type="button" title="Editar" onClick={() => setSelectedBlockId(block.id)}><Pencil size={14} /></button>
+                                <button type="button" title="Duplicar" onClick={() => handleDuplicateContentBlock(block.id)}><Copy size={14} /></button>
+                                <button type="button" title="Mover para cima" onClick={() => handleMoveContentBlock(blockIndex, blockIndex - 1)}>↑</button>
+                                <button type="button" title="Mover para baixo" onClick={() => handleMoveContentBlock(blockIndex, blockIndex + 1)}>↓</button>
+                                <button type="button" title="Remover" onClick={() => handleRemoveContentBlock(block.id)}><Trash2 size={14} /></button>
+                              </div>
+                              {selectedBlockId === block.id ? renderInlineBlockEditor(block) : renderBuilderPreview(block)}
+                            </article>
+                          ))}
+                        </div>
+
+                        <aside className="page-builder-sidebar">
+                          <h4>Blocos</h4>
+                          <div className="builder-block-menu">
+                            {blockMenu.map(({ type, label, icon: Icon }) => (
+                              <button
+                                key={type}
+                                type="button"
+                                className="builder-menu-card"
+                                draggable
+                                onClick={() => handleAddContentBlock(type)}
+                                onDragStart={(event) => {
+                                  const payload = { kind: 'new-block', type };
+                                  setDragState(payload);
+                                  event.dataTransfer.setData('application/json', JSON.stringify(payload));
+                                }}
+                              >
+                                <Icon size={16} />
+                                <span>{label}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </aside>
                       </div>
+                    ) : (
+                      <ContentBlockRenderer blocks={builderBlocks} fallbackContent={extractionPreview.content} />
                     )}
                   </div>
 
@@ -748,11 +1167,11 @@ const AdminTrainings = ({ currentUser }) => {
 
               <div className="training-form-actions">
                 <button type="button" className="btn-outline" onClick={resetForm}>
-                  {editingTrainingId ? 'Cancelar' : 'Limpar'}
+                  {editingTrainingId || editingCatalogTraining ? 'Cancelar' : 'Limpar'}
                 </button>
                 <button type="submit" className="btn-primary" disabled={!extractionPreview || extractingPdf}>
-                  {editingTrainingId ? <CheckCircle size={18} /> : <Plus size={18} />}
-                  {editingTrainingId ? 'Salvar Alterações' : 'Cadastrar Treinamento'}
+                  {editingTrainingId || editingCatalogTraining ? <CheckCircle size={18} /> : <Plus size={18} />}
+                  {editingTrainingId ? 'Salvar Alterações' : editingCatalogTraining ? 'Salvar Versão Editável' : 'Cadastrar Treinamento'}
                 </button>
               </div>
             </form>
@@ -778,6 +1197,9 @@ const AdminTrainings = ({ currentUser }) => {
                       <span className={`training-status ${training.status}`}>
                         {training.status === 'published' ? 'Publicado' : 'Rascunho'}
                       </span>
+                      {training.builtinSource && (
+                        <span className="training-status catalog">Catálogo</span>
+                      )}
                     </div>
                     <div className="training-row-description">
                       <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -793,12 +1215,14 @@ const AdminTrainings = ({ currentUser }) => {
                   <div className="training-row-actions">
                     <button type="button" className="btn-small btn-primary-ghost" onClick={() => handleStartEdit(training)}>
                       <Pencil size={15} />
-                      Editar
+                      {training.builtinSource ? 'Editar cópia' : 'Editar'}
                     </button>
-                    <button type="button" className="btn-small btn-danger-ghost" onClick={() => handleDelete(training)}>
-                      <Trash2 size={15} />
-                      Remover
-                    </button>
+                    {!training.builtinSource && (
+                      <button type="button" className="btn-small btn-danger-ghost" onClick={() => handleDelete(training)}>
+                        <Trash2 size={15} />
+                        Remover
+                      </button>
+                    )}
                   </div>
                 </article>
               ))}

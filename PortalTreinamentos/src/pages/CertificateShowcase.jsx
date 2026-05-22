@@ -2,7 +2,7 @@ import { Download, Printer, ShieldCheck, Layout } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import './CertificateShowcase.css';
 import { certificateTemplates, fillTemplate } from '../data/certificateTemplates';
-import { getCurrentUser } from '../data/usersStorage';
+import { getCurrentUser } from '../api/usersStorage';
 import { getDepartmentLabel, getUserDepartmentId } from '../data/sectorAccess';
 
 const certificate = {

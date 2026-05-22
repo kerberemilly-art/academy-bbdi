@@ -1,4 +1,4 @@
-import { readStorageJSON, writeStorageJSON } from './runtime';
+import { readStorageJSON, writeStorageJSON } from '../data/runtime';
 
 const BACKEND_BASE_URL = import.meta.env.VITE_BACKEND_URL ?? '/api';
 const USERS_STORAGE_KEY = 'portalTreinamentos.users';

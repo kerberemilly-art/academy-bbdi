@@ -9,7 +9,6 @@ import {
   Clock3,
   FileText,
   LogOut,
-  ShieldCheck,
   Sparkles,
   Target,
   Users,
@@ -19,27 +18,19 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import SectorCard from '../components/SectorCard';
-import { modulesData } from '../data/modulesData';
+import StudyMentor from '../components/StudyMentor';
 import { getSectorSummaries } from '../data/trainingCatalog';
-import { getMarketingTrainingProgress } from '../data/trainingPath';
-import { getLatestResultsByUser, getQuizResults, getTrainingTests } from '../data/progressStorage';
-import { getUsers } from '../data/usersStorage';
-import { canAccessAdminArea, canAccessSector, getUserDepartmentId, getUserDepartmentIds } from '../data/sectorAccess';
-import { fetchTrainings } from '../data/trainingAdminApi';
+import { canAccessAdminArea, canAccessSector } from '../data/sectorAccess';
+import { fetchTrainings } from '../api/trainingAdminApi';
+import {
+  buildMentorContext,
+  getCollaboratorStats,
+  getDonutData,
+  getMasterProgress,
+  getRecentActivity,
+  getUserProgressSummary,
+} from '../data/dashboardMetrics';
 import './Dashboard.css';
-
-const dateTimeFormatter = new Intl.DateTimeFormat('pt-BR', {
-  day: '2-digit',
-  month: '2-digit',
-  hour: '2-digit',
-  minute: '2-digit',
-});
-
-const dateFormatter = new Intl.DateTimeFormat('pt-BR', {
-  day: '2-digit',
-  month: '2-digit',
-  year: 'numeric',
-});
 
 const Dashboard = ({ currentUser, onLogout }) => {
   const navigate = useNavigate();
@@ -57,207 +48,49 @@ const Dashboard = ({ currentUser, onLogout }) => {
     ? sectors
     : sectors.filter((sector) => canAccessSector(currentUser, sector.id));
 
-  const userProgress = useMemo(() => {
-    if (isAnyAdmin) return null;
-    const userDeptId = getUserDepartmentId(currentUser) || 'marketing-produtos';
-    const prog = getMarketingTrainingProgress(currentUser.id, userDeptId);
-    const sector = sectors.find((s) => s.id === userDeptId);
-    
-    return {
-      progressPercent: prog.progressPercent,
-      completedSteps: prog.completedSteps,
-      totalSteps: prog.totalSteps,
-      remainingSteps: prog.remainingSteps,
-      nextStepText: prog.nextStep
-        ? `${modulesData[prog.nextStep.moduleId]?.title} - ${prog.nextStep.levelTitle}`
-        : (prog.totalSteps === 0 ? 'Nenhum treinamento cadastrado' : 'Nenhum'),
-      hasFinished: !prog.nextStep,
-      deptTitle: sector?.title || userDeptId,
-    };
-  }, [currentUser, sectors, isAnyAdmin]);
+  const userProgress = useMemo(
+    () => getUserProgressSummary(currentUser, sectors, isAnyAdmin),
+    [currentUser, sectors, isAnyAdmin],
+  );
 
-  const collaboratorStats = useMemo(() => {
-    if (isAnyAdmin) return null;
-    const results = getQuizResults().filter((r) => r.userId === currentUser.id);
-    const uniqueQuizzesCompleted = new Set(results.map((r) => `${r.moduleId}:${r.levelId}`));
-    const completedCount = uniqueQuizzesCompleted.size;
-    
-    const latestResults = new Map();
-    results.forEach((r) => {
-      const key = `${r.moduleId}:${r.levelId}`;
-      const prev = latestResults.get(key);
-      if (!prev || new Date(r.submittedAt) > new Date(prev.submittedAt)) {
-        latestResults.set(key, r);
-      }
-    });
-    
-    const totalScorePercent = Array.from(latestResults.values()).reduce((acc, curr) => acc + curr.percent, 0);
-    const averageScore = latestResults.size > 0 ? Math.round(totalScorePercent / latestResults.size) : 0;
-    
-    // Each completed step is estimated to take ~15-20 minutes, plus 30 minutes for quiz
-    const totalCompletedSteps = visibleSectors.reduce((sum, s) => {
-      const prog = getMarketingTrainingProgress(currentUser.id, s.id);
-      return sum + (prog.completedSteps || 0);
-    }, 0);
-    const estimatedHours = Math.max(0.2, parseFloat(((totalCompletedSteps * 15 + completedCount * 25) / 60).toFixed(1)));
-    
-    let certificatesCount = 0;
-    visibleSectors.forEach((s) => {
-      const prog = getMarketingTrainingProgress(currentUser.id, s.id);
-      if (prog.totalSteps > 0 && prog.completedSteps === prog.totalSteps) {
-        certificatesCount++;
-      }
-    });
+  const collaboratorStats = useMemo(
+    () => getCollaboratorStats(currentUser, visibleSectors, isAnyAdmin),
+    [currentUser, visibleSectors, isAnyAdmin],
+  );
 
-    return {
-      completedCount,
-      averageScore,
-      estimatedHours,
-      certificatesCount,
-    };
-  }, [currentUser, visibleSectors, isAnyAdmin]);
+  const donutData = useMemo(
+    () => getDonutData(currentUser, visibleSectors, isAnyAdmin),
+    [currentUser, visibleSectors, isAnyAdmin],
+  );
 
-  const donutData = useMemo(() => {
-    if (isAnyAdmin) return null;
-    const sectorsInfo = visibleSectors.map((sector) => {
-      const prog = getMarketingTrainingProgress(currentUser.id, sector.id);
-      return {
-        id: sector.id,
-        title: sector.title,
-        color: sector.color || '#3b82f6',
-        completed: prog.completedSteps || 0,
-        percent: prog.progressPercent || 0,
-      };
-    });
-    
-    const totalCompleted = sectorsInfo.reduce((sum, s) => sum + s.completed, 0);
-    
-    if (totalCompleted === 0) {
-      return {
-        total: 0,
-        segments: sectorsInfo.map((s) => ({
-          ...s,
-          percentageOfTotal: 100 / (sectorsInfo.length || 1),
-        })),
-        isEmpty: true,
-      };
-    }
-    
-    const segments = sectorsInfo.map((s) => ({
-      ...s,
-      percentageOfTotal: (s.completed / totalCompleted) * 100,
-    }));
-    
-    return {
-      total: totalCompleted,
-      segments,
-      isEmpty: false,
-    };
-  }, [currentUser, visibleSectors, isAnyAdmin]);
+  const masterProgress = useMemo(
+    () => getMasterProgress(currentUser, sectors, isAdmin),
+    [currentUser, sectors, isAdmin],
+  );
 
-  const masterProgress = useMemo(() => {
-    let users = getUsers().filter((user) => user.role !== 'master' && user.role !== 'admin');
-    
-    if (isAdmin) {
-      const adminDeptIds = getUserDepartmentIds(currentUser);
-      users = users.filter((u) => {
-        const uDeptIds = getUserDepartmentIds(u);
-        return uDeptIds.some((deptId) => adminDeptIds.includes(deptId));
-      });
-    }
+  const mentorContext = useMemo(
+    () => buildMentorContext({
+      isMaster,
+      isAdmin,
+      displayName,
+      visibleSectors,
+      masterProgress,
+      userProgress,
+      collaboratorStats,
+    }),
+    [collaboratorStats, displayName, isAdmin, isMaster, masterProgress, userProgress, visibleSectors],
+  );
 
-    const activeUsers = users.filter((user) => user.active);
-    
-    let tests = getTrainingTests(modulesData);
-    if (isAdmin) {
-      const adminDeptIds = getUserDepartmentIds(currentUser);
-      const allowedModuleIds = sectors
-        .filter((sector) => adminDeptIds.includes(sector.id))
-        .flatMap((sector) => sector.moduleIds ?? []);
-      const allowedModuleIdsStr = allowedModuleIds.map(String);
-      tests = tests.filter((test) => allowedModuleIdsStr.includes(String(test.moduleId)));
-    }
+  const recentActivity = useMemo(
+    () => getRecentActivity(trainings, currentUser, sectors, isAdmin),
+    [currentUser, isAdmin, sectors, trainings],
+  );
 
-    const results = getQuizResults();
-    const latestResults = getLatestResultsByUser(results);
-    const totalPossible = users.length * tests.length;
-    const completed = users.reduce((sum, user) => (
-      sum + tests.filter((test) => latestResults.has(`${user.id}:${test.moduleId}:${test.levelId}`)).length
-    ), 0);
-    const userSummaries = users.map((user) => {
-      const userResults = tests
-        .map((test) => latestResults.get(`${user.id}:${test.moduleId}:${test.levelId}`))
-        .filter(Boolean);
-      const average = userResults.length
-        ? Math.round(userResults.reduce((sum, result) => sum + result.percent, 0) / userResults.length)
-        : 0;
-      const latestDate = userResults
-        .map((result) => result.submittedAt)
-        .sort((a, b) => new Date(b) - new Date(a))[0];
-
-      return {
-        user,
-        completed: userResults.length,
-        average,
-        progress: tests.length ? Math.round((userResults.length / tests.length) * 100) : 0,
-        latestDate,
-      };
-    });
-    const averageScore = userSummaries.length
-      ? Math.round(userSummaries.reduce((sum, summary) => sum + summary.average, 0) / userSummaries.length)
-      : 0;
-
-    return {
-      activeUsers: activeUsers.length,
-      tests: tests.length,
-      completion: totalPossible ? Math.round((completed / totalPossible) * 100) : 0,
-      averageScore,
-      userSummaries: userSummaries.slice(0, 5),
-    };
-  }, [currentUser, sectors, isAdmin]);
-
-  const recentActivity = useMemo(() => {
-    const latestTraining = [...trainings]
-      .sort((a, b) => new Date(b.updatedAt ?? b.createdAt ?? 0) - new Date(a.updatedAt ?? a.createdAt ?? 0))[0];
-    
-    let users = getUsers().filter((user) => user.role !== 'master' && user.role !== 'admin');
-    if (isAdmin) {
-      const adminDeptIds = getUserDepartmentIds(currentUser);
-      users = users.filter((u) => {
-        const uDeptIds = getUserDepartmentIds(u);
-        return uDeptIds.some((deptId) => adminDeptIds.includes(deptId));
-      });
-    }
-
-    const recentCollaborator = [...users]
-      .sort((a, b) => new Date(b.createdAt ?? 0) - new Date(a.createdAt ?? 0))[0];
-    const highlightedSector = sectors.find((sector) => sector.status === 'active') ?? sectors[0] ?? null;
-
-    return [
-      {
-        id: 'latest-training',
-        icon: FileText,
-        title: latestTraining ? latestTraining.title : 'Nenhum treinamento cadastrado',
-        subtitle: latestTraining
-          ? `Atualizado em ${dateTimeFormatter.format(new Date(latestTraining.updatedAt ?? latestTraining.createdAt))}`
-          : 'Ainda não há conteúdo publicado',
-      },
-      {
-        id: 'recent-user',
-        icon: Users,
-        title: recentCollaborator ? recentCollaborator.name : 'Nenhum colaborador recente',
-        subtitle: recentCollaborator
-          ? `Cadastrado em ${dateFormatter.format(new Date(recentCollaborator.createdAt))}`
-          : 'Sem movimentação de usuários',
-      },
-      {
-        id: 'sector',
-        icon: Sparkles,
-        title: highlightedSector ? highlightedSector.title : 'Nenhum departamento',
-        subtitle: highlightedSector ? highlightedSector.description : 'Sem departamentos configurados',
-      },
-    ];
-  }, [sectors, trainings, currentUser, isAdmin]);
+  const activityIconMap = {
+    training: FileText,
+    user: Users,
+    sector: Sparkles,
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -279,15 +112,6 @@ const Dashboard = ({ currentUser, onLogout }) => {
     };
   }, []);
 
-  const formatDate = (date) => {
-    if (!date) return 'Sem atividade';
-    return new Intl.DateTimeFormat('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(new Date(date));
-  };
 
 
 
@@ -420,7 +244,7 @@ const Dashboard = ({ currentUser, onLogout }) => {
               </div>
               <div className="activity-grid">
                 {recentActivity.map((item) => {
-                  const Icon = item.icon;
+                  const Icon = activityIconMap[item.iconKey] ?? FileText;
                   return (
                     <article key={item.id} className="activity-card">
                       <div className="activity-icon">
@@ -457,9 +281,9 @@ const Dashboard = ({ currentUser, onLogout }) => {
           <>
             <section className="hero-panel">
               <div className="hero-copy">
-                <span className="section-kicker">
-                  <Target size={14} />
-                  Sua Jornada Técnica
+                <span className="section-kicker" style={{ gap: '12px', marginBottom: '24px' }}>
+                  <Target size={16} style={{ marginRight: '8px' }} />
+                  <span>Sua Jornada Técnica</span>
                 </span>
                 <h1>Olá, {displayName}!</h1>
                 <p>
@@ -491,7 +315,7 @@ const Dashboard = ({ currentUser, onLogout }) => {
             </section>
 
             {/* Analytics Section remains identical in logic but benefits from global style refactor */}
-            <section className="learning-analytics-section glass-panel" style={{ padding: '40px', marginTop: '32px' }}>
+            <section className="learning-analytics-section glass-panel">
               <div className="panel-heading">
                 <BarChart3 size={24} color="var(--accent-color)" />
                 <h2>Métricas de Aprendizado</h2>
@@ -523,7 +347,7 @@ const Dashboard = ({ currentUser, onLogout }) => {
                     <Clock3 size={20} />
                   </div>
                   <div className="stat-info">
-                    <strong>{collaboratorStats.estimatedHours}h</strong>
+                    <strong>{collaboratorStats.formattedStudyTime}</strong>
                     <span>Estudo</span>
                   </div>
                 </div>
@@ -621,6 +445,7 @@ const Dashboard = ({ currentUser, onLogout }) => {
           </>
         )}
       </main>
+      <StudyMentor lessonContent={mentorContext} />
     </div>
   );
 };

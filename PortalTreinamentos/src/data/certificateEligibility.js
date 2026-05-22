@@ -1,4 +1,4 @@
-import { getQuizResults, getLatestResultsByUser } from './progressStorage';
+import { getQuizResults, getLatestResultsByUser } from '../api/progressStorage';
 
 const MARKETING_PROGRAM = {
   programKey: 'marketing-products',

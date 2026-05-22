@@ -17,9 +17,12 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 24px;
 }
 
-.btn-back {
+.lesson-header .btn-back {
   background: transparent;
   border: none;
   color: var(--text-secondary);
@@ -29,12 +32,20 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  width: fit-content;
+  width: auto;
+  height: auto;
+  min-width: max-content;
+  padding: 0;
+  white-space: nowrap;
+  line-height: 1;
   transition: var(--transition-smooth);
 }
 
-.btn-back:hover {
+.lesson-header .btn-back:hover {
   color: var(--accent-color);
+  background: transparent;
+  border-color: transparent;
+  transform: none;
 }
 
 .progress-bar-container {
