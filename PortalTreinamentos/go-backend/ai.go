@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"io"
 )
 
 // Placeholder for the AI endpoints to ensure the server compiles
@@ -21,6 +22,10 @@ func MentorHandler(w http.ResponseWriter, r *http.Request) {
 
 func PdfExtractHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	
+	// Read and discard the body so the browser doesn't throw ERR_CONNECTION_RESET during fetch
+	io.Copy(io.Discard, r.Body)
+	r.Body.Close()
 	
 	departmentId := r.URL.Query().Get("departmentId")
 	if departmentId == "" {
