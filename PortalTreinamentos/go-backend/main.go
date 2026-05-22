@@ -11,6 +11,7 @@ import (
 	"embed"
 	"io"
 	"io/fs"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -69,6 +70,17 @@ func main() {
 			http.Error(w, `{"ok":false,"error":"JSON inválido."}`, http.StatusBadRequest)
 			return
 		}
+		
+		if t.ID == "" {
+			t.ID = "custom-" + time.Now().Format("20060102150405") // fallback if we don't have a uuid generator, or we can use crypto/rand
+		}
+		if t.CreatedAt == "" {
+			t.CreatedAt = time.Now().Format(time.RFC3339)
+		}
+		if t.UpdatedAt == "" {
+			t.UpdatedAt = time.Now().Format(time.RFC3339)
+		}
+		
 		SaveTraining(t)
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]interface{}{"ok": true, "training": t, "trainings": GetTrainings()})

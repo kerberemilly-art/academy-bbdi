@@ -58,8 +58,9 @@ func InitDB() {
 	alterQueries := []string{
 		"ALTER TABLE app_state ADD COLUMN trainings_json TEXT NOT NULL DEFAULT '[]'",
 		"ALTER TABLE trainings ADD COLUMN quiz_questions_json TEXT NOT NULL DEFAULT '[]'",
-		"ALTER TABLE trainings ADD COLUMN module_id TEXT NOT NULL DEFAULT ''",
 		"ALTER TABLE trainings ADD COLUMN content_blocks_json TEXT NOT NULL DEFAULT '[]'",
+		"ALTER TABLE trainings ADD COLUMN module_id TEXT NOT NULL DEFAULT ''",
+		"ALTER TABLE trainings ADD COLUMN level TEXT NOT NULL DEFAULT 'basico'",
 	}
 
 	for _, query := range alterQueries {
