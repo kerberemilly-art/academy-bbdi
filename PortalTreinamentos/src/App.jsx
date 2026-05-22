@@ -108,7 +108,12 @@ function App() {
         {isDarkTheme ? <Sun size={20} /> : <Moon size={20} />}
       </button>
       <Routes>
-        <Route path="/" element={<CertificateShowcase />} />
+        <Route 
+          path="/" 
+          element={
+            isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/login" />
+          } 
+        />
         <Route path="/certificate-showcase" element={<CertificateShowcase />} />
         <Route path="/preview" element={<Preview />} />
         <Route 
