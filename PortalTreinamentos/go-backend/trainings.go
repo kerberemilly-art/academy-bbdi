@@ -14,13 +14,14 @@ type TrainingPayload struct {
 	UpdatedAt     string          `json:"updatedAt"`
 	Status        string          `json:"status"`
 	ModuleID      string          `json:"moduleId"`
+	Level         string          `json:"level"`
 	Content       json.RawMessage `json:"content"`
 	QuizQuestions json.RawMessage `json:"quizQuestions"`
 	ContentBlocks json.RawMessage `json:"contentBlocks"`
 }
 
 func GetTrainings() []TrainingPayload {
-	rows, err := db.Query("SELECT id, department_id, title, description, created_at, updated_at, status, module_id, content, quiz_questions_json, content_blocks_json FROM trainings ORDER BY created_at ASC")
+	rows, err := db.Query("SELECT id, department_id, title, description, created_at, updated_at, status, module_id, level, content, quiz_questions_json, content_blocks_json FROM trainings ORDER BY created_at ASC")
 	if err != nil {
 		log.Printf("Error getting trainings: %v\n", err)
 		return []TrainingPayload{}
@@ -30,15 +31,44 @@ func GetTrainings() []TrainingPayload {
 	trainings := []TrainingPayload{}
 	for rows.Next() {
 		var t TrainingPayload
-		var content, quiz, blocks string
-		err := rows.Scan(&t.ID, &t.DepartmentID, &t.Title, &t.Description, &t.CreatedAt, &t.UpdatedAt, &t.Status, &t.ModuleID, &content, &quiz, &blocks)
+		var id, deptId, title, desc, createdAt, updatedAt, status, moduleId, level sql.NullString
+		var content, quiz, blocks sql.NullString
+		err := rows.Scan(&id, &deptId, &title, &desc, &createdAt, &updatedAt, &status, &moduleId, &level, &content, &quiz, &blocks)
 		if err != nil {
+			log.Printf("Scan error: %v", err)
 			continue
 		}
 		
-		t.Content = json.RawMessage(content)
-		t.QuizQuestions = json.RawMessage(quiz)
-		t.ContentBlocks = json.RawMessage(blocks)
+		t.ID = id.String
+		t.DepartmentID = deptId.String
+		t.Title = title.String
+		t.Description = desc.String
+		t.CreatedAt = createdAt.String
+		t.UpdatedAt = updatedAt.String
+		t.Status = status.String
+		t.ModuleID = moduleId.String
+		t.Level = level.String
+
+		if t.CreatedAt == "" {
+			t.CreatedAt = "2024-01-01T00:00:00Z"
+		}
+		if t.UpdatedAt == "" {
+			t.UpdatedAt = t.CreatedAt
+		}
+		if t.Level == "" {
+			t.Level = "basico"
+		}
+
+		contentStr := content.String
+		if contentStr == "" { contentStr = `""` }
+		quizStr := quiz.String
+		if quizStr == "" { quizStr = "[]" }
+		blocksStr := blocks.String
+		if blocksStr == "" { blocksStr = "[]" }
+
+		t.Content = json.RawMessage(contentStr)
+		t.QuizQuestions = json.RawMessage(quizStr)
+		t.ContentBlocks = json.RawMessage(blocksStr)
 		trainings = append(trainings, t)
 	}
 
@@ -47,8 +77,8 @@ func GetTrainings() []TrainingPayload {
 
 func SaveTraining(t TrainingPayload) error {
 	query := `
-		INSERT INTO trainings (id, department_id, title, description, created_at, updated_at, status, module_id, content, quiz_questions_json, content_blocks_json)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+		INSERT INTO trainings (id, department_id, title, description, created_at, updated_at, status, module_id, level, content, quiz_questions_json, content_blocks_json)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		ON CONFLICT(id) DO UPDATE SET
 			department_id = excluded.department_id,
 			title = excluded.title,
@@ -56,19 +86,38 @@ func SaveTraining(t TrainingPayload) error {
 			updated_at = excluded.updated_at,
 			status = excluded.status,
 			module_id = excluded.module_id,
+			level = excluded.level,
 			content = excluded.content,
 			quiz_questions_json = excluded.quiz_questions_json,
 			content_blocks_json = excluded.content_blocks_json
 	`
+	
+	if t.Level == "" {
+		t.Level = "basico"
+	}
+	if t.CreatedAt == "" {
+		t.CreatedAt = "2024-01-01T00:00:00Z"
+	}
+	if t.UpdatedAt == "" {
+		t.UpdatedAt = t.CreatedAt
+	}
+
 	contentStr := string(t.Content)
-	if contentStr == "" { contentStr = "[]" }
+	if contentStr == "" { contentStr = `""` }
 	quizStr := string(t.QuizQuestions)
 	if quizStr == "" { quizStr = "[]" }
 	blocksStr := string(t.ContentBlocks)
 	if blocksStr == "" { blocksStr = "[]" }
 
-	_, err := db.Exec(query, t.ID, t.DepartmentID, t.Title, t.Description, t.CreatedAt, t.UpdatedAt, t.Status, t.ModuleID, contentStr, quizStr, blocksStr)
-	return err
+	_, err := db.Exec(query,
+		t.ID, t.DepartmentID, t.Title, t.Description, t.CreatedAt, t.UpdatedAt, t.Status, t.ModuleID, t.Level,
+		contentStr, quizStr, blocksStr,
+	)
+	if err != nil {
+		log.Printf("Error saving training: %v\n", err)
+		return err
+	}
+	return nil
 }
 
 func DeleteTraining(id string) error {
