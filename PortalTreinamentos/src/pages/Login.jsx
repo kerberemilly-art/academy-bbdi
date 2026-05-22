@@ -83,7 +83,6 @@ const Login = ({ onLogin }) => {
              <ShieldCheck size={14} />
              <span>Acesso Restrito a Colaboradores Grupo BBDI</span>
           </div>
-          <p className="master-hint">Acesso master: {MASTER_CREDENTIALS.email}</p>
         </footer>
       </div>
     </div>

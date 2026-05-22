@@ -12,8 +12,8 @@ import { readBackendSlice, writeBackendSlice } from '../../api/backendSync';
 const SESSION_STORAGE_KEY = 'portalTreinamentos.currentUserId';
 
 export const MASTER_CREDENTIALS = {
-  email: 'master@treinamentos.local',
-  password: 'MASTER_PASSWORD_REMOVED',
+  email: import.meta.env.VITE_MASTER_EMAIL || 'master@treinamentos.local',
+  password: import.meta.env.VITE_MASTER_PASSWORD || 'MASTER_PASSWORD_REMOVED',
 };
 
 export const MASTER_USER = {
