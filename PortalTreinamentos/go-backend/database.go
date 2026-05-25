@@ -72,8 +72,6 @@ func InitDB() {
 		db.Exec(query)
 	}
 
-	SeedTrainingsIfEmpty()
-
 	fmt.Println("Database initialized successfully.")
 }
 
