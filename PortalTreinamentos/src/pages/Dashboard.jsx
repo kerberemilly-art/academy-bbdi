@@ -21,8 +21,9 @@ import SectorCard from '../components/SectorCard';
 import { getBuiltinTrainings } from '../data/adminTrainingCatalog';
 import StudyMentor from '../components/StudyMentor';
 import { getSectorSummaries } from '../data/trainingCatalog';
-import { canAccessAdminArea, canAccessSector } from '../data/sectorAccess';
+import { canAccessAdminArea } from '../data/sectorAccess';
 import { fetchTrainings } from '../api/trainingAdminApi';
+import { useVisibleSectorsWithStats } from '../data/trainingStats';
 import {
   buildMentorContext,
   getCollaboratorStats,
@@ -45,25 +46,7 @@ const Dashboard = ({ currentUser, onLogout }) => {
   const isAdmin = currentUser.role === 'admin';
   const isAnyAdmin = isMaster || isAdmin;
 
-  const visibleSectors = useMemo(() => {
-    const filteredSectors = isMaster
-      ? sectors
-      : sectors.filter((sector) => canAccessSector(currentUser, sector.id));
-    const builtinTrainings = getBuiltinTrainings(filteredSectors);
-    const customTrainingKeys = new Set(
-      trainings.map((training) => `${training.departmentId}:${String(training.moduleId)}:${training.level}`)
-    );
-
-    return filteredSectors.map((sector) => ({
-      ...sector,
-      moduleCount:
-        trainings.filter((training) => training.departmentId === sector.id).length
-        + builtinTrainings.filter((training) => (
-          training.departmentId === sector.id
-          && !customTrainingKeys.has(`${training.departmentId}:${String(training.moduleId)}:${training.level}`)
-        )).length,
-    }));
-  }, [currentUser, isMaster, sectors, trainings]);
+  const visibleSectors = useVisibleSectorsWithStats(currentUser, sectors, trainings);
 
   const userProgress = useMemo(
     () => getUserProgressSummary(currentUser, sectors, isAnyAdmin),

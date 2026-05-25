@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, BookOpen, CheckCircle, Lock, PlayCircle, Award } from 'lucide-react';
+import { getModuleById } from '../data/trainingCatalog';
 import { modulesData } from '../data/modulesData';
-import { sectorsData } from '../data/sectorsData';
 import { getMarketingLevelStatus, getMarketingModuleProgress, getMarketingModuleStatus } from '../data/trainingPath';
 import { fetchTrainings, getCachedTrainings } from '../api/trainingAdminApi';
 import { getCertificateByLevel } from '../api/certificateStorage';
@@ -31,27 +31,7 @@ const ModuleDetail = ({ currentUser }) => {
     };
   }, []);
 
-  let moduleInfo = modulesData[id];
-  if (!moduleInfo) {
-    const matchedTraining = customTrainings.find(
-      (t) => String(t.moduleId).trim().toLowerCase() === String(id).trim().toLowerCase()
-    );
-    if (matchedTraining) {
-      const sector = sectorsData.find((s) => s.id === matchedTraining.departmentId);
-      moduleInfo = {
-        id: matchedTraining.moduleId,
-        title: matchedTraining.moduleId,
-        description: matchedTraining.description || 'Treinamento personalizado criado por Administrador.',
-        color: sector?.color || '#3b82f6',
-        levels: [
-          { id: 'basico', title: 'Básico', description: 'Conceitos introdutórios e termos fundamentais.' },
-          { id: 'intermediario', title: 'Intermediário', description: 'Processos avançados e uso prático.' },
-          { id: 'avancado', title: 'Avançado', description: 'Análise crítica e liderança.' }
-        ]
-      };
-    }
-  }
-
+  const moduleInfo = useMemo(() => getModuleById(id), [id, customTrainings]);
   const moduleStatus = getMarketingModuleStatus(currentUser, id);
   const moduleProgress = getMarketingModuleProgress(currentUser?.id, id);
 

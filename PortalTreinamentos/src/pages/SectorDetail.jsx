@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, BookOpen, LogOut, PencilLine, ShieldCheck } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
@@ -16,7 +16,6 @@ import './SectorDetail.css';
 const SectorDetail = ({ currentUser, onLogout }) => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const initialSector = getSectorSummary(id);
   const displayName = currentUser?.name?.trim() || 'Usuário';
 
   const [customTrainings, setCustomTrainings] = useState(() => getCachedTrainings());
@@ -37,64 +36,7 @@ const SectorDetail = ({ currentUser, onLogout }) => {
     };
   }, []);
 
-  const sector = initialSector ? { ...initialSector } : null;
-
-  if (sector) {
-    const hardcodedModuleIds = sector.moduleIds.map(String);
-    const sectorTrainings = customTrainings.filter((t) => t.departmentId === sector.id);
-
-    const dynamicModulesMap = {};
-    sectorTrainings.forEach((t) => {
-      const tModIdStr = String(t.moduleId).trim();
-      if (!tModIdStr) return;
-
-      const isHardcoded = hardcodedModuleIds.includes(tModIdStr);
-      if (!isHardcoded) {
-        const lower = tModIdStr.toLowerCase();
-        if (!dynamicModulesMap[lower]) {
-          dynamicModulesMap[lower] = {
-            id: tModIdStr,
-            title: tModIdStr,
-            description: t.description || 'Treinamento personalizado.',
-            icon: BookOpen,
-            color: sector.color || '#3b82f6',
-            count: 3,
-            levels: [
-              { id: 'basico', title: 'Básico' },
-              { id: 'intermediario', title: 'Intermediário' },
-              { id: 'avancado', title: 'Avançado' }
-            ]
-          };
-        }
-      }
-    });
-
-    const dynamicModulesList = Object.values(dynamicModulesMap);
-    const combinedModules = [...sector.modules, ...dynamicModulesList];
-
-    // Filter to only display modules that have at least one registered training in the DB
-    // OR are the built-in pre-packaged trainings with real content (IDs 1 to 8)
-    // OR have manual lesson content in modulesData
-    sector.modules = combinedModules.filter((m) => {
-      const idNum = Number(m.id);
-      if (!isNaN(idNum) && idNum >= 1 && idNum <= 8) {
-        return true;
-      }
-      
-      const hasCustomTraining = sectorTrainings.some((t) => {
-        const tModLower = String(t.moduleId).trim().toLowerCase();
-        const mIdLower = String(m.id).trim().toLowerCase();
-        const mTitleLower = String(m.title).trim().toLowerCase();
-        return tModLower === mIdLower || tModLower === mTitleLower;
-      });
-
-      if (hasCustomTraining) return true;
-
-      const originalMod = modulesData[m.id];
-      return originalMod && originalMod.levels && originalMod.levels.some(l => l.lesson);
-    });
-  }
-
+  const sector = useMemo(() => getSectorSummary(id), [id, customTrainings]);
   const canManageCurrentSector = sector ? canManageSector(currentUser, sector.id) : false;
 
   if (!sector) {

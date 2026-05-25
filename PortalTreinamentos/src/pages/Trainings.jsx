@@ -1,11 +1,10 @@
 import { ArrowLeft, BookOpen, LogOut } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchTrainings } from '../api/trainingAdminApi';
 import SectorCard from '../components/SectorCard';
-import { getBuiltinTrainings } from '../data/adminTrainingCatalog';
 import { getSectorSummaries } from '../data/trainingCatalog';
-import { canAccessSector } from '../data/sectorAccess';
+import { useVisibleSectorsWithStats } from '../data/trainingStats';
 import './Dashboard.css';
 
 const Trainings = ({ currentUser, onLogout }) => {
@@ -33,26 +32,7 @@ const Trainings = ({ currentUser, onLogout }) => {
     };
   }, []);
 
-  const sectors = useMemo(() => (
-    (() => {
-      const filteredSectors = getSectorSummaries()
-        .filter((sector) => canAccessSector(currentUser, sector.id));
-      const builtinTrainings = getBuiltinTrainings(filteredSectors);
-      const customTrainingKeys = new Set(
-        trainings.map((training) => `${training.departmentId}:${String(training.moduleId)}:${training.level}`)
-      );
-
-      return filteredSectors.map((sector) => ({
-        ...sector,
-        moduleCount:
-          trainings.filter((training) => training.departmentId === sector.id).length
-          + builtinTrainings.filter((training) => (
-            training.departmentId === sector.id
-            && !customTrainingKeys.has(`${training.departmentId}:${String(training.moduleId)}:${training.level}`)
-          )).length,
-      }));
-    })()
-  ), [currentUser, trainings]);
+  const sectors = useVisibleSectorsWithStats(currentUser, getSectorSummaries(), trainings);
 
   return (
     <div className="dashboard-wrapper">

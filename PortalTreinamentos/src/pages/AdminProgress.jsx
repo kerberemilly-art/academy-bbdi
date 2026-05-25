@@ -1,10 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, BarChart3, CheckCircle, ClipboardList, Target, Users } from 'lucide-react';
 import { modulesData } from '../data/modulesData';
 import { getLatestResultsByUser, getQuizResults, getTrainingTests } from '../api/progressStorage';
 import { getUsers } from '../api/usersStorage';
 import { sectorsData } from '../data/sectorsData';
+import { fetchTrainings, getCachedTrainings } from '../api/trainingAdminApi';
 import { getUserDepartmentIds, isSuperAdmin } from '../data/sectorAccess';
 import './AdminProgress.css';
 
@@ -31,21 +32,21 @@ const AdminProgress = ({ currentUser }) => {
   const [selectedUserId, setSelectedUserId] = useState('');
   const [results] = useState(() => getQuizResults());
   const [users] = useState(() => getUsers());
+  const [trainings, setTrainings] = useState(() => getCachedTrainings());
+
+  useEffect(() => {
+    fetchTrainings().then(setTrainings).catch(() => {});
+  }, []);
+
   const isMaster = isSuperAdmin(currentUser);
   const accessibleDepartmentIds = isMaster
     ? sectorsData.map((sector) => sector.id)
     : getUserDepartmentIds(currentUser);
-  const accessibleModuleIds = useMemo(() => {
-    const moduleIds = sectorsData
-      .filter((sector) => accessibleDepartmentIds.includes(sector.id))
-      .flatMap((sector) => sector.moduleIds ?? []);
 
-    return [...new Set(moduleIds.map((moduleId) => String(moduleId)))];
-  }, [accessibleDepartmentIds]);
-
-  const tests = useMemo(() => getTrainingTests(modulesData).filter(
-    (test) => accessibleModuleIds.includes(test.moduleId),
-  ), [accessibleModuleIds]);
+  const tests = useMemo(() => {
+    const allTests = getTrainingTests(modulesData, trainings);
+    return allTests.filter((test) => accessibleDepartmentIds.includes(test.departmentId || sectorsData.find(s => s.moduleIds.map(String).includes(test.moduleId))?.id));
+  }, [accessibleDepartmentIds, trainings]);
   const collaborators = useMemo(
     () => users.filter((user) => user.role !== 'master' && user.role !== 'admin' && (
       isMaster || getUserDepartmentIds(user).some((departmentId) => accessibleDepartmentIds.includes(departmentId))

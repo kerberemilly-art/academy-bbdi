@@ -1,5 +1,6 @@
 import { modulesData } from './modulesData';
 import { sectorsData } from './sectorsData';
+import { readBackendSlice } from '../api/backendSync';
 import {
   Battery,
   Zap,
@@ -38,7 +39,8 @@ import {
   Users,
   Megaphone,
   Compass,
-  Briefcase
+  Briefcase,
+  BookOpen
 } from 'lucide-react';
 
 const modulePresentation = {
@@ -97,7 +99,7 @@ export const getModulesForSector = (sectorId) => {
     return [];
   }
 
-  return sector.moduleIds
+  const baseModules = sector.moduleIds
     .map((moduleId) => {
       const moduleInfo = modulesData[moduleId];
       const presentation = modulePresentation[moduleId];
@@ -114,6 +116,40 @@ export const getModulesForSector = (sectorId) => {
       };
     })
     .filter(Boolean);
+
+  const trainings = readBackendSlice('trainings', []);
+  const sectorTrainings = trainings.filter(t => String(t.departmentId) === String(sectorId));
+  
+  const dynamicModulesMap = {};
+  const hardcodedIds = sector.moduleIds.map(String);
+
+  sectorTrainings.forEach((t) => {
+    const tModIdStr = String(t.moduleId || '').trim();
+    if (!tModIdStr) return;
+
+    if (!hardcodedIds.includes(tModIdStr)) {
+      const lower = tModIdStr.toLowerCase();
+      if (!dynamicModulesMap[lower]) {
+        dynamicModulesMap[lower] = {
+          id: tModIdStr,
+          title: tModIdStr,
+          description: t.description || 'Treinamento personalizado.',
+          icon: BookOpen,
+          color: sector.color || '#3b82f6',
+          count: 0,
+          progress: 0,
+          levels: [
+            { id: 'basico', title: 'Básico' },
+            { id: 'intermediario', title: 'Intermediário' },
+            { id: 'avancado', title: 'Avançado' }
+          ]
+        };
+      }
+      dynamicModulesMap[lower].count += 1;
+    }
+  });
+
+  return [...baseModules, ...Object.values(dynamicModulesMap)];
 };
 
 export const getSectorSummary = (sectorId) => {
@@ -124,11 +160,34 @@ export const getSectorSummary = (sectorId) => {
   }
 
   const modules = getModulesForSector(sectorId);
+  const trainings = readBackendSlice('trainings', []);
+  const sectorTrainings = trainings.filter(t => String(t.departmentId) === String(sectorId));
+
+  const filteredModules = modules.filter(m => {
+    const idNum = Number(m.id);
+    if (!isNaN(idNum) && idNum >= 1 && idNum <= 8) return true;
+
+    const originalMod = modulesData[m.id];
+    if (originalMod && originalMod.levels && originalMod.levels.some(l => l.lesson)) return true;
+
+    const hasCustomTraining = sectorTrainings.some((t) => {
+      const tModLower = String(t.moduleId).trim().toLowerCase();
+      const mIdLower = String(m.id).trim().toLowerCase();
+      const mTitleLower = String(m.title).trim().toLowerCase();
+      return tModLower === mIdLower || tModLower === mTitleLower;
+    });
+
+    if (hasCustomTraining) return true;
+
+    if (!originalMod) return true;
+
+    return false;
+  });
 
   return {
     ...sector,
-    modules,
-    moduleCount: modules.length,
+    modules: filteredModules,
+    moduleCount: filteredModules.length,
   };
 };
 
@@ -136,3 +195,20 @@ export const getSectorSummaries = () => sectorsData.map((sector) => {
   const summary = getSectorSummary(sector.id);
   return summary;
 });
+
+export const getSectorIdByModuleId = (moduleId) => {
+  const sector = sectorsData.find((s) => s.moduleIds.map(String).includes(String(moduleId)));
+  if (sector) return sector.id;
+
+  const trainings = readBackendSlice('trainings', []);
+  const customTraining = trainings.find((t) => String(t.moduleId).trim().toLowerCase() === String(moduleId).trim().toLowerCase());
+  return customTraining?.departmentId;
+};
+
+export const getModuleById = (moduleId) => {
+  const sectorId = getSectorIdByModuleId(moduleId);
+  if (!sectorId) return null;
+
+  const modules = getModulesForSector(sectorId);
+  return modules.find((m) => String(m.id).trim().toLowerCase() === String(moduleId).trim().toLowerCase());
+};
