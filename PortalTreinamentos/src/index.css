@@ -209,15 +209,15 @@ h1, h2, h3, h4 {
 /* ── Theme Toggle ── */
 .theme-toggle {
   position: fixed;
-  right: 28px;
-  bottom: 28px;
-  z-index: 1000;
-  padding: 16px;
-  border-radius: 18px;
+  right: 20px;
+  top: 20px;
+  z-index: 999999; /* Massive z-index to be above EVERYTHING */
+  padding: 10px;
+  border-radius: 12px;
   background: var(--bg-secondary);
   color: var(--text-secondary);
-  border: 1px solid var(--panel-border);
-  box-shadow: var(--shadow-lg);
+  border: 2px solid var(--accent-color); /* Add border to make it visible */
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
   cursor: pointer;
   display: flex;
   align-items: center;
