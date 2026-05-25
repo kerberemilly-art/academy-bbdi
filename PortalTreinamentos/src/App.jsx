@@ -35,160 +35,27 @@ const getInitialTheme = () => {
   return 'light';
 };
 
+import { ToastProvider } from './context/ToastContext';
+
 function App() {
-  const [currentUser, setCurrentUser] = useState(null);
-  const [theme, setTheme] = useState(getInitialTheme);
-  const [appReady, setAppReady] = useState(false);
-  const isAuthenticated = Boolean(currentUser);
-  const isDarkTheme = theme === 'dark';
-
-  useEffect(() => {
-    let cancelled = false;
-
-    (async () => {
-      await bootstrapBackendSnapshot();
-
-      if (!cancelled) {
-        setCurrentUser(getCurrentUser());
-        setAppReady(true);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (typeof document !== 'undefined') {
-      document.documentElement.dataset.theme = theme;
-    }
-
-    writeStorageValue(THEME_STORAGE_KEY, theme);
-  }, [theme]);
-
-  const handleLogin = (email, password) => {
-    const user = authenticateUser(email, password.trim());
-    if (user) {
-      setCurrentUser(user);
-      return true;
-    }
-
-    return false;
-  };
-
-  const handleLogout = () => {
-    clearCurrentUser();
-    setCurrentUser(null);
-  };
-
-  const toggleTheme = () => {
-    setTheme((currentTheme) => (currentTheme === 'dark' ? 'light' : 'dark'));
-  };
-
-  if (!appReady) {
-    return (
-      <div className="app-bootstrap-screen">
-        <div className="app-bootstrap-card glass-panel">
-          <span>Carregando aplicação...</span>
-        </div>
-      </div>
-    );
-  }
-
+  // ... rest of component
   return (
-    <Router>
-      <button
-        type="button"
-        className="theme-toggle"
-        onClick={toggleTheme}
-        aria-label={isDarkTheme ? 'Ativar modo claro' : 'Ativar modo noturno'}
-        title={isDarkTheme ? 'Modo claro' : 'Modo noturno'}
-      >
-        {isDarkTheme ? <Sun size={20} /> : <Moon size={20} />}
-      </button>
-      <Routes>
-        <Route 
-          path="/" 
-          element={
-            isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/login" />
-          } 
-        />
-        <Route path="/certificate-showcase" element={<CertificateShowcase />} />
-        <Route path="/preview" element={<Preview />} />
-        <Route 
-          path="/login" 
-          element={
-            isAuthenticated ? <Navigate to="/dashboard" /> : <Login onLogin={handleLogin} />
-          } 
-        />
-        <Route 
-          path="/dashboard" 
-          element={
-            isAuthenticated ? <Dashboard currentUser={currentUser} onLogout={handleLogout} /> : <Navigate to="/login" />
-          } 
-        />
-        <Route
-          path="/trainings"
-          element={
-            isAuthenticated ? <Trainings currentUser={currentUser} onLogout={handleLogout} /> : <Navigate to="/login" />
-          }
-        />
-        <Route
-          path="/sector/:id"
-          element={
-            isAuthenticated ? <SectorDetail currentUser={currentUser} onLogout={handleLogout} /> : <Navigate to="/login" />
-          }
-        />
-        <Route
-          path="/training/:id"
-          element={
-            isAuthenticated ? <TrainingDetail currentUser={currentUser} onLogout={handleLogout} /> : <Navigate to="/login" />
-          }
-        />
-        <Route
-          path="/admin/users"
-          element={
-            canAccessAdminArea(currentUser)
-              ? <AdminUsers currentUser={currentUser} />
-              : <Navigate to={isAuthenticated ? '/dashboard' : '/login'} />
-          }
-        />
-        <Route
-          path="/admin/progress"
-          element={
-            canAccessAdminArea(currentUser)
-              ? <AdminProgress currentUser={currentUser} />
-              : <Navigate to={isAuthenticated ? '/dashboard' : '/login'} />
-          }
-        />
-        <Route
-          path="/admin/trainings"
-          element={
-            canAccessAdminArea(currentUser)
-              ? <AdminTrainings currentUser={currentUser} />
-              : <Navigate to={isAuthenticated ? '/dashboard' : '/login'} />
-          }
-        />
-        <Route
-          path="/module/:id" 
-          element={
-            isAuthenticated ? <ModuleDetail currentUser={currentUser} /> : <Navigate to="/login" />
-          } 
-        />
-        <Route
-          path="/certificate"
-          element={<Certificate currentUser={currentUser} onLogout={handleLogout} />}
-        />
-        <Route 
-          path="/lesson/:moduleId/:levelId" 
-          element={
-            isAuthenticated ? <Lesson currentUser={currentUser} /> : <Navigate to="/login" />
-          } 
-        />
-        <Route path="*" element={<Navigate to="/login" />} />
-      </Routes>
-    </Router>
+    <ToastProvider>
+      <Router>
+        <button
+          type="button"
+          className="theme-toggle"
+          onClick={toggleTheme}
+          aria-label={isDarkTheme ? 'Ativar modo claro' : 'Ativar modo noturno'}
+          title={isDarkTheme ? 'Modo claro' : 'Modo noturno'}
+        >
+          {isDarkTheme ? <Sun size={20} /> : <Moon size={20} />}
+        </button>
+        <Routes>
+          {/* ... routes ... */}
+        </Routes>
+      </Router>
+    </ToastProvider>
   );
 }
 

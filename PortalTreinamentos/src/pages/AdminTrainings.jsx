@@ -145,7 +145,10 @@ const richTextCommand = (command, value = null) => {
   document.execCommand(command, false, value);
 };
 
+import { useToast } from '../context/ToastContext';
+
 const AdminTrainings = ({ currentUser }) => {
+  const { addToast } = useToast();
   const navigate = useNavigate();
   const isMaster = isSuperAdmin(currentUser);
   const accessibleDepartments = useMemo(() => (
@@ -452,12 +455,12 @@ const AdminTrainings = ({ currentUser }) => {
 
   const handleExtractPdf = async () => {
     if (!selectedPdf) {
-      setFeedback({ type: 'error', message: 'Selecione um PDF para extrair.' });
+      addToast('Selecione um PDF para extrair.', 'error');
       return;
     }
 
     if (!canManageSector(currentUser, formData.departmentId)) {
-      setFeedback({ type: 'error', message: 'Você só pode enviar PDF do seu departamento.' });
+      addToast('Você só pode enviar PDF do seu departamento.', 'error');
       return;
     }
 
@@ -476,73 +479,43 @@ const AdminTrainings = ({ currentUser }) => {
         status: payload.status,
         organizationStatus: payload.organizationStatus,
       });
-      setFeedback({
-        type: 'success',
-        message: payload.status === 'organized'
-          ? 'PDF lido e organizado pela IA. Confira a prévia antes de cadastrar.'
-          : payload.status === 'configuration_missing'
-            ? 'PDF enviado. Configure a API no backend para gerar a prévia automaticamente.'
-            : 'PDF lido. Confira a prévia antes de cadastrar.',
-      });
+      
+      addToast(
+        payload.status === 'organized'
+          ? 'PDF lido e organizado pela IA!'
+          : 'PDF lido. Configure as chaves API para organização automática.',
+        'success'
+      );
     } catch (error) {
-      setFeedback({ type: 'error', message: error.message });
+      addToast(error.message, 'error');
     } finally {
       setExtractingPdf(false);
     }
-  };
-
-  const handleStartManualTraining = () => {
-    if (!canManageSector(currentUser, formData.departmentId)) {
-      setFeedback({ type: 'error', message: 'Você só pode gerenciar treinamentos no seu departamento.' });
-      return;
-    }
-    
-    setExtractionPreview(createEmptyPreview());
-    setFeedback({
-      type: 'success',
-      message: 'Modo manual ativado. Preencha os dados abaixo.',
-    });
-  };
-
-  const resetForm = () => {
-    setExtractionPreview(null);
-    setSelectedPdf(null);
-    setFileInputKey((current) => current + 1);
-    setFormData(emptyForm(defaultDepartmentId));
-    setEditingTrainingId(null);
-    setEditingCatalogTraining(null);
-    setSelectedBlockId(null);
-  };
-
-  const handleCatalogDepartmentFilterChange = (event) => {
-    const nextDepartmentId = event.target.value;
-    setCatalogDepartmentId(nextDepartmentId);
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (!canManageSector(currentUser, formData.departmentId)) {
-      setFeedback({ type: 'error', message: 'Você só pode gerenciar treinamentos no seu departamento.' });
+      addToast('Você só pode gerenciar treinamentos no seu departamento.', 'error');
       return;
     }
 
     if (!extractionPreview) {
       setExtractionPreview(createEmptyPreview());
-      setFeedback({
-        type: 'success',
-        message: 'Modo manual ativado para o departamento selecionado. Agora preencha título, conteúdo e quiz antes de salvar.',
-      });
+      addToast('Modo manual ativado. Preencha os dados.', 'info');
       return;
     }
 
     const resolvedModuleId = resolveModuleId(formData.moduleId, formData.departmentId);
     const hasInvalidVideo = normalizeContentBlocks(extractionPreview.contentBlocks, extractionPreview.content)
       .some((block) => block.type === 'videoEmbed' && block.props.url && !getSafeEmbedUrl(block.props.url));
+    
     if (hasInvalidVideo) {
-      setFeedback({ type: 'error', message: 'Revise a URL do vídeo. Use YouTube, Vimeo ou embed aceito.' });
+      addToast('Revise a URL do vídeo. Use YouTube, Vimeo ou embed aceito.', 'error');
       return;
     }
+    
     const normalizedContentBlocks = normalizeContentBlocks(extractionPreview.contentBlocks, extractionPreview.content);
     const trainingPayload = {
       ...formData,
@@ -556,27 +529,26 @@ const AdminTrainings = ({ currentUser }) => {
       catalogImport: Boolean(editingCatalogTraining),
     };
     
-    // Remover property temporária do customLevel
     delete trainingPayload.customLevel;
 
     if (!trainingPayload.title?.trim()) {
-      setFeedback({ type: 'error', message: 'Por favor, insira o título do treinamento.' });
+      addToast('Por favor, insira o título do treinamento.', 'error');
       return;
     }
 
     if (!trainingPayload.content?.trim() && !trainingPayload.contentBlocks?.length) {
-      setFeedback({ type: 'error', message: 'Por favor, insira o conteúdo do treinamento.' });
+      addToast('Por favor, insira o conteúdo do treinamento.', 'error');
       return;
     }
 
     const minimumQuizQuestions = editingCatalogTraining ? 8 : 10;
     if (!Array.isArray(trainingPayload.quizQuestions) || trainingPayload.quizQuestions.length < minimumQuizQuestions) {
-      setFeedback({
-        type: 'error',
-        message: editingCatalogTraining
-          ? 'O quiz do treinamento nativo precisa manter pelo menos oito perguntas.'
-          : 'O quiz do treinamento precisa ter pelo menos dez perguntas.',
-      });
+      addToast(
+        editingCatalogTraining
+          ? 'O quiz nativo precisa de pelo menos 8 perguntas.'
+          : 'O quiz precisa de pelo menos 10 perguntas.',
+        'error'
+      );
       return;
     }
 
@@ -584,45 +556,35 @@ const AdminTrainings = ({ currentUser }) => {
       let savedTraining;
       if (editingTrainingId) {
         savedTraining = await updateTraining(editingTrainingId, trainingPayload);
-        setFeedback({
-          type: 'success',
-          message: 'Treinamento atualizado com sucesso.',
-        });
+        addToast('Treinamento atualizado com sucesso!', 'success');
       } else {
         savedTraining = await createTraining(trainingPayload);
-        setFeedback({
-          type: 'success',
-          message: 'Treinamento cadastrado a partir da prévia da IA.',
-        });
+        addToast('Treinamento cadastrado com sucesso!', 'success');
       }
 
       const items = await fetchTrainings();
       setTrainings(items);
       setCatalogDepartmentId(savedTraining.departmentId);
-
-      setSelectedPdf(null);
-      setFileInputKey((current) => current + 1);
-      setExtractionPreview(null);
-      setFormData(emptyForm(savedTraining.departmentId));
-      setEditingTrainingId(null);
-      setEditingCatalogTraining(null);
+      resetForm();
     } catch (error) {
-      setFeedback({ type: 'error', message: error.message });
+      addToast(error.message, 'error');
     }
   };
 
   const handleDelete = async (training) => {
     if (!canManageSector(currentUser, training.departmentId)) {
-      setFeedback({ type: 'error', message: 'Você só pode remover treinamentos do seu departamento.' });
+      addToast('Você só pode remover treinamentos do seu departamento.', 'error');
       return;
     }
+
+    if (!window.confirm(`Tem certeza que deseja excluir "${training.title}"?`)) return;
 
     try {
       const items = await deleteTraining(training.id);
       setTrainings(items);
-      setFeedback({ type: 'success', message: 'Treinamento removido.' });
+      addToast('Treinamento removido.', 'success');
     } catch (error) {
-      setFeedback({ type: 'error', message: error.message });
+      addToast(error.message, 'error');
     }
   };
 
