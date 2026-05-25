@@ -18,7 +18,6 @@ const readSnapshot = () => ({
   users: readStorageJSON(USERS_STORAGE_KEY, []),
   results: readStorageJSON(RESULTS_STORAGE_KEY, []),
   certificates: readStorageJSON(CERTIFICATES_STORAGE_KEY, []),
-  trainings: [],
 });
 
 const writeSnapshot = (snapshot) => {
@@ -32,7 +31,7 @@ const setCachedSnapshot = (snapshot) => {
     users: Array.isArray(snapshot?.users) ? snapshot.users : [],
     results: Array.isArray(snapshot?.results) ? snapshot.results : [],
     certificates: Array.isArray(snapshot?.certificates) ? snapshot.certificates : [],
-    trainings: Array.isArray(snapshot?.trainings) ? snapshot.trainings : [],
+    trainings: cachedSnapshot.trainings, // Keep existing trainings in cache
   };
 };
 
@@ -40,7 +39,6 @@ const hasSnapshotData = (snapshot) => (
   Array.isArray(snapshot?.users) && snapshot.users.length > 0
   || Array.isArray(snapshot?.results) && snapshot.results.length > 0
   || Array.isArray(snapshot?.certificates) && snapshot.certificates.length > 0
-  || Array.isArray(snapshot?.trainings) && snapshot.trainings.length > 0
 );
 
 const hasBusinessSnapshotData = (snapshot) => (
