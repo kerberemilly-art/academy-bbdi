@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -11,6 +12,10 @@ import (
 )
 
 var db *sql.DB
+
+type SeedPayload struct {
+	Trainings []TrainingPayload `json:"trainings"`
+}
 
 func InitDB() {
 	var err error
@@ -67,5 +72,64 @@ func InitDB() {
 		db.Exec(query)
 	}
 
+	SeedTrainingsIfEmpty()
+
 	fmt.Println("Database initialized successfully.")
+}
+
+func SeedTrainingsIfEmpty() {
+	var trainingCount int
+	if err := db.QueryRow("SELECT COUNT(*) FROM trainings").Scan(&trainingCount); err != nil {
+		log.Printf("Error counting trainings for seed: %v\n", err)
+		return
+	}
+
+	if trainingCount > 0 {
+		return
+	}
+
+	seedPath := "seed_trainings.json"
+	raw, err := os.ReadFile(seedPath)
+	if err != nil {
+		if !os.IsNotExist(err) {
+			log.Printf("Error reading seed file: %v\n", err)
+		}
+		return
+	}
+
+	var payload SeedPayload
+	if err := json.Unmarshal(raw, &payload); err != nil {
+		log.Printf("Error parsing seed trainings: %v\n", err)
+		return
+	}
+
+	seeded := 0
+	for _, training := range payload.Trainings {
+		if training.DepartmentID == "" || training.Title == "" {
+			continue
+		}
+
+		if training.Level == "" {
+			training.Level = "basico"
+		}
+		if training.Status == "" {
+			training.Status = "published"
+		}
+		if training.CreatedAt == "" {
+			training.CreatedAt = "2026-05-22T18:00:54.886981"
+		}
+		if training.UpdatedAt == "" {
+			training.UpdatedAt = training.CreatedAt
+		}
+
+		if err := SaveTraining(training); err != nil {
+			log.Printf("Error seeding training %q: %v\n", training.Title, err)
+			continue
+		}
+		seeded++
+	}
+
+	if seeded > 0 {
+		log.Printf("Seeded %d training(s) from %s\n", seeded, seedPath)
+	}
 }

@@ -1,0 +1,139 @@
+{
+  "trainings": [
+    {
+      "id": "custom-fontes-basico-estoque",
+      "departmentId": "estoque",
+      "title": "Treinamento em Fontes Básico",
+      "description": "**Aprenda** sobre a função da fonte de um notebook, suas principais características e como identificar a fonte correta para o seu equipamento.",
+      "createdAt": "2026-05-22T18:00:54.886981",
+      "updatedAt": "2026-05-22T18:00:54.886981",
+      "status": "published",
+      "moduleId": "9",
+      "level": "basico",
+      "content": "## Introdução às Fontes\n\nA principal função da fonte para notebook é fazer a conversão da energia alternada (100/240V) para a energia contínua, com a tensão necessária para o equipamento, variando entre 15V e 24V.\n\n> 💡 **Dica:** Sem a fonte, não é possível a alimentação do equipamento.\n\nA fonte é um item essencial para o notebook funcionar corretamente.\n\n## Principais Características de uma Fonte\n\n- **Voltagem**: a tensão de saída da fonte.\n- **Amperagem**: a corrente de saída da fonte.\n- **Potência**: o resultado da multiplicação da voltagem pela amperagem.\n\n> ⚠️ **Importante:** A potência da fonte deve ser compatível com a necessidade do notebook.\n\n## Pinos de Conexão e Cabos\n\nOs pinos de conexão podem variar de marca para marca ou de modelo para modelo.\n\nA forma como medimos estes conectores é analisando o diâmetro externo e o diâmetro interno do conector.\n\n> 💡 **Dica:** Os cabos de conexão não influenciam na fonte, mas os pinos de conexão sim.\n\n## Pinos Macho e Fêmea\n\nTemos pinos de dois tipos: **macho** e **fêmea**.\n\nO pino macho tem um pino externo, enquanto o pino fêmea não possui esse pino.\n\n> ⚠️ **Importante:** A escolha do pino correto é fundamental para uma conexão segura.\n\n## Principais Pinos de Conexão e Marcas\n\nExistem várias marcas e modelos de pinos de conexão, cada um com suas próprias especificações.\n\nÉ importante consultar a tabela de pinos de conexão para determinar o pino correto para o notebook.\n\n> 💡 **Dica:** A tabela de pinos pode ser consultada no manual do notebook ou em catálogos técnicos.",
+      "quizQuestions": [
+        {
+          "id": "q-1",
+          "question": "Qual é a principal função da fonte de um notebook?",
+          "options": [
+            "Fazer a conversão da energia alternada para a energia contínua",
+            "Fazer a conversão da energia contínua para a energia alternada",
+            "Armazenar energia para o notebook",
+            "Proteger o notebook contra impactos"
+          ],
+          "answerIndex": 0,
+          "explanation": "A fonte converte a energia alternada da tomada em energia contínua adequada para o notebook."
+        },
+        {
+          "id": "q-2",
+          "question": "Quais são as principais características de uma fonte para notebook?",
+          "options": [
+            "Voltagem, amperagem e potência",
+            "Voltagem, corrente e cabo USB",
+            "Potência, tela e bateria",
+            "Amperagem, cooler e conector HDMI"
+          ],
+          "answerIndex": 0,
+          "explanation": "Voltagem, amperagem e potência são os dados básicos para validar a compatibilidade da fonte."
+        },
+        {
+          "id": "q-3",
+          "question": "Como medimos os conectores de uma fonte?",
+          "options": [
+            "Pelo diâmetro externo e interno do conector",
+            "Pelo comprimento total do cabo",
+            "Pelo peso da fonte",
+            "Pela temperatura máxima do transformador"
+          ],
+          "answerIndex": 0,
+          "explanation": "A medida correta do conector depende dos diâmetros externo e interno."
+        },
+        {
+          "id": "q-4",
+          "question": "Quais são os dois tipos de pinos de conexão mencionados no treinamento?",
+          "options": [
+            "Macho e fêmea",
+            "Positivo e negativo",
+            "Interno e externo",
+            "Curto e longo"
+          ],
+          "answerIndex": 0,
+          "explanation": "O treinamento diferencia os pinos entre macho e fêmea."
+        },
+        {
+          "id": "q-5",
+          "question": "Por que a escolha do pino correto é importante?",
+          "options": [
+            "Porque é fundamental para a conexão segura do notebook",
+            "Porque melhora o brilho da tela",
+            "Porque reduz o peso do equipamento",
+            "Porque aumenta a memória RAM"
+          ],
+          "answerIndex": 0,
+          "explanation": "Um pino incorreto pode comprometer a conexão e causar problemas no equipamento."
+        },
+        {
+          "id": "q-6",
+          "question": "A potência da fonte deve ser compatível com qual fator?",
+          "options": [
+            "Com a necessidade do notebook",
+            "Com a cor do equipamento",
+            "Com o tamanho do teclado",
+            "Com a resolução da webcam"
+          ],
+          "answerIndex": 0,
+          "explanation": "A potência precisa atender a demanda elétrica do notebook."
+        },
+        {
+          "id": "q-7",
+          "question": "Sem a fonte, o que acontece com o notebook segundo o treinamento?",
+          "options": [
+            "Não é possível alimentá-lo adequadamente",
+            "Ele funciona normalmente com qualquer cabo",
+            "Ele passa a usar menos energia",
+            "Ele entra automaticamente em modo de segurança"
+          ],
+          "answerIndex": 0,
+          "explanation": "A fonte é essencial para alimentar o equipamento."
+        },
+        {
+          "id": "q-8",
+          "question": "Os cabos de conexão influenciam diretamente na fonte?",
+          "options": [
+            "Não, mas os pinos de conexão influenciam",
+            "Sim, sempre definem a potência",
+            "Sim, são mais importantes que a voltagem",
+            "Não, porque não há diferença entre cabos"
+          ],
+          "answerIndex": 0,
+          "explanation": "O treinamento destaca que os pinos importam para a compatibilidade, não simplesmente o cabo."
+        },
+        {
+          "id": "q-9",
+          "question": "Onde a tabela de pinos de conexão pode ser consultada?",
+          "options": [
+            "No manual do notebook ou em catálogos técnicos",
+            "Apenas na embalagem da bateria",
+            "Somente no sistema operacional",
+            "Exclusivamente na BIOS do equipamento"
+          ],
+          "answerIndex": 0,
+          "explanation": "O treinamento cita o manual e materiais técnicos como fontes de consulta."
+        },
+        {
+          "id": "q-10",
+          "question": "Qual faixa de tensão é citada como necessária para o equipamento?",
+          "options": [
+            "Entre 15V e 24V",
+            "Entre 5V e 9V",
+            "Entre 24V e 48V",
+            "Entre 110V e 220V"
+          ],
+          "answerIndex": 0,
+          "explanation": "O conteúdo informa que a tensão contínua necessária ao equipamento pode variar entre 15V e 24V."
+        }
+      ],
+      "contentBlocks": []
+    }
+  ]
+}

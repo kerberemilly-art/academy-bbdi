@@ -28,6 +28,11 @@ func main() {
 	envPath := filepath.Join(filepath.Dir(workDir), ".env")
 	godotenv.Load(envPath) // ignore error if it doesn't exist
 
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8787"
+	}
+
 	InitDB()
 
 	r := chi.NewRouter()
@@ -41,7 +46,7 @@ func main() {
 	}))
 
 	r.Get("/api/health", func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode(map[string]interface{}{"ok": true, "port": 8787})
+		json.NewEncoder(w).Encode(map[string]interface{}{"ok": true, "port": port})
 	})
 
 	r.Get("/api/state", func(w http.ResponseWriter, r *http.Request) {
@@ -152,11 +157,6 @@ func main() {
 		fileInfo, _ := file.Stat()
 		http.ServeContent(w, r, filePath, fileInfo.ModTime(), file.(io.ReadSeeker))
 	})
-
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8787"
-	}
 
 	fmt.Printf("Go Backend listening on port %s...\n", port)
 	log.Fatal(http.ListenAndServe(":"+port, r))

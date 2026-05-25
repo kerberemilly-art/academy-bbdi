@@ -11,7 +11,7 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Build do Backend (Go)
-FROM golang:alpine AS backend-builder
+FROM golang:1.25-alpine AS backend-builder
 WORKDIR /app
 
 # Baixa as dependências do Go separadamente para otimizar o cache do Docker
