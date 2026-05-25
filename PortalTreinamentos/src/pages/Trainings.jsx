@@ -1,6 +1,9 @@
 import { ArrowLeft, BookOpen, LogOut } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { fetchTrainings } from '../api/trainingAdminApi';
 import SectorCard from '../components/SectorCard';
+import { getBuiltinTrainings } from '../data/adminTrainingCatalog';
 import { getSectorSummaries } from '../data/trainingCatalog';
 import { canAccessSector } from '../data/sectorAccess';
 import './Dashboard.css';
@@ -8,7 +11,48 @@ import './Dashboard.css';
 const Trainings = ({ currentUser, onLogout }) => {
   const navigate = useNavigate();
   const displayName = currentUser.name?.trim() || 'Usuário';
-  const sectors = getSectorSummaries().filter((sector) => canAccessSector(currentUser, sector.id));
+  const [trainings, setTrainings] = useState([]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetchTrainings()
+      .then((items) => {
+        if (!cancelled) {
+          setTrainings(items);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setTrainings([]);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const sectors = useMemo(() => (
+    (() => {
+      const filteredSectors = getSectorSummaries()
+        .filter((sector) => canAccessSector(currentUser, sector.id));
+      const builtinTrainings = getBuiltinTrainings(filteredSectors);
+      const customTrainingKeys = new Set(
+        trainings.map((training) => `${training.departmentId}:${String(training.moduleId)}:${training.level}`)
+      );
+
+      return filteredSectors.map((sector) => ({
+        ...sector,
+        moduleCount:
+          trainings.filter((training) => training.departmentId === sector.id).length
+          + builtinTrainings.filter((training) => (
+            training.departmentId === sector.id
+            && !customTrainingKeys.has(`${training.departmentId}:${String(training.moduleId)}:${training.level}`)
+          )).length,
+      }));
+    })()
+  ), [currentUser, trainings]);
 
   return (
     <div className="dashboard-wrapper">

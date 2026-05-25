@@ -16,6 +16,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 )
 
@@ -77,16 +78,19 @@ func main() {
 		}
 		
 		if t.ID == "" {
-			t.ID = "custom-" + time.Now().Format("20060102150405") // fallback if we don't have a uuid generator, or we can use crypto/rand
+			t.ID = "custom-" + uuid.NewString()
 		}
 		if t.CreatedAt == "" {
 			t.CreatedAt = time.Now().Format(time.RFC3339)
 		}
 		if t.UpdatedAt == "" {
-			t.UpdatedAt = time.Now().Format(time.RFC3339)
+			t.UpdatedAt = t.CreatedAt
 		}
-		
-		SaveTraining(t)
+
+		if err := SaveTraining(t); err != nil {
+			http.Error(w, `{"ok":false,"error":"Não foi possível salvar o treinamento."}`, http.StatusInternalServerError)
+			return
+		}
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]interface{}{"ok": true, "training": t, "trainings": GetTrainings()})
 	})
@@ -99,14 +103,23 @@ func main() {
 			return
 		}
 		t.ID = id
-		SaveTraining(t)
+		if t.UpdatedAt == "" {
+			t.UpdatedAt = time.Now().Format(time.RFC3339)
+		}
+		if err := SaveTraining(t); err != nil {
+			http.Error(w, `{"ok":false,"error":"Não foi possível atualizar o treinamento."}`, http.StatusInternalServerError)
+			return
+		}
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]interface{}{"ok": true, "training": t, "trainings": GetTrainings()})
 	})
 
 	r.Delete("/api/trainings/{id}", func(w http.ResponseWriter, r *http.Request) {
 		id := chi.URLParam(r, "id")
-		DeleteTraining(id)
+		if err := DeleteTraining(id); err != nil {
+			http.Error(w, `{"ok":false,"error":"Não foi possível remover o treinamento."}`, http.StatusInternalServerError)
+			return
+		}
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]interface{}{"ok": true, "trainings": GetTrainings()})
 	})

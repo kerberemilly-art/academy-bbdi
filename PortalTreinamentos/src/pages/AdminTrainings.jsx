@@ -132,6 +132,15 @@ const blockMenu = [
   { type: 'videoEmbed', label: 'Video', icon: Video },
 ];
 
+const createEmptyPreview = () => ({
+  title: '',
+  description: '',
+  content: '',
+  contentBlocks: [],
+  quizQuestions: [],
+  status: 'organized',
+});
+
 const richTextCommand = (command, value = null) => {
   document.execCommand(command, false, value);
 };
@@ -414,6 +423,7 @@ const AdminTrainings = ({ currentUser }) => {
       if (name === 'departmentId') {
         const sectorModules = getModulesForSector(value);
         updated.moduleId = sectorModules.length > 0 ? String(sectorModules[0].title) : '';
+        setCatalogDepartmentId(value);
       }
       return updated;
     });
@@ -487,14 +497,7 @@ const AdminTrainings = ({ currentUser }) => {
       return;
     }
     
-    setExtractionPreview({
-      title: '',
-      description: '',
-      content: '',
-      contentBlocks: [],
-      quizQuestions: [],
-      status: 'organized',
-    });
+    setExtractionPreview(createEmptyPreview());
     setFeedback({
       type: 'success',
       message: 'Modo manual ativado. Preencha os dados abaixo.',
@@ -525,7 +528,11 @@ const AdminTrainings = ({ currentUser }) => {
     }
 
     if (!extractionPreview) {
-      setFeedback({ type: 'error', message: 'Preencha os dados do treinamento ou extraia de um PDF antes de salvar.' });
+      setExtractionPreview(createEmptyPreview());
+      setFeedback({
+        type: 'success',
+        message: 'Modo manual ativado para o departamento selecionado. Agora preencha título, conteúdo e quiz antes de salvar.',
+      });
       return;
     }
 
@@ -1198,7 +1205,7 @@ const AdminTrainings = ({ currentUser }) => {
                 <button type="button" className="btn-outline" onClick={resetForm}>
                   {editingTrainingId || editingCatalogTraining ? 'Cancelar' : 'Limpar'}
                 </button>
-                <button type="submit" className="btn-primary" disabled={!extractionPreview || extractingPdf}>
+                <button type="submit" className="btn-primary" disabled={extractingPdf}>
                   {editingTrainingId || editingCatalogTraining ? <CheckCircle size={18} /> : <Plus size={18} />}
                   {editingTrainingId ? 'Salvar Alterações' : editingCatalogTraining ? 'Salvar Versão Editável' : 'Cadastrar Treinamento'}
                 </button>

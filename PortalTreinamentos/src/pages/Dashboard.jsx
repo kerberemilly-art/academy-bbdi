@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import SectorCard from '../components/SectorCard';
+import { getBuiltinTrainings } from '../data/adminTrainingCatalog';
 import StudyMentor from '../components/StudyMentor';
 import { getSectorSummaries } from '../data/trainingCatalog';
 import { canAccessAdminArea, canAccessSector } from '../data/sectorAccess';
@@ -44,9 +45,25 @@ const Dashboard = ({ currentUser, onLogout }) => {
   const isAdmin = currentUser.role === 'admin';
   const isAnyAdmin = isMaster || isAdmin;
 
-  const visibleSectors = isMaster
-    ? sectors
-    : sectors.filter((sector) => canAccessSector(currentUser, sector.id));
+  const visibleSectors = useMemo(() => {
+    const filteredSectors = isMaster
+      ? sectors
+      : sectors.filter((sector) => canAccessSector(currentUser, sector.id));
+    const builtinTrainings = getBuiltinTrainings(filteredSectors);
+    const customTrainingKeys = new Set(
+      trainings.map((training) => `${training.departmentId}:${String(training.moduleId)}:${training.level}`)
+    );
+
+    return filteredSectors.map((sector) => ({
+      ...sector,
+      moduleCount:
+        trainings.filter((training) => training.departmentId === sector.id).length
+        + builtinTrainings.filter((training) => (
+          training.departmentId === sector.id
+          && !customTrainingKeys.has(`${training.departmentId}:${String(training.moduleId)}:${training.level}`)
+        )).length,
+    }));
+  }, [currentUser, isMaster, sectors, trainings]);
 
   const userProgress = useMemo(
     () => getUserProgressSummary(currentUser, sectors, isAnyAdmin),
