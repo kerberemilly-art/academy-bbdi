@@ -238,6 +238,7 @@
   border: 1.5px solid;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: auto; /* Ensure cards are clickable even if columns overlap */
+  color: var(--text-primary);
 }
 
 .timeline-card:hover {
@@ -256,12 +257,24 @@
   font-size: 1.15rem;
   margin-top: 4px;
   font-weight: 700;
+  color: var(--text-primary);
 }
 
 .timeline-card .level-info p {
   font-size: 0.88rem;
   margin-bottom: 16px;
   line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+.timeline-card .level-status {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.timeline-card .level-status span {
+  color: inherit;
 }
 
 .timeline-card .btn-start {
@@ -269,6 +282,17 @@
   font-size: 0.88rem;
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+  color: #ffffff;
+  font-weight: 700;
+  border: none;
+  min-height: 42px;
+}
+
+.timeline-card .btn-start:disabled {
+  background: rgba(148, 163, 184, 0.45) !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+  cursor: not-allowed;
+  opacity: 1;
 }
 
 /* Micro-animations */
@@ -359,8 +383,23 @@
 :root[data-theme='dark'] .timeline-card {
   background: var(--panel-bg) !important;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25) !important;
+  color: var(--text-primary);
 }
 
 :root[data-theme='dark'] .timeline-card.locked-card {
   background: rgba(31, 41, 55, 0.2) !important;
+}
+
+:root[data-theme='dark'] .timeline-card .level-info h3,
+:root[data-theme='dark'] .timeline-card .level-status {
+  color: #f8fafc;
+}
+
+:root[data-theme='dark'] .timeline-card .level-info p {
+  color: #cbd5e1;
+}
+
+:root[data-theme='dark'] .timeline-card .btn-start:disabled {
+  background: rgba(148, 163, 184, 0.35) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
 }
