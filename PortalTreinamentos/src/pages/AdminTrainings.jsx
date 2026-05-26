@@ -493,6 +493,42 @@ const AdminTrainings = ({ currentUser }) => {
     }
   };
 
+  const resetForm = () => {
+    setExtractionPreview(null);
+    setSelectedPdf(null);
+    setFileInputKey((current) => current + 1);
+    setFormData(emptyForm(defaultDepartmentId));
+    setFeedback({ type: '', message: '' });
+    setEditingTrainingId(null);
+    setEditingCatalogTraining(null);
+    setSelectedBlockId(null);
+    setDragState(null);
+    setDescMode('preview');
+    setContentMode('preview');
+  };
+
+  const handleCatalogDepartmentFilterChange = (event) => {
+    setCatalogDepartmentId(event.target.value);
+  };
+
+  const handleStartManualTraining = () => {
+    if (!canManageSector(currentUser, formData.departmentId)) {
+      addToast('Você só pode criar treinamentos no seu departamento.', 'error');
+      return;
+    }
+
+    setSelectedPdf(null);
+    setFileInputKey((current) => current + 1);
+    setExtractionPreview(createEmptyPreview());
+    setFeedback({ type: '', message: '' });
+    setEditingTrainingId(null);
+    setEditingCatalogTraining(null);
+    setSelectedBlockId(null);
+    setDescMode('edit');
+    setContentMode('edit');
+    addToast('Modo manual ativado. Preencha os dados do treinamento.', 'info');
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
