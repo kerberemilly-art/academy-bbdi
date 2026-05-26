@@ -14,8 +14,16 @@ services:
     restart: unless-stopped
     environment:
       - PORT=8787
+      - PDF_EXTRACT_PROVIDER
+      - MISTRAL_API_KEY
+      - MISTRAL_OCR_MODEL
+      - MISTRAL_OCR_URL
+      - GROQ_API_KEY
+      - GROQ_CHAT_URL
+      - GROQ_TRAINING_MODEL
     env_file:
       - .env
+
 
 
 volumes:
