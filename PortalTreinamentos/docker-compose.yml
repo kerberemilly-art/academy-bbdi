@@ -14,6 +14,9 @@ services:
     restart: unless-stopped
     environment:
       - PORT=8787
+    env_file:
+      - .env
+
 
 volumes:
   portal_data:

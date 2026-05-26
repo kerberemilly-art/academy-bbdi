@@ -233,11 +233,11 @@ func PdfExtractHandler(w http.ResponseWriter, r *http.Request) {
 	organizedData, err := organizeTrainingWithGroq(ocrText, departmentId, fileName, groqKey)
 	if err != nil {
 		json.NewEncoder(w).Encode(map[string]interface{}{
-			"ok": false,
-			"status": "failed",
-			"error": fmt.Sprintf("A Groq falhou ao estruturar: %v", err),
+			"ok":     true,
+			"status": "extracted",
+			"error":  fmt.Sprintf("A Groq falhou ao estruturar: %v", err),
 			"suggestion": map[string]interface{}{
-				"title": fileName,
+				"title":   strings.TrimSuffix(fileName, ".pdf"),
 				"content": ocrText,
 			},
 		})
@@ -245,8 +245,8 @@ func PdfExtractHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"ok": true,
-		"status": "organized",
+		"ok":         true,
+		"status":     "organized",
 		"suggestion": organizedData,
 	})
 }
@@ -301,8 +301,9 @@ func extractPdfWithMistral(pdfBuffer []byte, apiKey string) (string, error) {
 		Pages []struct {
 			Markdown string `json:"markdown"`
 		} `json:"pages"`
-		Text string `json:"text"`
-		Content string `json:"content"`
+		Text     string `json:"text"`
+		Content  string `json:"content"`
+		Markdown string `json:"markdown"`
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&mistralResp); err != nil {
@@ -323,6 +324,9 @@ func extractPdfWithMistral(pdfBuffer []byte, apiKey string) (string, error) {
 	}
 	if text == "" {
 		text = mistralResp.Content
+	}
+	if text == "" {
+		text = mistralResp.Markdown
 	}
 
 	return text, nil
@@ -468,10 +472,58 @@ Atenção técnica: Seja 100% fiel às informações extraídas do documento ori
 	return finalJSON, nil
 }
 
-var consecutiveWhitespace = regexp.MustCompile(`\s+`)
+var imgRegex = regexp.MustCompile(`!\[[^\]]*]\([^)]+\)`)
+var tripleNewlineRegex = regexp.MustCompile(`\n{3,}`)
+var headingRegex = regexp.MustCompile(`^(#{1,3}\s+|\d+\)|[-*]\s+)`)
+
 func compactTrainingText(text string) string {
-	if len(text) > 40000 {
-		text = text[:40000] // limite de segurança para a Groq não dar erro de context length
+	normalizedText := imgRegex.ReplaceAllString(text, "")
+	normalizedText = tripleNewlineRegex.ReplaceAllString(normalizedText, "\n\n")
+	normalizedText = strings.TrimSpace(normalizedText)
+
+	const maxChars = 12000
+	if len(normalizedText) <= maxChars {
+		return normalizedText
 	}
-	return consecutiveWhitespace.ReplaceAllString(text, " ")
+
+	lines := strings.Split(normalizedText, "\n")
+	var headingsBuilder strings.Builder
+	for _, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		if headingRegex.MatchString(trimmed) {
+			headingsBuilder.WriteString(line)
+			headingsBuilder.WriteString("\n")
+		}
+	}
+	headings := headingsBuilder.String()
+	if len(headings) > int(maxChars*0.45) {
+		headings = headings[:int(maxChars*0.45)]
+	}
+
+	beginning := normalizedText
+	if len(beginning) > int(maxChars*0.45) {
+		beginning = beginning[:int(maxChars*0.45)]
+	}
+
+	ending := ""
+	if len(normalizedText) > int(maxChars*0.1) {
+		ending = normalizedText[len(normalizedText)-int(maxChars*0.1):]
+	}
+
+	var parts []string
+	if beginning != "" {
+		parts = append(parts, beginning)
+	}
+	if headings != "" {
+		parts = append(parts, headings)
+	}
+	if ending != "" {
+		parts = append(parts, ending)
+	}
+
+	result := strings.Join(parts, "\n\n---\n\n")
+	if len(result) > maxChars {
+		result = result[:maxChars]
+	}
+	return result
 }
