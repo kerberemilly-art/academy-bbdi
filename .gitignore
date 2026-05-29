@@ -1,8 +1,8 @@
 # Gitignore raiz
 PortalTreinamentos/node_modules/
 PortalTreinamentos/dist/
-PortalTreinamentos/backend/data/*.sqlite
-PortalTreinamentos/data/*.sqlite
+PortalTreinamentos/backend/data/
+PortalTreinamentos/data/
 PortalTreinamentos/backend/uploads/
 PortalTreinamentos/uploads/
 PortalTreinamentos/.env
