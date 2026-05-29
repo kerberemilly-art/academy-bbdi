@@ -278,7 +278,11 @@ const Lesson = ({ currentUser }) => {
           </div>
         )}
       </main>
-      <StudyMentor lessonContent={currentLessonStep?.content || ''} />
+      <StudyMentor
+        key={showQuiz ? 'lesson-quiz' : 'lesson-content'}
+        lessonContent={currentLessonStep?.content || ''}
+        disabled={showQuiz}
+      />
     </div>
   );
 };

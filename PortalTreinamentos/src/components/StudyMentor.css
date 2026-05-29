@@ -22,6 +22,28 @@
   transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
 }
 
+.study-mentor-locked {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(255, 255, 255, 0.82);
+  color: #64748b;
+  font: 700 0.82rem/1.1 system-ui, sans-serif;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(14px);
+  pointer-events: none;
+}
+
+:root[data-theme='dark'] .study-mentor-locked {
+  background: rgba(15, 23, 42, 0.92);
+  border-color: rgba(148, 163, 184, 0.2);
+  color: #cbd5e1;
+}
+
 .study-mentor-window {
   display: flex;
   flex-direction: column;

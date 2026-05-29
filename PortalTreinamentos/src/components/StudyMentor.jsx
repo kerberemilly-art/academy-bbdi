@@ -8,7 +8,7 @@ const MENTOR_API_URL = import.meta.env.VITE_BACKEND_URL
   ? `${import.meta.env.VITE_BACKEND_URL.replace(/\/$/, '')}/mentor`
   : '/api/mentor';
 
-const StudyMentor = ({ lessonContent }) => {
+const StudyMentor = ({ lessonContent, disabled = false }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
@@ -98,8 +98,15 @@ const StudyMentor = ({ lessonContent }) => {
 
   return (
     <div className="study-mentor-root">
+      {disabled && (
+        <div className="study-mentor-locked" role="status" aria-live="polite">
+          <Sparkles size={16} />
+          <span>IA bloqueada durante o quiz</span>
+        </div>
+      )}
+
       {/* Toggle Button */}
-      {!isOpen && (
+      {!disabled && !isOpen && (
         <button
           type="button"
           className="study-mentor-toggle"
@@ -111,7 +118,7 @@ const StudyMentor = ({ lessonContent }) => {
       )}
 
       {/* Chat window */}
-      {isOpen && (
+      {!disabled && isOpen && (
         <div
           className="glass-panel"
           className="study-mentor-window"
