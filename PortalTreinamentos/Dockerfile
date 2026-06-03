@@ -6,6 +6,11 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 
+ARG VITE_MASTER_EMAIL
+ARG VITE_MASTER_PASSWORD
+ENV VITE_MASTER_EMAIL=${VITE_MASTER_EMAIL}
+ENV VITE_MASTER_PASSWORD=${VITE_MASTER_PASSWORD}
+
 # Copia o restante do código do frontend e faz o build
 COPY . .
 RUN npm run build

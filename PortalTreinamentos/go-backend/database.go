@@ -62,6 +62,7 @@ func InitDB() {
 	// Alter tables (ignore errors if columns exist)
 	alterQueries := []string{
 		"ALTER TABLE app_state ADD COLUMN trainings_json TEXT NOT NULL DEFAULT '[]'",
+		"ALTER TABLE trainings ADD COLUMN content TEXT NOT NULL DEFAULT ''",
 		"ALTER TABLE trainings ADD COLUMN quiz_questions_json TEXT NOT NULL DEFAULT '[]'",
 		"ALTER TABLE trainings ADD COLUMN content_blocks_json TEXT NOT NULL DEFAULT '[]'",
 		"ALTER TABLE trainings ADD COLUMN module_id TEXT NOT NULL DEFAULT ''",
